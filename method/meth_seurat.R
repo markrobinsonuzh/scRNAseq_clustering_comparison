@@ -1,0 +1,107 @@
+#####################
+# Seurat
+#####################
+
+#load libraries
+
+library(Seurat)
+
+# file paths
+
+DATA_DIR <- "~/Desktop/masterthesis/data"
+files <- list(
+  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rds"),
+  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rds"),
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rds")
+)
+
+# load data sets
+
+data <- labels <- sys.time <-  vector("list", length(files))
+
+names(data) <- names(labels) <- names(sys.time) <- names(files)
+
+
+for (i in 1:length(data)){
+  f <- files[[i]]
+  load(f)
+  data[[i]] <- res
+  
+}
+
+# load cell labels
+for(i in 1:length(data)) {
+  labels[[i]] <- as.character(phenoData(data[[i]])@data$source_name_ch1)
+}
+
+### Run SEurat
+for (i in 1:length(data)) {
+  # create Seurat object
+  data[[i]] <- CreateSeuratObject(raw.data = counts(data[[i]]), min.cells = -Inf, min.genes = -Inf, project = "test") # use raw count_lstpm
+  ## Normalizing the data. After removing unwanted cells from the dataset, 
+  # the next step is to normalize the data. By default, we employ a global-scaling normalization method "LogNormalize" 
+  #that normalizes the gene expression measurements for each cell by the total expression, 
+  #multiplies this by a scale factor (10,000 by default), and log-transforms the result. 
+  data[[i]] <- NormalizeData(object = (data[[i]]), normalization.method = "LogNormalize", scale.factor = 1e4)
+  # Detection of variable genes across the single cells
+  data[[i]] <- FindVariableGenes(object =(data[[i]]), mean.function = ExpMean, dispersion.function = LogVMR)
+  ### Scaling the data and removing unwanted sources of variation
+  data[[i]] <- ScaleData(object = data[[i]])
+  
+}
+
+
+### Perform lin dimension reduction and cluster the cells
+
+
+for (i in 1:length(data)){
+  ### Perform linear dimensional reduction
+sys.time[[i]] <- system.time({
+data[[i]] <- RunPCA(object = data[[i]], pc.genes = data[[i]]@var.genes, do.print = FALSE)
+#data[[i]] <- JackStraw(object = data[[i]], num.replicate = 30, do.print = FALSE)
+### Cluster the cells
+# save.SNN = T saves the SNN so that the clustering algorithm can be rerun using the same graph
+# but with a different resolution value (see docs for full details)
+data[[i]] <- FindClusters(object = data[[i]], reduction.type = "pca", dims.use = 1:10, resolution = 0.6, print.output = 0, save.SNN = TRUE)
+})
+
+}
+# save clusters
+
+file_names <- paste0("~/Desktop/masterthesis/results/Seurat/seurat_clus_", 
+                     names(data), ".txt")
+
+for (i in 1:length(file_names)) {
+  res_i <- data[[i]]@ident
+  write.table(res_i, file = file_names[i], row.names = FALSE, quote = FALSE, sep = "\t")
+}
+
+
+# save systemtime
+file_names <-  paste0("~/Desktop/masterthesis/results/Seurat/Seurat_systime_",names(sys.time))
+for (i in 1:length(sys.time)){
+  sys_i <- sys.time[[i]]["elapsed"]
+  write.table(sys_i, file=file_names[i], sep="\t")
+  
+}
+
+# save experiment labels
+
+file_names <-  paste0("~/Desktop/masterthesis/results/Seurat/Seurat_labels_",names(sys.time), ".txt")
+for (i in 1:length(sys.time)){
+  sys_i <- as.data.frame(labels[[i]])
+  write.table(sys_i, file=file_names[i], sep="\t")
+  
+}
+
+
+###### Save Session Info
+sink(file = "~/Desktop/masterthesis/results/Seurat/session_info_Seurat.txt")
+sessionInfo()
+sink()
+
+##### Apendix
+
+
+
+
