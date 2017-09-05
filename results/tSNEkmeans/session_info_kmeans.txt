@@ -1,0 +1,24 @@
+R version 3.4.1 (2017-06-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+
+locale:
+[1] de_CH.UTF-8/de_CH.UTF-8/de_CH.UTF-8/C/de_CH.UTF-8/de_CH.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Rtsne_0.13      dplyr_0.7.2     caret_6.0-76    ggplot2_2.2.1   lattice_0.20-35 reshape_0.8.7  
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.12       compiler_3.4.1     nloptr_1.0.4       plyr_1.8.4         bindr_0.1          class_7.3-14       iterators_1.0.8    tools_3.4.1        digest_0.6.12     
+[10] lme4_1.1-13        tibble_1.3.4       nlme_3.1-131       gtable_0.2.0       mgcv_1.8-19        pkgconfig_2.0.1    rlang_0.1.2        Matrix_1.2-11      foreach_1.4.3     
+[19] parallel_3.4.1     SparseM_1.77       bindrcpp_0.2       e1071_1.6-8        stringr_1.2.0      MatrixModels_0.4-1 stats4_3.4.1       grid_3.4.1         nnet_7.3-12       
+[28] glue_1.1.1         R6_2.2.2           minqa_1.2.4        reshape2_1.4.2     car_2.1-5          magrittr_1.5       scales_0.5.0       codetools_0.2-15   ModelMetrics_1.1.0
+[37] MASS_7.3-47        splines_3.4.1      assertthat_0.2.0   pbkrtest_0.4-7     colorspace_1.3-2   labeling_0.3       quantreg_5.33      stringi_1.1.5      lazyeval_0.2.0    
+[46] munsell_0.4.3     

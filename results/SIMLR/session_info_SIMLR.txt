@@ -1,0 +1,46 @@
+R version 3.4.1 (2017-06-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+
+locale:
+[1] de_CH.UTF-8/de_CH.UTF-8/de_CH.UTF-8/C/de_CH.UTF-8/de_CH.UTF-8
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] igraph_1.1.2               SIMLR_1.2.1                Rtsne_0.13                 mvoutlier_2.0.8            sgeostat_1.0-27           
+ [6] bindrcpp_0.2               plyr_1.8.4                 tidyr_0.7.1                dplyr_0.7.2                scater_1.4.0              
+[11] ggplot2_2.2.1              Biobase_2.36.2             BiocGenerics_0.22.0        MultiAssayExperiment_1.2.1
+
+loaded via a namespace (and not attached):
+  [1] lazyeval_0.2.0             sp_1.2-5                   shinydashboard_0.6.1       splines_3.4.1              elliptic_1.3-7            
+  [6] GenomeInfoDb_1.12.2        digest_0.6.12              htmltools_0.3.6            viridis_0.4.0              magrittr_1.5              
+ [11] memoise_1.1.0              contfrac_1.1-11            cluster_2.0.6              limma_3.32.5               matrixStats_0.52.2        
+ [16] colorspace_1.3-2           blob_1.1.0                 rrcov_1.4-3                RCurl_1.95-4.8             tximport_1.4.0            
+ [21] lme4_1.1-13                bindr_0.1                  zoo_1.8-0                  glue_1.1.1                 scRNA.seq.funcs_0.1.0     
+ [26] gtable_0.2.0               zlibbioc_1.22.0            XVector_0.16.0             UpSetR_1.3.3               MatrixModels_0.4-1        
+ [31] DelayedArray_0.2.7         car_2.1-5                  kernlab_0.9-25             prabclus_2.2-6             DEoptimR_1.0-8            
+ [36] SparseM_1.77               VIM_4.7.0                  scales_0.5.0               mvtnorm_1.0-6              DBI_0.7                   
+ [41] GGally_1.3.2               edgeR_3.18.1               Rcpp_0.12.12               sROC_0.1-2                 viridisLite_0.2.0         
+ [46] xtable_1.8-2               laeken_0.4.6               bit_1.1-12                 mclust_5.3                 deSolve_1.20              
+ [51] stats4_3.4.1               vcd_1.4-3                  RColorBrewer_1.1-2         fpc_2.1-10                 modeltools_0.2-21         
+ [56] pkgconfig_2.0.1            reshape_0.8.7              XML_3.98-1.9               flexmix_2.3-14             nnet_7.3-12               
+ [61] locfit_1.5-9.1             labeling_0.3               rlang_0.1.2                reshape2_1.4.2             AnnotationDbi_1.38.2      
+ [66] munsell_0.4.3              tools_3.4.1                moments_0.14               RSQLite_2.0                pls_2.6-0                 
+ [71] stringr_1.2.0              cvTools_0.3.2              knitr_1.17                 bit64_0.9-7                robustbase_0.92-7         
+ [76] hypergeo_1.2-13            purrr_0.2.3                nlme_3.1-131               mime_0.5                   quantreg_5.33             
+ [81] pracma_2.0.7               biomaRt_2.32.1             compiler_3.4.1             pbkrtest_0.4-7             beeswarm_0.2.3            
+ [86] e1071_1.6-8                tibble_1.3.4               statmod_1.4.30             robCompositions_2.0.6      pcaPP_1.9-72              
+ [91] stringi_1.1.5              highr_0.6                  RSpectra_0.12-0            lattice_0.20-35            trimcluster_0.1-2         
+ [96] Matrix_1.2-11              nloptr_1.0.4               lmtest_0.9-35              RcppAnnoy_0.0.9            data.table_1.10.4         
+[101] cowplot_0.8.0              bitops_1.0-6               orthopolynom_1.0-5         httpuv_1.3.5               GenomicRanges_1.28.4      
+[106] R6_2.2.2                   gridExtra_2.2.1            vipor_0.4.5                IRanges_2.10.2             codetools_0.2-15          
+[111] boot_1.3-20                MASS_7.3-47                assertthat_0.2.0           rhdf5_2.20.0               SummarizedExperiment_1.6.3
+[116] rjson_0.2.15               S4Vectors_0.14.3           GenomeInfoDbData_0.99.0    diptest_0.75-7             mgcv_1.8-19               
+[121] quadprog_1.5-5             grid_3.4.1                 class_7.3-14               minqa_1.2.4                shiny_1.0.5               
+[126] ggbeeswarm_0.6.0          
