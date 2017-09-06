@@ -126,4 +126,4 @@ for (i in 1:length(clusters)){
 }
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("results/plots/plot_cluster_GSE52529-GPL16791.pdf", plot2by3)
+save_plot("results/plots/plot_cluster_GSE52529-GPL16791.pdf", plot2by3, base_height = 10, base_width = 15)

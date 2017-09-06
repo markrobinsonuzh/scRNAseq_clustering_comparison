@@ -5,12 +5,9 @@
 # load libraries
 source("skript/helper_files/Helper_functions.R")
 
+library(vsn)
+library(cowplot)
 
-library(ggfortify)
-library("vsn")
-library(gridExtra)
-
-pdf("results/QC_data/meanvarplots.pdf")
 
 # file paths
 
@@ -43,9 +40,11 @@ count_lstpm.log <- log2(count_lstpm +1)  # log2
 count_lstpm.norm <- as.matrix(exprs(data)) # standart from scater, is log2
 ########## mean var plots
 ########### plot
+pdf("results/QC_data/meanvarplots_xue2013.pdf")
+
 par(mfrow=c(1,3))
 meansdplot(data=count_lstpm, title = "count_lstpm" ,ylim=c(0,2000), rank=TRUE)
 meansdplot(count_lstpm.log, title="count_lstpm.log2", rank=TRUE )
-count_lstpm.norm <- as.matrix(exprs(data)) # standart from scater, is log2
+meansdplot(count_lstpm.norm, title="count_lstpm.expr", rank=TRUE )
 
 dev.off()

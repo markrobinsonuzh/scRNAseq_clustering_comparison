@@ -3,8 +3,7 @@
 ####################################################
 library(gridExtra)
 library(ggfortify)
-
-library(Seurat)
+library(cowplot)
 library(scater)
 library(plyr)
 # load the data
@@ -125,5 +124,4 @@ for (i in 1:length(clusters)){
 }
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("results/plots/plot_cluster_GSE44183-GPL11154.pdf", plot2by3)
-
+save_plot("results/plots/plot_cluster_GSE44183-GPL11154.pdf", plot2by3, base_height = 10, base_width = 15)
