@@ -10,15 +10,18 @@ locale:
 [1] de_CH.UTF-8/de_CH.UTF-8/de_CH.UTF-8/C/de_CH.UTF-8/de_CH.UTF-8
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rtsne_0.13      dplyr_0.7.2     caret_6.0-76    ggplot2_2.2.1   lattice_0.20-35 reshape_0.8.7  
+[1] scater_1.4.0        ggplot2_2.2.1       Biobase_2.36.2      BiocGenerics_0.22.0 Rtsne_0.13         
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.12       compiler_3.4.1     nloptr_1.0.4       plyr_1.8.4         bindr_0.1          class_7.3-14       iterators_1.0.8    tools_3.4.1        digest_0.6.12     
-[10] lme4_1.1-13        tibble_1.3.4       nlme_3.1-131       gtable_0.2.0       mgcv_1.8-19        pkgconfig_2.0.1    rlang_0.1.2        Matrix_1.2-11      foreach_1.4.3     
-[19] parallel_3.4.1     SparseM_1.77       bindrcpp_0.2       e1071_1.6-8        stringr_1.2.0      MatrixModels_0.4-1 stats4_3.4.1       grid_3.4.1         nnet_7.3-12       
-[28] glue_1.1.1         R6_2.2.2           minqa_1.2.4        reshape2_1.4.2     car_2.1-5          magrittr_1.5       scales_0.5.0       codetools_0.2-15   ModelMetrics_1.1.0
-[37] MASS_7.3-47        splines_3.4.1      assertthat_0.2.0   pbkrtest_0.4-7     colorspace_1.3-2   labeling_0.3       quantreg_5.33      stringi_1.1.5      lazyeval_0.2.0    
-[46] munsell_0.4.3     
+ [1] tximport_1.4.0       beeswarm_0.2.3       locfit_1.5-9.1       reshape2_1.4.2       rhdf5_2.20.0         lattice_0.20-35      colorspace_1.3-2    
+ [8] htmltools_0.3.6      stats4_3.4.1         viridisLite_0.2.0    blob_1.1.0           XML_3.98-1.9         rlang_0.1.2          glue_1.1.1          
+[15] DBI_0.7              bit64_0.9-7          bindrcpp_0.2         matrixStats_0.52.2   plyr_1.8.4           bindr_0.1            zlibbioc_1.22.0     
+[22] stringr_1.2.0        munsell_0.4.3        gtable_0.2.0         memoise_1.1.0        IRanges_2.10.2       biomaRt_2.32.1       httpuv_1.3.5        
+[29] vipor_0.4.5          AnnotationDbi_1.38.2 Rcpp_0.12.12         xtable_1.8-2         edgeR_3.18.1         scales_0.5.0         limma_3.32.5        
+[36] S4Vectors_0.14.3     mime_0.5             bit_1.1-12           gridExtra_2.2.1      rjson_0.2.15         digest_0.6.12        stringi_1.1.5       
+[43] dplyr_0.7.2          shiny_1.0.5          cowplot_0.8.0        grid_3.4.1           tools_3.4.1          bitops_1.0-6         magrittr_1.5        
+[50] lazyeval_0.2.0       RCurl_1.95-4.8       tibble_1.3.4         RSQLite_2.0          pkgconfig_2.0.1      Matrix_1.2-11        data.table_1.10.4   
+[57] ggbeeswarm_0.6.0     shinydashboard_0.6.1 assertthat_0.2.0     viridis_0.4.0        R6_2.2.2             compiler_3.4.1      

@@ -1,26 +1,29 @@
 #####################################
 ## Within sum of squares for clusters      
 #####################################
-pdf("~/Desktop/masterthesis/results/plots/optimalk_wss.pdf")
+
 ### load libraries
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/WORKIN_DIR.R")
+
+source("skript/helper_files/Helper_functions.R")
 library(cluster)
 library(dplyr)
 library(fpc)
 library(scater)
 
+pdf("results/plots/optimalk_wss.pdf")
 ### set seed
 
 set.seed(1234)
 
 # Directories
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
+
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
   xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
-  
 )
 
 
@@ -59,15 +62,14 @@ par.nk <- list(
 # 
 wss <- vector("list", length(files))
 names(wss) <- names(files)
+
 for (i in names(wss)){
 wss[[i]] <- (nrow(tinput_matrix[[i]] )-1)*sum(apply(tinput_matrix[[i]],2,var))
 }
 
 
-
-
 # compute wss for different k
-for (i in 1:3) {{
+for (i in seq_len(length(tinput_matrix))) {{
   for (j in 2:par.nk[[i]] ) wss[[i]][j] <- sum(kmeans(tinput_matrix[[i]],
                                        centers=j)$withinss)
 

@@ -2,10 +2,10 @@
 # Load and process data set: Trapnell2014 GSE52529-GPL16791
 ###########################################################
 
-pdf("~/Desktop/masterthesis/results/QC_data/QC_GSE52529-GPL16791.pdf")
+pdf("results/QC_data/QC_GSE52529-GPL16791.pdf")
 
 # load packages
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_functions/Helper_functions.R")
 
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
@@ -14,7 +14,7 @@ suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(mvoutlier))
 suppressPackageStartupMessages(library(plyr))
 # load multiassay dataset from IMLS conquer
-maex <- readRDS("~/Desktop/masterthesis/data/GSE52529-GPL16791.rds")
+maex <- readRDS("data/GSE52529-GPL16791.rds")
 # summary of data set
 print(maex)
 dim(assay(maex)) # 65218 x 288
@@ -87,15 +87,15 @@ plot_QC(sceset)
 #### save cell labels
 
 labels <- phenoData(sceset)$phenoid
-dir_labels <-  paste0("~/Desktop/masterthesis/results/dataset_labels/labels_trapnell2014.txt")
+dir_labels <-  paste0("results/dataset_labels/labels_trapnell2014.txt")
 write.table(labels , file=dir_labels, sep="\t")
 
 
 ###### save as SCEobject 
 res <- sceset
-save(res,file = "~/Desktop/masterthesis/data/sceset_GSE52529-GPL16791.rda")
+save(res,file = "data/sceset_GSE52529-GPL16791.rda")
 ###### save session info
-sink(file = "~/Desktop/masterthesis/results/QC_data/session_info_GSE52529-GPL16791.txt")
+sink(file = "results/QC_data/session_info_GSE52529-GPL16791.txt")
 sessionInfo()
 sink()
 dev.off()

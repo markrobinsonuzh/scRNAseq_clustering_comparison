@@ -2,17 +2,17 @@
 # Load and process data set: Xue 2013 GSE44183-GPL11154
 ###########################################################
 
-pdf("~/Desktop/masterthesis/results/QC_data/QC_GSE44183-GPL11154.pdf")
+pdf("results/QC_data/QC_GSE44183-GPL11154.pdf")
 
 # load packages
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_functions/Helper_functions.R")
 
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 # load multiassay dataset from IMLS conquer
-maex <- readRDS("~/Desktop/masterthesis/data/GSE44183-GPL11154.rds")
+maex <- readRDS("data/GSE44183-GPL11154.rds")
 # summary of data set
 print(maex)
 dim(assay(maex)) # 65218 x 29
@@ -83,17 +83,17 @@ plot_QC(sceset)
 #### save cell labels
 
 labels <- phenoData(sceset)$phenoid
-dir_labels <-  paste0("~/Desktop/masterthesis/results/dataset_labels/labels_xue2013.txt")
+dir_labels <-  paste0("results/dataset_labels/labels_xue2013.txt")
 write.table(labels , file=dir_labels, sep="\t")
 
 
 ###### save as SCEobject and the tpm Matrix as Text file
 res <- sceset
-save(res,file = "~/Desktop/masterthesis/data/sceset_GSE44183-GPL11154.rda")
+save(res,file = "data/sceset_GSE44183-GPL11154.rda")
 
 
 ###### save session info
-sink(file = "~/Desktop/masterthesis/results/QC_data/session_info_GSE44183-GPL11154.txt")
+sink(file = "results/QC_data/session_info_GSE44183-GPL11154.txt")
 sessionInfo()
 sink()
 

@@ -1,14 +1,18 @@
 #####################################
 ## Gap statistic for datasets      ##  
 #####################################
+# Workin directory
+source("~/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/WORKIN_DIR.R")
 
-pdf("~/Desktop/masterthesis/results/plots/plot_optimalk_gap.pdf")
 ### load libraries
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source(paste0(WORKIN_DIR,"skript/helper_files/Helper_functions.R"))
+
 library(cluster)
 library(dplyr)
 library(fpc)
 library(scater)
+
+pdf(paste0(WORKIN_DIR,"results/plots/plot_optimalk_gap.pdf"))
 
 ### set seed
 
@@ -16,7 +20,7 @@ set.seed(1234)
 
 # load data
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- paste0(WORKIN_DIR,"data")
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
@@ -24,13 +28,6 @@ files <- list(
   
 )
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
-  
-)
 
 # load data sets
 
@@ -76,7 +73,7 @@ par.K.max <- list(
 for (i in names(input_matrix))
 res.clusgap[[i]] <- clusGap(input_matrix[[i]], kmeans, K.max=par.K.max[[i]], B = par.B[[i]] , verbose = interactive(), spaceH0 = "scaledPCA")
 
-save(res.clusgap,file="~/Desktop/masterthesis/results/number_k/resclusgap.rda")
+save(res.clusgap,file=paste0(WORKIN_DIR,"results/number_k/resclusgap.rda"))
 #### store results for further use
 
 

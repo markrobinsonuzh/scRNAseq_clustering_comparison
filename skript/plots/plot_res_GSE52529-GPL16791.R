@@ -2,6 +2,8 @@
 # PLots for Data set TRAPNELL 2014 GSE52529-GPL16791
 ####################################################
 
+
+# load libraries
 library(gridExtra)
 library(ggfortify)
 
@@ -10,7 +12,7 @@ library(scater)
 library(plyr)
 # load the data
 ##############################
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda")
 )
@@ -124,4 +126,4 @@ for (i in 1:length(clusters)){
 }
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("~/Desktop/masterthesis/results/plots/plot_cluster_GSE52529-GPL16791.pdf", plot2by3)
+save_plot("results/plots/plot_cluster_GSE52529-GPL16791.pdf", plot2by3)

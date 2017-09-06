@@ -1,6 +1,7 @@
 ####################################################
 # PLots for Data set KUMAR 2015 GSE60749-GPL13112
 ####################################################
+# load libraries
 
 library(gridExtra)
 library(ggfortify)
@@ -8,10 +9,11 @@ library(cowplot)
 library(Seurat)
 library(scater)
 library(plyr)
+
 # load the data
 ##############################
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda")
 )
@@ -47,8 +49,8 @@ for (i in 1:length(data)){
 
 # load the the labels:
 
-# create dir
-RES_DIR <- "~/Desktop/masterthesis/results"
+# create filenames
+RES_DIR <- "results"
 
 fileslabels <- list(
   tSNEkmeans = file.path(RES_DIR, "tSNEkmeans/tSNEkmeans_labels_kumar2015.txt"),
@@ -126,7 +128,7 @@ for (i in 1:length(clusters)){
 
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("~/Desktop/masterthesis/results/plots/plot_cluster_GSE60749-GPL13112.pdf", plot2by3)
+save_plot("results/plots/plot_cluster_GSE60749-GPL13112.pdf", plot2by3)
 
 # Appendix
 

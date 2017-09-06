@@ -1,15 +1,20 @@
 #######################################
 # Mean variance plots for all data sets
 #######################################
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+
+# load libraries
+source("skript/helper_files/Helper_functions.R")
 
 
 library(ggfortify)
 library("vsn")
 library(gridExtra)
+
+pdf("results/QC_data/meanvarplots.pdf")
+
 # file paths
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rds"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rds"),
@@ -43,3 +48,4 @@ meansdplot(data=count_lstpm, title = "count_lstpm" ,ylim=c(0,2000), rank=TRUE)
 meansdplot(count_lstpm.log, title="count_lstpm.log2", rank=TRUE )
 count_lstpm.norm <- as.matrix(exprs(data)) # standart from scater, is log2
 
+dev.off()

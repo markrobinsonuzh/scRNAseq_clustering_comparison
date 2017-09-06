@@ -2,10 +2,10 @@
 ### plot confusion matrix for method x 
 ###################################
 
-pdf("~/Desktop/masterthesis/results/plots/confusion_matrix.pdf")
+pdf("results/plots/confusion_matrix.pdf")
 
 # load libraries
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_functions/Helper_functions.R")
 
 library(reshape)
 library(caret)
@@ -18,7 +18,7 @@ library(magrittr)
 
 # define method:
 
-DATA_DIR <-  "~/Desktop/masterthesis/results/tSNEkmeans/"
+DATA_DIR <-  "results/tSNEkmeans/"
 METHOD <- c("tSNEkmeans")
 
 ### files with the cell labels, "ground truth":

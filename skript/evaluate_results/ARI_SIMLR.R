@@ -1,7 +1,10 @@
 #####################################
 # adjusted Rand Index for SIMLR
 #####################################
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+
+
+#load libraries
+source("skript/helper_files/Helper_functions.R")
 
 library(MLmetrics)
 library(caret)
@@ -11,7 +14,7 @@ library(mclust)
 METHOD <- "SIMLR"
 
 # file paths to the clustering results
-DATA_DIR <-  "~/Desktop/masterthesis/results/SIMLR/"
+DATA_DIR <- "results/SIMLR/"
 
 ### files with the cell labels, "ground truth":
 files_labels <- list(

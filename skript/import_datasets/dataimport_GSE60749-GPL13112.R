@@ -1,11 +1,11 @@
 ###########################################################
 # Load and process data set: Kumar 2014 GSE60749-GPL13112
 ###########################################################
-pdf("~/Desktop/masterthesis/results/QC_data/QC_GSE60749-GPL13112.pdf")
+pdf("results/QC_data/QC_GSE60749-GPL13112.pdf")
 
 
 # load packages
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_functions/Helper_functions.R")
 
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
@@ -13,7 +13,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(plyr))
 # load multiassay dataset from IMLS conquer
-maex <- readRDS("~/Desktop/masterthesis/data/GSE60749-GPL13112.rds")
+maex <- readRDS("data/GSE60749-GPL13112.rds")
 # summary of data set
 
 print(maex)
@@ -85,10 +85,10 @@ plot_QC(sceset)
 
 ###### save as SCEobject and the tpm Matrix as Text file
 res <- sceset
-save(res,file = "~/Desktop/masterthesis/data/sceset_GSE60749-GPL13112.rda")
+save(res,file = "data/sceset_GSE60749-GPL13112.rda")
 
 ###### save session info
-sink(file = "~/Desktop/masterthesis/results/QC_data/session_info_GSE60749-GPL13112.txt")
+sink(file = "results/QC_data/session_info_GSE60749-GPL13112.txt")
 sessionInfo()
 sink()
 

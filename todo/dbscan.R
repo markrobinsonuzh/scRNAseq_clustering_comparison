@@ -1,17 +1,20 @@
 #####################
 # DBscan
 #####################
-source("~/Desktop/masterthesis/skript/Helper_functions.R")
+
+source("~/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/WORKIN_DIR.R")
+source(paste0(WORKIN_DIR,"skript/helper_files/Helper_functions.R"))
+
 
 
 #load libraries
 
-library(pcaReduce)
+library(dbscan)
 
 # import data as sceset
 # file paths
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- paste0(WORKIN_DIR,"data")
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
@@ -43,16 +46,30 @@ names(list) <- names(data)
 res.cluster <- sys.time<- input_matrix<- pca.red <- list
 
 
-# extract expression data
+# extract transposed expression data
 
-for (i in 1:(length(input_matrix))){
+for (i in names(input_matrix)){
   input_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
 }
-dim(input_matrix[[1]])
 # RUN dbscan
-kNNdistplot(input_matrix[[1]], k = 97)
-dbscan(input_matrix[[1]], eps = 260 ,minPts = 5)
 
+par.k <- list(
+  kumar2015 = 97,
+  trapnell2014 = 97,
+  xue2013 = 5
+)
+
+
+# run k neirest neighbour distance plot to find epsilon
+for (i in names(input_matrix)){
+
+kNNdist(input_matrix[[i]], k = par.k[[i]])
+  
+}
+
+# run kmeans
+dbscan(input_matrix[[1]], eps = 260 ,minPts = 5)
+?kNNdist
 
 
 

@@ -1,12 +1,12 @@
 #####################
 # SNN-Cliq
 #####################
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/Helper_functions.R")
 
 
 # file paths
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
@@ -66,7 +66,7 @@ par.m <-  list(
   xue2013 = 0.5
 )
 
-write.csv(x=NULL,file="~/Desktop/masterthesis/skript/run_methods/snn-cliq.txt")
+write.csv(x=NULL,file="skript/run_methods/snn-cliq.txt")
 for (i in names(input_matrix)){
   # construct a graph 
 scRNA.seq.funcs::SNN(
@@ -78,7 +78,7 @@ scRNA.seq.funcs::SNN(
   
 
 # find clusters in the graph
-setwd("~/Desktop/masterthesis/skript/run_methods")
+setwd("skript/run_methods")
 sys.time[[i]] <- system.time({
 snn.res <- 
   system(
@@ -106,28 +106,28 @@ system("rm snn-cliq.txt res-snn-cliq.txt")
 for (i in seq_len(length(res.cluster))){
   res.cluster[[i]] <- pData(data[[i]])$SNNCliq
 }
-dir_cluster <- paste0("~/Desktop/masterthesis/results/SNNCliq/SNNCliq_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/SNNCliq/SNNCliq_clus_", names(res.cluster), ".txt")
 
 
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0("~/Desktop/masterthesis/results/SNNCliq/SNNCliq_systime_",names(sys.time),".txt")
+dir_systime <-  paste0("results/SNNCliq/SNNCliq_systime_",names(sys.time),".txt")
 
 save_systemtime(sys.time, dir_systime)
 
 
 # save experiment labels
 
-file_names <-  paste0("~/Desktop/masterthesis/results/SNNCliq/SNNCliq_labels_",names(labels), ".txt")
+file_names <-  paste0("results/SNNCliq/SNNCliq_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
 }
 
 ###### Save Session Info
-sink(file = "~/Desktop/masterthesis/results/SNNCliq/session_info_SNNCliqreduce.txt")
+sink(file = "results/SNNCliq/session_info_SNNCliqreduce.txt")
 sessionInfo()
 sink()
 

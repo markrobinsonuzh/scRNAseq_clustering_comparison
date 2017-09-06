@@ -1,7 +1,9 @@
 #####################################
 # adjusted Rand Index for tSNEkmeans
 #####################################
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+
+#load libraries
+source("skript/helper_files/Helper_functions.R")
 
 library(MLmetrics)
 library(caret)
@@ -11,7 +13,7 @@ library(mclust)
 METHOD <- "Seurat"
 
 # file paths to the clustering results
-DATA_DIR <-  "~/Desktop/masterthesis/results/Seurat/"
+DATA_DIR <- "results/Seurat/"
 
 ### files with the cell labels, "ground truth":
 files_labels <- list(

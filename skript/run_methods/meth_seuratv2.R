@@ -2,7 +2,7 @@
 # Seurat
 #####################
 
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/Helper_functions.R")
 
 
 #load libraries
@@ -11,7 +11,7 @@ library(Seurat)
 
 # file paths
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
@@ -72,21 +72,21 @@ res.cluster[[i]] <-  data[[i]]@ident
 
 # save clusters
 
-dir_cluster <- paste0("~/Desktop/masterthesis/results/Seurat/seurat_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/Seurat/seurat_clus_", names(res.cluster), ".txt")
 
 
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0("~/Desktop/masterthesis/results/Seurat/seurat_systime_",names(sys.time),".txt")
+dir_systime <-  paste0("results/Seurat/seurat_systime_",names(sys.time),".txt")
 
 save_systemtime(sys.time, dir_systime)
 
 
 # save experiment labels
 
-file_names <-  paste0("~/Desktop/masterthesis/results/Seurat/seurat_labels_",names(sys.time), ".txt")
+file_names <-  paste0("results/Seurat/seurat_labels_",names(sys.time), ".txt")
 for (i in 1:length(sys.time)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
@@ -95,7 +95,7 @@ for (i in 1:length(sys.time)){
 
 
 ###### Save Session Info
-sink(file = "~/Desktop/masterthesis/results/Seurat/session_info_Seurat.txt")
+sink(file = "results/Seurat/session_info_Seurat.txt")
 sessionInfo()
 sink()
 

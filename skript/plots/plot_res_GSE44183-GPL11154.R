@@ -9,7 +9,7 @@ library(scater)
 library(plyr)
 # load the data
 ##############################
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
 )
@@ -125,5 +125,5 @@ for (i in 1:length(clusters)){
 }
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("~/Desktop/masterthesis/results/plots/plot_cluster_GSE44183-GPL11154.pdf", plot2by3)
+save_plot("results/plots/plot_cluster_GSE44183-GPL11154.pdf", plot2by3)
 

@@ -5,7 +5,7 @@ library(stargazer)
 library(dplyr)
 # define data directory, METHODS and DATASETS
 
-RES_DIR <- "~/Desktop/masterthesis/results/"
+RES_DIR <- "results/"
 
 DATASET <- c(
   "kumar2015",

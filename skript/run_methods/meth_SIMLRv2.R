@@ -2,7 +2,7 @@
 # SIMLR
 #####################
 
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/Helper_functions.R")
 
 #load libraries
 
@@ -14,7 +14,7 @@ set.seed(1234)
 
 # file paths
 
-DATA_DIR <- "~/Desktop/masterthesis/data"
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
@@ -64,26 +64,26 @@ for (i in names(data)){
 
 # save clusters
 
-dir_cluster <- paste0("~/Desktop/masterthesis/results/SIMLR/SIMLR_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/SIMLR/SIMLR_clus_", names(res.cluster), ".txt")
 
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0("~/Desktop/masterthesis/results/SIMLR/SIMLR_systime_",names(sys.time),".txt")
+dir_systime <-  paste0("results/SIMLR/SIMLR_systime_",names(sys.time),".txt")
 
 save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 
-file_names <-  paste0("~/Desktop/masterthesis/results/SIMLR/SIMLR_labels_",names(labels), ".txt")
+file_names <-  paste0("results/SIMLR/SIMLR_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
 }
 
 ###### Save Session Info
-sink(file = "~/Desktop/masterthesis/results/SIMLR/session_info_SIMLR.txt")
+sink(file = "results/SIMLR/session_info_SIMLR.txt")
 sessionInfo()
 sink()
 

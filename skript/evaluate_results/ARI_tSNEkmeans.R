@@ -1,7 +1,12 @@
 #####################################
 # adjusted Rand Index for tSNEkmeans
 #####################################
-source("~/Desktop/masterthesis/skript/helper_functions/Helper_functions.R")
+
+
+#load libraries
+
+source("skript/helper_files/Helper_functions.R")
+
 library(MLmetrics)
 library(caret)
 library(mclust)
@@ -10,7 +15,7 @@ library(mclust)
 METHOD <- "tSNEkmeans"
 
 # file paths to the clustering results
-DATA_DIR <-  "~/Desktop/masterthesis/results/tSNEkmeans/"
+DATA_DIR <-  "results/tSNEkmeans/"
 
 ### files with the cell labels, "ground truth":
 files_labels <- list(
@@ -32,7 +37,7 @@ files_clusters <- list(
   xue2013 = file.path(DATA_DIR, paste0(METHOD,"_clus_xue2013.txt"))
 )
 
-cluster <- read.cluster(files_clusters=files_clusters)
+cluster <- read.cluster(files_clusters = files_clusters)
 
 
 ################################
