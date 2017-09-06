@@ -3,5 +3,5 @@
 .RData
 .Ruserdata
 scRNAseq_clustering_comparison.Rproj
-data
+data/
 .DS_Store
