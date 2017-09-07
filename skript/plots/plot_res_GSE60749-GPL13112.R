@@ -22,15 +22,18 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                  "SIMLR",
                  "Seurat",
                  "SC3",
-                 "pcaReduce"))
-# define method name
+                 "pcaReduce",
+                 "RtSNEkmeans"))
+
+# define method name for writing file
 method <- list(
   tSNEkmeans = NULL,
   SNNCliq = NULL,
   SIMLR = NULL,
   Seurat= NULL,
   SC3 = NULL,
-  pcaReduce = NULL
+  pcaReduce = NULL,
+  RtSNEkmeans=NULL
   
 )
 
@@ -58,7 +61,8 @@ fileslabels <- list(
   SIMLR = file.path(RES_DIR, "SIMLR/SIMLR_labels_kumar2015.txt"),
   Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
   SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
-  pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt")
+  pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
+  RtSNEkmeans = file.path(RES_DIR, "RtSNEkmeans/RtSNEkmeans_labels_kumar2015.txt")
 )
 
 # load cell labels
@@ -78,7 +82,8 @@ filesclusters <- list(
   SIMLR = file.path(RES_DIR, "SIMLR/SIMLR_clus_kumar2015.txt"),
   Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_kumar2015.txt"),
   SC3 = file.path(RES_DIR, "SC3/sc3_clus_kumar2015.txt"),
-  pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_kumar2015.txt")
+  pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_kumar2015.txt"),
+  RtSNEkmeans = file.path(RES_DIR, "RtSNEkmeans/RtSNEkmeans_clus_kumar2015.txt")
 )
 
 
