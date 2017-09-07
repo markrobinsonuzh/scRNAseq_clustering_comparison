@@ -7,6 +7,7 @@ source("skript/helper_files/Helper_functions.R")
 
 library(Rtsne)
 library(scater)
+library(dplyr)
 # file paths
 
 DATA_DIR <- "data"
@@ -64,11 +65,12 @@ par.k <- list(
 for (i in names(data)){
   
   sys.time [[i]] <- system.time({
-    res.rtsne[[i]] <- Rtsne(X= tinput_matrix[[i]] ,perplexity=par.perp[[i]] , pca = TRUE, verbose = TRUE)
+    res.rtsne[[i]] <- Rtsne(X= tinput_matrix[[i]] ,perplexity=par.perp[[i]] , pca = TRUE)
     res.cluster[[i]] <- as.character(kmeans(res.rtsne[[i]]$Y, centers = par.k[[i]])$cluster)
   })
 
 }
+
 
 # save clusters
 
@@ -98,4 +100,14 @@ sessionInfo()
 sink()
 
 ### Appendix
+# tidy up
+tidy.data <- res.rtsne[[1]]$Y %>% as.data.frame()%>% mutate(truth=as.factor(pData(data[[1]])$phenoid)) %>% mutate(col=truth) %>% mutate(cluster=res.cluster[[1]])
+levels(tidy.data$col) <- c(1,2,3 )
+
+ggplot(data = tidy.data  , mapping = aes(x=V1,y=V2))+geom_point(aes(shape=truth))
+
+
+
+
+
 
