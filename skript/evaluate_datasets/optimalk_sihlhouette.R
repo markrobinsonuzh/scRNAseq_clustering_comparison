@@ -14,7 +14,11 @@ library(dplyr)
 library(magrittr)
 
 
+<<<<<<< HEAD
 pdf("results/plots/optimalk_sihlhoutte.pdf")
+=======
+#pdf("results/plots/optimalk_sihlhoutte.pdf")
+>>>>>>> 73c340214ec5586c09efc8b7d3fe617a448fbcb7
 ### set seed
 
 set.seed(1234)
@@ -71,6 +75,18 @@ for (i in names(tinput_matrix)){
   res.si[[i]]<- silhouette(pam(tinput_matrix[[i]], k=par.k[[i]] ))
   plot(res.si[[i]])
 }
+<<<<<<< HEAD
 
 
 dev.off()
+=======
+# kmeans
+for (i in names(tinput_matrix)){
+  res.si[[i]]<- silhouette(kmeans(tinput_matrix[[i]], k=par.k[[i]] ))
+  plot(res.si[[i]])
+}
+
+
+
+
+>>>>>>> 73c340214ec5586c09efc8b7d3fe617a448fbcb7
