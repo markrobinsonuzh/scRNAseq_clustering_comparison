@@ -77,7 +77,7 @@ for (i in seq_len(length(tinput_matrix))) {{
 
 }}
 
-# plot
+ # plot
 par(mfrow=c(2,2))
 for ( i in 1:length(files)) {
 plot(1:15, wss[[i]][1:15], type="b", xlab="Number of Clusters",
