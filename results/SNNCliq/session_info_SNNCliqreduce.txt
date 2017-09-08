@@ -13,29 +13,17 @@ attached base packages:
 [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] plyr_1.8.4          Seurat_2.0.1        Matrix_1.2-11       cowplot_0.8.0       ggfortify_0.4.1     gridExtra_2.2.1     scater_1.4.0        Biobase_2.36.2     
- [9] BiocGenerics_0.22.0 Rtsne_0.13          dplyr_0.7.2         caret_6.0-76        ggplot2_2.2.1       lattice_0.20-35     reshape_0.8.7      
+[1] scater_1.4.0        ggplot2_2.2.1       pcaReduce_1.0       mclust_5.3          mnormt_1.5-5        pcaMethods_1.68.0   Biobase_2.36.2      BiocGenerics_0.22.0
 
 loaded via a namespace (and not attached):
-  [1] backports_1.1.0       Hmisc_4.0-3           VGAM_1.0-4            NMF_0.20.6            sn_1.5-0              igraph_1.1.2          lazyeval_0.2.0       
-  [8] shinydashboard_0.6.1  splines_3.4.1         elliptic_1.3-7        gridBase_0.4-7        digest_0.6.12         foreach_1.4.3         htmltools_0.3.6      
- [15] viridis_0.4.0         lars_1.2              gdata_2.18.0          magrittr_1.5          checkmate_1.8.3       memoise_1.1.0         contfrac_1.1-11      
- [22] cluster_2.0.6         doParallel_1.0.10     mixtools_1.1.0        ROCR_1.0-7            limma_3.32.5          matrixStats_0.52.2    R.utils_2.5.0        
- [29] colorspace_1.3-2      blob_1.1.0            RCurl_1.95-4.8        tximport_1.4.0        lme4_1.1-13           bindr_0.1             scRNA.seq.funcs_0.1.0
- [36] ape_4.1               survival_2.41-3       iterators_1.0.8       glue_1.1.1            registry_0.3          gtable_0.2.0          zlibbioc_1.22.0      
- [43] MatrixModels_0.4-1    car_2.1-5             kernlab_0.9-25        prabclus_2.2-6        DEoptimR_1.0-8        SparseM_1.77          scales_0.5.0         
- [50] mvtnorm_1.0-6         DBI_0.7               edgeR_3.18.1          rngtools_1.2.4        Rcpp_0.12.12          dtw_1.18-1            viridisLite_0.2.0    
- [57] xtable_1.8-2          htmlTable_1.9         tclust_1.3-1          proxy_0.4-17          foreign_0.8-69        bit_1.1-12            mclust_5.3           
- [64] deSolve_1.20          SDMTools_1.1-221      Formula_1.2-2         tsne_0.1-3            stats4_3.4.1          htmlwidgets_0.9       FNN_1.1              
- [71] gplots_3.0.1          RColorBrewer_1.1-2    fpc_2.1-10            acepack_1.4.1         modeltools_0.2-21     ica_1.0-1             pkgconfig_2.0.1      
- [78] XML_3.98-1.9          R.methodsS3_1.7.1     flexmix_2.3-14        nnet_7.3-12           locfit_1.5-9.1        labeling_0.3          rlang_0.1.2          
- [85] reshape2_1.4.2        AnnotationDbi_1.38.2  munsell_0.4.3         tools_3.4.1           moments_0.14          RSQLite_2.0           ranger_0.8.0         
- [92] stringr_1.2.0         ModelMetrics_1.1.0    knitr_1.17            bit64_0.9-7           robustbase_0.92-7     hypergeo_1.2-13       caTools_1.17.1       
- [99] purrr_0.2.3           bindrcpp_0.2          pbapply_1.3-3         nlme_3.1-131          mime_0.5              quantreg_5.33         R.oo_1.21.0          
-[106] biomaRt_2.32.1        compiler_3.4.1        pbkrtest_0.4-7        beeswarm_0.2.3        ggjoy_0.3.0           e1071_1.6-8           statmod_1.4.30       
-[113] tibble_1.3.4          stringi_1.1.5         trimcluster_0.1-2     nloptr_1.0.4          diffusionMap_1.1-0    orthopolynom_1.0-5    irlba_2.2.1          
-[120] data.table_1.10.4     bitops_1.0-6          httpuv_1.3.5          R6_2.2.2              latticeExtra_0.6-28   KernSmooth_2.23-15    vipor_0.4.5          
-[127] IRanges_2.10.2        codetools_0.2-15      MASS_7.3-47           gtools_3.5.0          assertthat_0.2.0      rhdf5_2.20.0          pkgmaker_0.22        
-[134] rjson_0.2.15          mnormt_1.5-5          S4Vectors_0.14.3      diptest_0.75-7        mgcv_1.8-19           grid_3.4.1            rpart_4.1-11         
-[141] tidyr_0.7.1           class_7.3-14          minqa_1.2.4           segmented_0.5-2.1     numDeriv_2016.8-1     scatterplot3d_0.3-40  shiny_1.0.5          
-[148] base64enc_0.1-3       ggbeeswarm_0.6.0     
+ [1] viridis_0.4.0         edgeR_3.18.1          bit64_0.9-7           viridisLite_0.2.0     elliptic_1.3-7        moments_0.14          shiny_1.0.5          
+ [8] assertthat_0.2.0      statmod_1.4.30        stats4_3.4.1          blob_1.1.0            vipor_0.4.5           RSQLite_2.0           lattice_0.20-35      
+[15] glue_1.1.1            limma_3.32.5          digest_0.6.12         colorspace_1.3-2      htmltools_0.3.6       httpuv_1.3.5          Matrix_1.2-11        
+[22] plyr_1.8.4            XML_3.98-1.9          pkgconfig_2.0.1       biomaRt_2.32.1        zlibbioc_1.22.0       xtable_1.8-2          scales_0.5.0         
+[29] Rtsne_0.13            tibble_1.3.4          IRanges_2.10.2        lazyeval_0.2.0        magrittr_1.5          mime_0.5              memoise_1.1.0        
+[36] MASS_7.3-47           beeswarm_0.2.3        shinydashboard_0.6.1  tools_3.4.1           data.table_1.10.4     matrixStats_0.52.2    stringr_1.2.0        
+[43] S4Vectors_0.14.3      munsell_0.4.3         locfit_1.5-9.1        AnnotationDbi_1.38.2  bindrcpp_0.2          orthopolynom_1.0-5    compiler_3.4.1       
+[50] contfrac_1.1-11       rlang_0.1.2           rhdf5_2.20.0          grid_3.4.1            RCurl_1.95-4.8        tximport_1.4.0        rjson_0.2.15         
+[57] scRNA.seq.funcs_0.1.0 bitops_1.0-6          hypergeo_1.2-13       gtable_0.2.0          deSolve_1.20          DBI_0.7               reshape2_1.4.2       
+[64] R6_2.2.2              gridExtra_2.2.1       dplyr_0.7.2           bit_1.1-12            bindr_0.1             stringi_1.1.5         ggbeeswarm_0.6.0     
+[71] Rcpp_0.12.12         

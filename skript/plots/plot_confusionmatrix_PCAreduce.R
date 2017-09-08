@@ -1,8 +1,8 @@
 ###################################
-### plot confusion matrix for method x 
+### plot confusion matrix for method PCAreduce 
 ###################################
 
-pdf("results/plots/confusion_matrix.pdf")
+pdf("results/plots/confusion_matrix_PCAreduce.pdf")
 
 # load libraries
 source("skript/helper_functions/Helper_functions.R")
@@ -18,8 +18,8 @@ library(magrittr)
 
 # define method:
 
-DATA_DIR <-  "results/tSNEkmeans/"
-METHOD <- c("tSNEkmeans")
+DATA_DIR <-  "results/PCAreduce/"
+METHOD <- c("PCAreduce")
 
 ### files with the cell labels, "ground truth":
 files_labels <- list(
@@ -37,7 +37,7 @@ files_clusters <- list(
   xue2013 = file.path(DATA_DIR, paste0(METHOD,"_clus_xue2013.txt")),
   koh2016 = file.path(DATA_DIR, paste0(METHOD,"_clus_koh2016.txt"))
 )
-cluster <- read.cluster(files_clusters=files_clusters)
+cluster <- read.cluster(files_clusters = files_clusters)
 
 
 
@@ -48,7 +48,7 @@ cluster <- read.cluster(files_clusters=files_clusters)
 #list <-  vector("list", 3) %>% names() %$% names(files_clusters)
 conv.tbl <- vector("list", 3)
 for (i in seq_len(length(cluster))){
- conv.tbl[[i]] <- table(cluster=cluster[[i]], label=labels[[i]])
+  conv.tbl[[i]] <- table(cluster=cluster[[i]], label=labels[[i]])
 }
 
 ##################################
@@ -60,12 +60,12 @@ names(conv.tbl) <- names(files_labels)
 for (i in seq_len(length(conv.tbl))){
   
   dd <- melt(conv.tbl[[i]])
- print(ggplot(dd, aes(dd[,1], dd[,2], fill=value))+geom_tile()
-       +geom_text(aes(label=dd$value),colour="white")
-       +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 15),axis.text.y=element_text(size = 15))
-       +ylab("labels")+xlab("cluster")
-
-       )
+  print(ggplot(dd, aes(dd[,1], dd[,2], fill=value))+geom_tile()
+        +geom_text(aes(label=dd$value),colour="white")
+        +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 15),axis.text.y=element_text(size = 15))
+        +ylab("labels")+xlab("cluster")
+        
+  )
 }
 
 

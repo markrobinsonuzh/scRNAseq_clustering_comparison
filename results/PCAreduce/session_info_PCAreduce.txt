@@ -13,22 +13,15 @@ attached base packages:
 [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] pcaReduce_1.0              mclust_5.3                 mnormt_1.5-5               pcaMethods_1.68.0          Rtsne_0.13                 fpc_2.1-10                
- [7] cluster_2.0.6              bindrcpp_0.2               plyr_1.8.4                 tidyr_0.7.1                dplyr_0.7.2                MultiAssayExperiment_1.2.1
-[13] scater_1.4.0               ggplot2_2.2.1              Biobase_2.36.2             BiocGenerics_0.22.0       
+[1] scater_1.4.0        ggplot2_2.2.1       pcaReduce_1.0       mclust_5.3          mnormt_1.5-5        pcaMethods_1.68.0   Biobase_2.36.2      BiocGenerics_0.22.0
 
 loaded via a namespace (and not attached):
- [1] bitops_1.0-6               matrixStats_0.52.2         bit64_0.9-7                prabclus_2.2-6             GenomeInfoDb_1.12.2        UpSetR_1.3.3              
- [7] tools_3.4.1                R6_2.2.2                   vipor_0.4.5                DBI_0.7                    lazyeval_0.2.0             colorspace_1.3-2          
-[13] trimcluster_0.1-2          nnet_7.3-12                gridExtra_2.2.1            bit_1.1-12                 compiler_3.4.1             DelayedArray_0.2.7        
-[19] labeling_0.3               diptest_0.75-7             scales_0.5.0               DEoptimR_1.0-8             mvtnorm_1.0-6              robustbase_0.92-7         
-[25] stringr_1.2.0              digest_0.6.12              XVector_0.16.0             pkgconfig_2.0.1            htmltools_0.3.6            limma_3.32.5              
-[31] rlang_0.1.2                RSQLite_2.0                BiocInstaller_1.26.0       shiny_1.0.5                bindr_0.1                  RCurl_1.95-4.8            
-[37] magrittr_1.5               modeltools_0.2-21          GenomeInfoDbData_0.99.0    Matrix_1.2-11              Rcpp_0.12.12               ggbeeswarm_0.6.0          
-[43] munsell_0.4.3              S4Vectors_0.14.3           viridis_0.4.0              stringi_1.1.5              edgeR_3.18.1               MASS_7.3-47               
-[49] SummarizedExperiment_1.6.3 zlibbioc_1.22.0            flexmix_2.3-14             rhdf5_2.20.0               grid_3.4.1                 blob_1.1.0                
-[55] shinydashboard_0.6.1       lattice_0.20-35            cowplot_0.8.0              locfit_1.5-9.1             GenomicRanges_1.28.4       rjson_0.2.15              
-[61] reshape2_1.4.2             biomaRt_2.32.1             stats4_3.4.1               XML_3.98-1.9               glue_1.1.1                 packrat_0.4.8-1           
-[67] data.table_1.10.4          httpuv_1.3.5               gtable_0.2.0               purrr_0.2.3                kernlab_0.9-25             assertthat_0.2.0          
-[73] mime_0.5                   xtable_1.8-2               class_7.3-14               viridisLite_0.2.0          tibble_1.3.4               AnnotationDbi_1.38.2      
-[79] beeswarm_0.2.3             memoise_1.1.0              IRanges_2.10.2             tximport_1.4.0            
+ [1] Rcpp_0.12.12         locfit_1.5-9.1       lattice_0.20-35      assertthat_0.2.0     digest_0.6.12        mime_0.5             R6_2.2.2            
+ [8] plyr_1.8.4           stats4_3.4.1         RSQLite_2.0          zlibbioc_1.22.0      rlang_0.1.2          lazyeval_0.2.0       data.table_1.10.4   
+[15] blob_1.1.0           S4Vectors_0.14.3     Matrix_1.2-11        stringr_1.2.0        RCurl_1.95-4.8       bit_1.1-12           biomaRt_2.32.1      
+[22] munsell_0.4.3        shiny_1.0.5          compiler_3.4.1       httpuv_1.3.5         vipor_0.4.5          pkgconfig_2.0.1      ggbeeswarm_0.6.0    
+[29] htmltools_0.3.6      tximport_1.4.0       tibble_1.3.4         gridExtra_2.2.1      edgeR_3.18.1         IRanges_2.10.2       matrixStats_0.52.2  
+[36] XML_3.98-1.9         viridisLite_0.2.0    dplyr_0.7.2          bitops_1.0-6         grid_3.4.1           xtable_1.8-2         gtable_0.2.0        
+[43] DBI_0.7              magrittr_1.5         scales_0.5.0         stringi_1.1.5        reshape2_1.4.2       viridis_0.4.0        bindrcpp_0.2        
+[50] limma_3.32.5         rjson_0.2.15         tools_3.4.1          bit64_0.9-7          glue_1.1.1           beeswarm_0.2.3       AnnotationDbi_1.38.2
+[57] colorspace_1.3-2     rhdf5_2.20.0         shinydashboard_0.6.1 memoise_1.1.0        bindr_0.1           

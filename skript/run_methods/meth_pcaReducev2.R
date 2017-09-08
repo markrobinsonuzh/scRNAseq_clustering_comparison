@@ -1,7 +1,6 @@
 ###################
 # pcaReduce
 ###################
-koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 source("skript/helper_files/Helper_functions.R")
 
 
@@ -16,7 +15,8 @@ DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR, "sceset_SRP073808.rda")
  
 )
 
@@ -58,19 +58,22 @@ for (i in 1:(length(input_matrix))){
 par.nbt <- list(
   kumar2015 = 10,
   trapnell2014 = 10,
-  xue2013 = 10
+  xue2013 = 10,
+  koh2016 = 10
 
 )
 
 par.q <- list(
   kumar2015 = 30,
   trapnell2014 = 30,
-  xue2013 = 8
+  xue2013 = 8,mn 
+  koh2016 = 30
 )
 n.cluster <- list(
   kumar2015=3,
-  trappnell=3,
-  xue2013=8
+  trapnell=3,
+  xue2013=8,
+  koh2016 = 30
   )
 
 # extract k dimension 
@@ -84,11 +87,13 @@ par.k <- function(i){
 for (i in names(input_matrix)){
   sys.time[[i]] <- system.time({
   pca.red[[i]] <- PCAreduce(t(input_matrix[[i]]), nbt = par.nbt[[i]], q = par.q[[i]], method = 'S')[[1]]
-  pData(data[[i]])$pcaReduce <- as.character(pca.red[[i]][ ,par.k(i)])
+  res.cluster[[i]]  <- as.character(pca.red[[i]][ ,par.k(i)])
 })
-  res.cluster[[i]] <- pData(data[[i]])$pcaReduce 
 }
 
+
+
+  
 
 # save clusters
 

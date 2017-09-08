@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
 ############################################################
-# developed in Python 2.7.3 by Chen Xu  cxu3@uncc.edu      #
+# developed in Python 2.7.3 (tested on Python 3.5.0)       #
+# by Chen Xu  cxu3@uncc.edu                                #
 # Department of Bioinformatics and Genomics, UNC-Charlotte #       
-# Aug 2014                                                 #
+# Aug 2014
+# newest update Feb 2017                                                 #
 ############################################################
 
 import re, os, sys, getopt
@@ -22,7 +24,7 @@ def output(clique_list=None, outfile=None, number_cells=None):
 	clqID=1
 	for line in clique_list:
 		cells=line.split(' ')
-		cells=map(int, cells)  # index
+		cells=list(map(int, cells))  # index
 		if len(cells)<3:
 			for c in cells:
 				cell_clqID[c]="-1"
@@ -33,7 +35,7 @@ def output(clique_list=None, outfile=None, number_cells=None):
 	try:
 		outfn=open(outfile, 'w')
 		for c in range(1,number_cells+1):
-			if cell_clqID.has_key(c):
+			if c in cell_clqID:
 				outfn.write(cell_clqID[c]+'\n')
 			else:   # some cells have not been covered because no clique found for them.
 				outfn.write('-1\n')
@@ -50,7 +52,7 @@ def uniq(clique_list=None, edgeFile=None, outfile=None):
 	# clique_list: clique output from merge() 
 	# edgeFile: pair of nodes and weigh of edge (3 column file)
 	# outfile: clique output file, each line is a clique
- 	if (clique_list is None) or (edgeFile is None): 
+	if (clique_list is None) or (edgeFile is None): 
 		sys.stderr.write("wrong argument number from uniq()")
 		sys.exit(1)
 
@@ -80,7 +82,7 @@ def uniq(clique_list=None, edgeFile=None, outfile=None):
 		cliqNum+=1
 
 #------------------- unique assign---------------------------------------- 
-	for c in cell_cliq.keys(): # for each node
+	for c in list(cell_cliq.keys()): # for each node
 		if len(cell_cliq[c])>1:  # if it is in more than one clique
 			# count links in each clique associated with the cell
 			count_link=defaultdict(list) # key: cliq, value: weighted link in the cliq to the node
@@ -91,7 +93,7 @@ def uniq(clique_list=None, edgeFile=None, outfile=None):
 			# calculate the average of link weights connect from the cliq to the node c		
 			max_link={}
 			for cl in count_link.keys():
-				max_link[cl]=sum(map(float,count_link[cl]))/len(count_link[cl])
+				max_link[cl]=sum(list(map(float,count_link[cl])))/len(count_link[cl])
 			# select the clique to assign the node c
 			assign_cliq=max(max_link, key=max_link.get)		
 			#print c+" in "+" ".join(cell_cliq[c])+" assign: "+assign_cliq	
@@ -103,7 +105,7 @@ def uniq(clique_list=None, edgeFile=None, outfile=None):
 
 #--------------- output------------------------------------------
 	uniqCliq_list=[]
-	for cl in sorted(map(int,cliq_cell.keys())):
+	for cl in sorted(list(map(int,cliq_cell.keys()))):
 		if len(cliq_cell[str(cl)])>0:
 			uniqCliq_list.append(" ".join(cliq_cell[str(cl)])+'\n')	
 
@@ -149,7 +151,7 @@ def merge(clique_list=None, cutoff=None):
 		#for cl in cliq_cell.keys():
 		#	print str(cl)+" cliq: "+" ".join(cliq_cell[cl])
 		#for c in cell_cliq.keys():
-		#	print c+" cell: "+" ".join(map(str,cell_cliq[c]))
+		#	print c+" cell: "+" ".join(list(map(str,cell_cliq[c])))
 		#print "------ new merge begins ------"
 		merged_bl=mergeOnline(cutoff, cell_cliq, cliq_cell)
 
@@ -172,13 +174,13 @@ def mergeOnline(cutoff=None, cell_cliq=None, cliq_cell=None):
 				s=list(itertools.combinations(cell_cliq[c],2))
 				for pair in s:
 					grp=" ".join(pair)
-					if overlapCliq.has_key(grp):
+					if grp in overlapCliq:
 						overlapCliq[grp]+=1
 					else:
 						overlapCliq[grp]=1
 			else:
 				grp=" ".join(cell_cliq[c])
-				if overlapCliq.has_key(grp):
+				if grp in overlapCliq:
 					overlapCliq[grp]+=1
 				else:
 					overlapCliq[grp]=1
@@ -207,7 +209,7 @@ def mergeOnline(cutoff=None, cell_cliq=None, cliq_cell=None):
 	
 	# online merge: merge only one candidate group, then refresh.
 	# merge the one with the biggest score
-	currCliqNum=max(map(int, cliq_cell.keys()))+1
+	currCliqNum=max(list(map(int, cliq_cell.keys())))+1
 	if len(cliq2Merge.keys()):
 		grp=max(cliq2Merge, key=cliq2Merge.get)	
 		#print "merge "+grp+": "+str(cliq2Merge[grp])	
@@ -221,7 +223,7 @@ def mergeOnline(cutoff=None, cell_cliq=None, cliq_cell=None):
 				if str(currCliqNum) not in cell_cliq[c]: # add new cliq index
 					cell_cliq[c].append(str(currCliqNum)) 
 			del cliq_cell[cl]
-		cliq_cell[str(currCliqNum)]=map(str,sorted(new.keys()))
+		cliq_cell[str(currCliqNum)]=list(map(str,sorted(new.keys())))
 
 	return len(cliq2Merge.keys())
 		
@@ -315,7 +317,7 @@ def findQuasiCliq(infile=None, r=None):
 		if bl:
 			cliques_clean[currCliq]=cliques[currCliq]
 
-	max_ID=max(map(int, nodehash.keys()))
+	max_ID=max(list(map(int, nodehash.keys())))
 	return (cliques_clean.keys(),max_ID)
 # end 1.
 ################       end of algorithm         #########
@@ -329,7 +331,7 @@ def usage():
   -m,--merging\tmerging parameter. A number in the range of (0  1]. Default is 0.5.\n\
   -n,--number\tnumber of objects. Default is the maximum index in the input file.\n\
   -h,--help\tprint help message.\n"
-	print help_msg
+	print(help_msg)
 	sys.exit(0)
 
 def main(argv):
@@ -343,7 +345,7 @@ def main(argv):
 	try:
 		opts, args=getopt.getopt(argv, "i:o:m:r:n:h", ["input=","output=","merging=","r-quasi-cliq=","number=","help"])
 	except getopt.GetoptError as err:
-		print str(err)
+		print(str(err))
 		usage()
 		sys.exit(0)
 
@@ -361,7 +363,7 @@ def main(argv):
 		elif opt in ('-n','--number'):
 			number_cells=int(arg)
 		else:
-			print "Error in arguments: unknown option\n"
+			print("Error in arguments: unknown option\n")
 			usage()
 			sys.exit(0)
 			
@@ -388,16 +390,17 @@ def main(argv):
 	max_ID=results[1]
 	if number_cells is None:
 		number_cells=max_ID
-	print "input file "+edgeFile
-	print "find "+str(len(cliques))+" quasi-cliques"
+	print("input file "+edgeFile)
+	print("find "+str(len(cliques))+" quasi-cliques")
 	merge_cliques=[]
 	merge_cliques=merge(cliques, merge_cutoff)
-	print "merged into "+str(len(merge_cliques))+" clusters"
+	print("merged into "+str(len(merge_cliques))+" clusters")
 	uniq_cliques=[]
 	uniq_cliques=uniq(merge_cliques, edgeFile)
-	print "unique assign done \n"
+	print("unique assign done \n")
 	output(uniq_cliques, outfile, number_cells)
 
 if __name__=="__main__":
 	main(sys.argv[1:])
+
 

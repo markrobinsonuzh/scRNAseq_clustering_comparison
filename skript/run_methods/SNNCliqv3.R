@@ -3,16 +3,17 @@
 #####################
 
 source("skript/helper_files/Helper_functions.R")
-
+source("skript/run_methods/snn-cliq/SNN.R")
 
 # file paths
 
 DATA_DIR <- "data"
 files <- list(
+  
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR, "sceset_SRP073808.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  
 )
 
 # load data sets
@@ -38,9 +39,9 @@ for(i in names(data)) {
 }
 
 
-# extract expression data
+# extract expression data, transposed
 for (i in names(input_matrix)){
-  input_matrix[[i]] <-exprs(data[[i]]) # use exprs slot of SCeset; log2, normalized count_lstpm
+  input_matrix[[i]] <-t(exprs(data[[i]])) # use exprs slot of SCeset; log2, normalized count_lstpm
 }
 
 
@@ -54,55 +55,53 @@ distan <- "euclidean"
 par.k <-  list(
   kumar2015 = 15,
   trapnell2014 = 20,
-  xue2013 = 3,
-  koh2016 = 20
+  xue2013 = 3
 )
 
 par.r <- list(
   kumar2015 = 0.7,
   trapnell2014 = 0.7,
-  xue2013 = 0.7,
-  koh2016 = 0.7
-  )
+  xue2013 = 0.7
+)
 par.m <-  list(
   kumar2015 = 0.5,
   trapnell2014 = 0.5,
-  xue2013 = 0.5,
-  koh2016 = 0.5
+  xue2013 = 0.5
 )
 
+
+#### produce SNN graph
 for (i in names(input_matrix)){
   # construct a graph 
-scRNA.seq.funcs::SNN(
-  data = t(input_matrix[[i]]),
-  outfile = "snn-cliq.txt",
-  k = par.k[[i]],
-  distance = distan
-)
+  SNN(
+    data = t(input_matrix[[i]]),
+    outfile = "snn-cliq.txt",
+    k = par.k[[i]],
+    distance = distan
+  )
+  
+  
+  # find clusters in the graph
   
 
-# find clusters in the graph
-
-sys.time[[i]] <- system.time({
-snn.res <- 
-  system(
-    paste0(
-      "python Cliq.py ", 
-      "-i snn-cliq.txt ",
-      "-o res-snn-cliq.txt ",
-      "-r ", par.r[[i]],
-      " -m ", par.m[[i]]
-    ),
-    intern = TRUE
-  )
-})
-#
-cat(paste(snn.res, collapse = "\n"))
-snn.res <- read.table("res-snn-cliq.txt")
-
-pData(data[[i]])$SNNCliq <- as.character(snn.res[,1])
-# remove files that were created during the analysis
-system("rm snn-cliq.txt res-snn-cliq.txt")
+    snn.res <- 
+      system(
+        paste0(
+          "python Cliq.py ", 
+          "-i snn-cliq.txt ",
+          "-o res-snn-cliq.txt ",
+          "-r ", par.r[[i]],
+          " -m ", par.m[[i]]
+        ),
+        intern = TRUE
+      )
+  #
+  cat(paste(snn.res, collapse = "\n"))
+  snn.res <- read.table("res-snn-cliq.txt")
+  
+  pData(data[[i]])$SNNCliq <- as.character(snn.res[,1])
+  # remove files that were created during the analysis
+  system("rm snn-cliq.txt res-snn-cliq.txt")
 }
 
 
@@ -133,9 +132,16 @@ for (i in 1:length(labels)){
 }
 
 ###### Save Session Info
-sink(file = "results/SNNCliq/session_info_SNNCliqreduce.txt")
+sink(file = "results/SNNCliq/session_info_SNNCliq.txt")
 sessionInfo()
 sink()
 
 # Appendix
 
+paste0(
+  "python Cliq.py ", 
+  "-i snn-cliq.txt ",
+  "-o res-snn-cliq.txt ",
+  "-r ", 0.7,
+  " -m ", 0.5
+)
