@@ -18,7 +18,8 @@ DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 )
 
 # load data sets
@@ -45,12 +46,13 @@ for(i in names(data)) {
 # RUN SIMLR
 list <- vector("list", length(data))
 names(list) <- names(data)
-res.SIMLR <- sys.time<- res.cluster <-  list
+res.SIMLR <- sys.time <- res.cluster <-  list
 # Set paramaeters
 par.c <-  list(
   kumar2015 = 3,
   trapnell2014 = 3,
-  xue2013 = 8
+  xue2013 = 8,
+  koh2016 = 10
 )
 
 # 

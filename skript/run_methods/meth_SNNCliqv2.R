@@ -59,7 +59,7 @@ par.r <- list(
   kumar2015 = 0.7,
   trapnell2014 = 0.7,
   xue2013 = 0.7
-)
+  )
 par.m <-  list(
   kumar2015 = 0.5,
   trapnell2014 = 0.5,

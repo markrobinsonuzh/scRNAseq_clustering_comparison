@@ -1,9 +1,9 @@
 #####################################
-## Within sum of squares for clusters      
+## Within sum of squares for clusters 
+## compute for all dataset
 #####################################
 
 ### load libraries
-source("skript/helper_files/WORKIN_DIR.R")
 
 source("skript/helper_files/Helper_functions.R")
 library(cluster)
@@ -23,7 +23,8 @@ DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 )
 
 
@@ -56,7 +57,8 @@ for (i in 1:(length(tinput_matrix))){
 par.nk <- list(
   kumar2015=15,
   trapnell2014=15,
-  xue2013=15
+  xue2013=15,
+  koh2016=15
   
 )
 # 
@@ -77,7 +79,7 @@ for (i in seq_len(length(tinput_matrix))) {{
 
 # plot
 par(mfrow=c(2,2))
-for ( i in 1:3) {
+for ( i in 1:length(files)) {
 plot(1:15, wss[[i]][1:15], type="b", xlab="Number of Clusters",
      ylab="Within groups sum of squares", main=paste0(names(files)[i]))
 }

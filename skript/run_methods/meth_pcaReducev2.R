@@ -1,7 +1,7 @@
 ###################
 # pcaReduce
 ###################
-
+koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 source("skript/helper_files/Helper_functions.R")
 
 
@@ -17,6 +17,7 @@ files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
   xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+ 
 )
 
 # load data sets
@@ -55,23 +56,22 @@ for (i in 1:(length(input_matrix))){
 
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 <- 10,
-  trapnell2014 <- 10,
-  xue2013 <- 10
-  
+  kumar2015 = 10,
+  trapnell2014 = 10,
+  xue2013 = 10
+
 )
 
 par.q <- list(
-  kumar2015 <- 30,
-  trapnell2014 <- 30,
-  xue2013 <- 8
-  
+  kumar2015 = 30,
+  trapnell2014 = 30,
+  xue2013 = 8
 )
 n.cluster <- list(
   kumar2015=3,
   trappnell=3,
   xue2013=8
-)
+  )
 
 # extract k dimension 
 
@@ -88,6 +88,7 @@ for (i in names(input_matrix)){
 })
   res.cluster[[i]] <- pData(data[[i]])$pcaReduce 
 }
+
 
 # save clusters
 
