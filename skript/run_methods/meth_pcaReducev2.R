@@ -66,14 +66,14 @@ par.nbt <- list(
 par.q <- list(
   kumar2015 = 30,
   trapnell2014 = 30,
-  xue2013 = 8,mn 
+  xue2013 = 8,
   koh2016 = 30
 )
 n.cluster <- list(
   kumar2015=3,
-  trapnell=3,
+  trapnell2014=3,
   xue2013=8,
-  koh2016 = 30
+  koh2016 = 10
   )
 
 # extract k dimension 

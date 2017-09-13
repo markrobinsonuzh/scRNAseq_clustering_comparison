@@ -5,7 +5,7 @@
 pdf("results/QC_data/QC_GSE44183-GPL11154.pdf")
 
 # load packages
-source("skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/Helper_functions.R")
 
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
@@ -52,9 +52,8 @@ get_exprs(sceset,"tpm")[1:3,1:6] # tpms
 # QC 
 ##################
 #Plot overview for each cell
-tryCatch({
   plot(sceset, block1 = paste("source_name_ch1", collapse = "."))
-}, error = function(e) print(e))
+
 
 # Calculate quality metrics and filter
 # use ERCC spike inn as control features
@@ -102,9 +101,9 @@ dev.off()
 
 ## Appendix
 ### Automatic Cell filtering
-sceset <-plotPCA(sceset,
-                 size_by = "total_features", 
-                 pca_data_input = "pdata",
-                 detect_outliers = TRUE,
-                 return_SCESet = TRUE)
+#sceset <-plotPCA(sceset,
+#                 size_by = "total_features", 
+#                 pca_data_input = "pdata",
+#                 detect_outliers = TRUE,
+#                 return_SCESet = TRUE)
 

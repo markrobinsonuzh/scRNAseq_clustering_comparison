@@ -28,4 +28,4 @@ loaded via a namespace (and not attached):
 [49] locfit_1.5-9.1             DelayedArray_0.2.7         AnnotationDbi_1.38.2       compiler_3.4.1             GenomeInfoDb_1.12.2        rlang_0.1.2               
 [55] rhdf5_2.20.0               grid_3.4.1                 RCurl_1.95-4.8             tximport_1.4.0             rjson_0.2.15               labeling_0.3              
 [61] bitops_1.0-6               gtable_0.2.0               DBI_0.7                    reshape2_1.4.2             R6_2.2.2                   gridExtra_2.2.1           
-[67] knitr_1.17                 bit_1.1-12                 bindr_0.1                  stringi_1.1.5              ggbeeswarm_0.6.0           Rcpp_0.12.12              
+[67] bit_1.1-12                 bindr_0.1                  stringi_1.1.5              ggbeeswarm_0.6.0           Rcpp_0.12.12              

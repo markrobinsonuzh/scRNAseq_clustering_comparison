@@ -2,8 +2,7 @@
 # DBscan
 #####################
 
-source("~/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/WORKIN_DIR.R")
-source(paste0(WORKIN_DIR,"skript/helper_files/Helper_functions.R"))
+source("skript/helper_files/Helper_functions.R")
 
 
 
@@ -14,11 +13,12 @@ library(dbscan)
 # import data as sceset
 # file paths
 
-DATA_DIR <- paste0(WORKIN_DIR,"data")
+DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 )
 
 # load data sets
@@ -51,12 +51,14 @@ res.cluster <- res.dbscan <- sys.time<- input_matrix<- pca.red <- list
 for (i in names(input_matrix)){
   input_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
 }
-# RUN dbscan
+# RUN dbscan, k is nearest neighbor
 
 par.k <- list(
   kumar2015 = 97,
   trapnell2014 = 97,
-  xue2013 = 15
+  xue2013 = 15,
+  koh2016 = 25
+  
 )
 
 
@@ -72,12 +74,15 @@ for (i in names(input_matrix)){
 par.eps <- list(
   kumar2015 = 280,
   trapnell2014 = 400,
-  xue2013 = 600
+  xue2013 = 600,
+  koh2016 = 300
 )
 par.Pts <- list(
   kumar2015 = 5,
   trapnell2014 = 5,
-  xue2013 = 5
+  xue2013 = 5,
+  koh2016 = 5
+  
 )
 
 for(i in names(input_matrix)){
@@ -89,20 +94,20 @@ res.cluster[[i]] <- dbscan(input_matrix[[i]], eps = par.eps[[i]] ,minPts = par.P
 
 # save clusters
 
-dir_cluster <- paste0(WORKIN_DIR,"results/dbscan/dbscan_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/dbscan/dbscan_clus_", names(res.cluster), ".txt")
 
 
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0(WORKIN_DIR,"results/dbscan/dbscan_systime_",names(sys.time),".txt")
+dir_systime <-  paste0("results/dbscan/dbscan_systime_",names(sys.time),".txt")
 
 save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 
-file_names <-  paste0(WORKIN_DIR,"results/dbscan/dbscan_labels_",names(labels), ".txt")
+file_names <-  paste0("results/dbscan/dbscan_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
@@ -110,14 +115,18 @@ for (i in 1:length(labels)){
 
 
 ###### Save Session Info
-sink(file = paste0(WORKIN_DIR,"results/dbscan/session_info_dbscan.txt"))
+sink(file = paste0("results/dbscan/session_info_dbscan.txt"))
 sessionInfo()
 sink()
 
 ### Appendix
+
+
+
 # plot Data
 
 # with Rtsne
 #library(Rtsne)
 #rtsne <- Rtsne(dd, perplexity =5)
 #plot(rtsne$Y)
+

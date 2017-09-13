@@ -12,6 +12,7 @@ source("skript/helper_files/Helper_functions.R")
 library(cluster)
 library(dplyr) 
 library(magrittr)
+library(scater)
 
 
 pdf("results/plots/optimalk_sihlhoutte.pdf")
@@ -27,7 +28,8 @@ DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
+  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 )
 
 
@@ -64,15 +66,15 @@ for (i in 1:(length(tinput_matrix))){
 par.k= list(
   kumar2015 = 3,
   trapnell2014 = 2,
-  xue2013 = 2
+  xue2013 = 2,
+  koh2016= 10
+  
 )
-
 
 for (i in names(tinput_matrix)){
   res.si[[i]]<- silhouette(pam(tinput_matrix[[i]], k=par.k[[i]] ))
-  plot(res.si[[i]])
+  plot(res.si[[i]], main=names(data[i]))
 }
-
 
 dev.off()
 
