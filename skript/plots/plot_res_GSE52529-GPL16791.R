@@ -7,9 +7,9 @@
 library(gridExtra)
 library(ggfortify)
 
-library(Seurat)
 library(scater)
 library(plyr)
+library(cowplot)
 # load the data
 ##############################
 DATA_DIR <- "data"
@@ -21,7 +21,8 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "SIMLR",
                               "Seurat",
                               "SC3",
-                              "pcaReduce"))
+                              "pcaReduce",
+                              "dbscan"))
 # define method name
 method <- list(
   tSNEkmeans = NULL,
@@ -29,7 +30,8 @@ method <- list(
   SIMLR = NULL,
   Seurat= NULL,
   SC3 = NULL,
-  pcaReduce = NULL
+  pcaReduce = NULL,
+  dbscan=NULL
   
 )
 
@@ -48,17 +50,17 @@ for (i in 1:length(data)){
 
 # load the the labels:
 
-# files labels
-RES_DIR <- "~/Desktop/masterthesis/results"
-# define dataset
-dataset <- "trapnell2014.txt"
+# create filenames
+RES_DIR <- "results"
+
 fileslabels <- list(
-  tSNEkmeans = file.path(RES_DIR, paste0("tSNEkmeans/tSNEkmeans_labels_",dataset)),
-  SNNCliq = file.path(RES_DIR, paste0("SNNCliq/SNNCliq_labels_",dataset)),
-  SIMLR = file.path(RES_DIR, paste0("SIMLR/SIMLR_labels_",dataset)),
-  Seurat= file.path(RES_DIR, paste0("Seurat/Seurat_labels_",dataset)),
-  SC3 = file.path(RES_DIR, paste0("Seurat/Seurat_labels_",dataset)),
-  pcaReduce = file.path(RES_DIR, paste0("Seurat/Seurat_labels_",dataset))
+  tSNEkmeans = file.path(RES_DIR, "tSNEkmeans/tSNEkmeans_labels_trapnell2014.txt"),
+  SNNCliq = file.path(RES_DIR, "SNNCliq/SNNCliq_labels_trapnell2014.txt"),
+  SIMLR = file.path(RES_DIR, "SIMLR/SIMLR_labels_trapnell2014.txt"),
+  Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
+  SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
+  pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_trapnell2014.txt")
 )
 
 # load cell labels
@@ -69,19 +71,17 @@ names(labels) <-  names(fileslabels)
 for(i in 1:length(labels)) {
   labels[[i]] <- read.csv(fileslabels[[i]], sep = "\t")
 }
-# rename cell levels
-
-labels <- unlist(labels[[1]])
-Labels <- as.factor(labels)
-
-# load the clustering results from method:
+Labels <- unlist(labels[[1]])
+Labels <- as.factor(Labels)
+# load the clustering results from methods:
 filesclusters <- list(
-  tSNEkmeans = file.path(RES_DIR, paste0("tSNEkmeans/tSNEkmeans_clus_",dataset)),
-  SNNCliq = file.path(RES_DIR, paste0("SNNCliq/SNNCliq_clus_",dataset)),
-  SIMLR = file.path(RES_DIR, paste0("SIMLR/SIMLR_clus_",dataset)),
-  Seurat= file.path(RES_DIR, paste0("Seurat/Seurat_clus_",dataset)),
-  SC3 = file.path(RES_DIR, paste0("SC3/sc3_clus_",dataset)),
-  pcaReduce = file.path(RES_DIR, paste0("PCAreduce/PCAreduce_clus_",dataset))
+  tSNEkmeans = file.path(RES_DIR, "tSNEkmeans/tSNEkmeans_clus_trapnell2014.txt"),
+  SNNCliq = file.path(RES_DIR, "SNNCliq/SNNCliq_clus_trapnell2014.txt"),
+  SIMLR = file.path(RES_DIR, "SIMLR/SIMLR_clus_trapnell2014.txt"),
+  Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_trapnell2014.txt"),
+  SC3 = file.path(RES_DIR, "SC3/sc3_clus_trapnell2014.txt"),
+  pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_trapnell2014.txt"),
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_trapnell2014.txt")
 )
 
 
@@ -94,19 +94,9 @@ for(i in 1:length(clusters)) {
   clusters[[i]] <- as.factor(unlist(read.csv(filesclusters[[i]], sep = "\t")))
 }
 
-
 # Plot on PC1 and PC2
 
-plot.method <- list(
-  tSNEkmeans = NULL,
-  SNNCliq = NULL,
-  SIMLR = NULL,
-  Seurat= NULL,
-  SC3 = NULL,
-  pcaReduce = NULL
-)
-
-
+plot.method <- NULL
 
 # PCA dim reduce on log2 transformed, normalized count_lstpm
 data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" ,return_SCESet=TRUE, scale_features=TRUE)
@@ -120,10 +110,15 @@ vec <- c(1:6)
 for (i in 1:length(clusters)){
   
   plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
-    geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])+
-    theme(legend.justification=c(0,0), legend.position=c(0,0))
-  
+    geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])
+
 }
 
-plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("results/plots/plot_cluster_GSE52529-GPL16791.pdf", plot2by3, base_height = 10, base_width = 15)
+plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto", nrow = 3,ncol =3)
+save_plot("results/plots/plot_cluster_trapnell2014.pdf", plot2by3, base_height = 10, base_width = 15)
+
+
+## appendix
+
+
+

@@ -1,11 +1,11 @@
 ###################################
-### plot confusion matrix for method PCAreduce 
+### plot confusion matrix for method RtSNE 
 ###################################
 
-pdf("results/plots/confusion_matrix_SC3.pdf")
+pdf("results/plots/confusion_matrix_SIMLR.pdf")
 
 # load libraries
-source("skript/helper_functions/Helper_functions.R")
+source("skript/helper_files/Helper_functions.R")
 
 library(reshape)
 library(caret)
@@ -18,8 +18,8 @@ library(magrittr)
 
 # define method:
 
-DATA_DIR <-  "results/SC3/"
-METHOD <- c("SC3")
+DATA_DIR <-  "results/SIMLR/"
+METHOD <- c("SIMLR")
 
 ### files with the cell labels, "ground truth":
 files_labels <- list(

@@ -19,7 +19,8 @@ DATA_DIR <-   "results/SC3/"
 files_labels <- list(
   kumar2015 = file.path(DATA_DIR, paste0(METHOD,"_labels_kumar2015.txt")),
   trapnell2014 = file.path(DATA_DIR, paste0(METHOD,"_labels_trapnell2014.txt")),
-  xue2013 = file.path(DATA_DIR, paste0(METHOD,"_labels_xue2013.txt"))
+  xue2013 = file.path(DATA_DIR, paste0(METHOD,"_labels_xue2013.txt")),
+  koh2016 = file.path(DATA_DIR, paste0(METHOD,"_labels_koh2016.txt"))
 )
 
 # read in labels
@@ -31,7 +32,8 @@ labels <- read.labels(files_labels = files_labels)
 files_clusters <- list(
   kumar2015 = file.path(DATA_DIR, paste0(METHOD,"_clus_kumar2015.txt")),
   trapnell2014 = file.path(DATA_DIR, paste0(METHOD,"_clus_trapnell2014.txt")),
-  xue2013 = file.path(DATA_DIR, paste0(METHOD,"_clus_xue2013.txt"))
+  xue2013 = file.path(DATA_DIR, paste0(METHOD,"_clus_xue2013.txt")),
+  koh2016 = file.path(DATA_DIR, paste0(METHOD,"_clus_koh2016.txt"))
 )
 
 cluster <- read.cluster(files_clusters=files_clusters)

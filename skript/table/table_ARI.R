@@ -3,6 +3,8 @@
 ###################
 library(stargazer)
 library(dplyr)
+library(plyr)
+
 # define data directory, METHODS and DATASETS
 
 RES_DIR <- "results/"
@@ -10,7 +12,8 @@ RES_DIR <- "results/"
 DATASET <- c(
   "kumar2015",
   "trapnell2014", 
-  "xue2013"
+  "xue2013",
+  "koh2016"
 )
 METHOD <- c(
   "tSNEkmeans",
@@ -18,7 +21,8 @@ METHOD <- c(
   "SC3",
   "SNNCliq",
   "pcaReduce",
-  "seurat"
+  "seurat",
+  "dbscan"
   
 )
 
@@ -39,7 +43,10 @@ ARI <- sapply(unlist(file_names),read.csv)
 #### Table
 ari.m <- matrix(ARI,nrow = length(DATASET), dimnames = list(DATASET,METHOD)) 
 ari.m[] <- lapply(ari.m, round,2)
-tbl.ari <- stargazer(ari.m)
+tbl.ari <- stargazer(ari.m, title = "Adjusted rand index ")
+
+
+
 
 ### Appendix
 ari.df <- ldply(ARI, data.frame)

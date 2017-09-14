@@ -25,7 +25,7 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "Seurat",
                               "SC3",
                               "pcaReduce",
-                              "RtSNEkmeans"))
+                              "dbscan"))
 
 # define method name for writing file
 method <- list(
@@ -35,7 +35,7 @@ method <- list(
   Seurat= NULL,
   SC3 = NULL,
   pcaReduce = NULL,
-  RtSNEkmeans=NULL
+  dbscan = NULL
   
 )
 
@@ -64,7 +64,7 @@ fileslabels <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
   SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
   pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
-  RtSNEkmeans = file.path(RES_DIR, "RtSNEkmeans/RtSNEkmeans_labels_koh2016.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_koh2016.txt")
 )
 
 # load cell labels
@@ -85,7 +85,7 @@ filesclusters <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_koh2016.txt"),
   SC3 = file.path(RES_DIR, "SC3/sc3_clus_koh2016.txt"),
   pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_koh2016.txt"),
-  RtSNEkmeans = file.path(RES_DIR, "RtSNEkmeans/RtSNEkmeans_clus_koh2016.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_koh2016.txt")
 )
 
 
@@ -107,7 +107,8 @@ plot.method <- list(
   SIMLR = NULL,
   Seurat= NULL,
   SC3 = NULL,
-  pcaReduce = NULL
+  pcaReduce = NULL,
+  dbscan = NULL
 )
 
 
@@ -120,22 +121,20 @@ pc.data <-as.data.frame(data[[1]]@reducedDimension)
 
 
 
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-vec <- c(1:6)
+
 
 for (i in 1:length(clusters)){
   
   plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
-    geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])+
-    theme(legend.justification=c(0,0), legend.position=c(0,0))
+    geom_point(aes_string(color=clusters[[i]]))+labs(colour=METHOD_NAME[i])+scale_shape_manual(values=c(1:10), guide=FALSE)
   
 }
 
 
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
-save_plot("results/plots/plot_cluster_GSE60749-GPL13112.pdf", plot2by3, base_height = 10, base_width = 15)
+save_plot("results/plots/plot_cluster_koh2016.pdf", plot2by3, base_height = 10, base_width = 15)
 # Appendix
 
 

@@ -60,7 +60,7 @@ names(conv.tbl) <- names(files_labels)
 for (i in seq_len(length(conv.tbl))){
   
   dd <- melt(conv.tbl[[i]])
-  print(ggplot(dd, aes(dd[,1], dd[,2], fill=value))+geom_tile()
+  print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2], fill=value))+geom_tile()
         +geom_text(aes(label=dd$value),colour="white")
         +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 15),axis.text.y=element_text(size = 15))
         +ylab("labels")+xlab("cluster")
