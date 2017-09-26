@@ -13,6 +13,8 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(mvoutlier))
 suppressPackageStartupMessages(library(plyr))
+library(cowplot)
+
 # load multiassay dataset from IMLS conquer
 maex <- readRDS("data/GSE52529-GPL16791.rds")
 # summary of data set
@@ -103,6 +105,20 @@ dev.off()
 
 
 # Appendix
+
+
+tsne <- scater::plotTSNE(sceset[!duplicated(tpm(sceset)), ], exprs_values = "tpm", return_SCESet = TRUE)
+phenoid <- as.data.frame(pData(tsne)$phenoid)
+
+tsne.data <- as.data.frame(tsne@reducedDimension)
+tsne.data <- cbind(tsne.data, phenoid)
+colnames(tsne.data) <- c("Dimension 1","Dimension 2", "phenoid")
+
+pdf("results/QC_data/Trapnell2014tsne.pdf")
+ggplot(data = tsne.data , mapping = aes(x=`Dimension 1`,y=`Dimension 2`))+
+  geom_point(aes(colour=phenoid), size=2)+labs(colour=phenoid)+scale_colour_manual(values=c("#000000", "#E69F00", "#0072B2"))
+
+dev.off()
 
 dim(sceset) # 41112    x  288 
 # Dealing with confounders

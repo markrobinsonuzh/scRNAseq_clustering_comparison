@@ -32,7 +32,7 @@ for (i in seq_len(length(labels))) {
   {
   levels(labels[[i]]) <- look[[i]] 
   }
-  lbls <- sapply(labels,as.integer)
+  lbls <- sapply(labels, as.integer)
 }
 
 # read in cluster results, format as integer
@@ -46,8 +46,11 @@ files_clusters <- list(
 clus <- read.cluster(files_clusters=files_clusters)%>%sapply(as.integer)
 
 ### calculate F1 scores
+res.f1 <- vector("list", length(files_labels))
+names(res.f1) <- names(files_labels)
+               
 for (i in seq_len(length(clus))) {
-         print(calc_f1_scores(lbls[[i]],clus[[i]])  ) 
+        res.f1[[i]] <- (calc_f1_scores(lbls[[i]],clus[[i]])  ) 
 }
 
 #####

@@ -56,7 +56,7 @@ for (i in names(input_matrix)){
 par.k <- list(
   kumar2015 = 97,
   trapnell2014 = 97,
-  xue2013 = 15,
+  xue2013 = 5,
   koh2016 = 25
   
 )

@@ -115,6 +115,34 @@ dev.off()
 
 
 ## Appendix
+
+tsne <- scater::plotTSNE(sceset[!duplicated(tpm(sceset)), ], exprs_values = "tpm", return_SCESet = TRUE)
+
+
+pdf("results/QC_data/Koh2016tsne.pdf")
+print(scater::plotReducedDim(tsne, colour_by = "phenoid") + 
+        guides(fill = guide_legend(byrow = TRUE)) )
+dev.off()
+
+
+
+tsne <- scater::plotTSNE(sceset[!duplicated(tpm(sceset)), ], exprs_values = "tpm", return_SCESet = TRUE)
+phenoid <- as.data.frame(pData(tsne)$phenoid)
+
+tsne.data <- as.data.frame(tsne@reducedDimension)
+tsne.data <- cbind(tsne.data, phenoid)
+colnames(tsne.data) <- c("Dimension 1","Dimension 2", "phenoid")
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#CC6666","#996633")
+
+pdf("results/QC_data/tsne_Koh2013.pdf")
+ggplot(data = tsne.data , mapping = aes(x=`Dimension 1`,y=`Dimension 2`))+
+  geom_point(aes(colour=phenoid), size=2)+labs(colour=phenoid)+scale_colour_manual(values=cbbPalette)
+
+dev.off()
+
+
+
+
 ### Automatic Cell filtering
 #sceset <-plotPCA(sceset,
 #                 size_by = "total_features", 

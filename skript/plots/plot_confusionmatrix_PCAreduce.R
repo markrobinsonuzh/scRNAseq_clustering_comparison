@@ -52,22 +52,30 @@ for (i in seq_len(length(cluster))){
 }
 
 ##################################
-# confusion matrix as ggplot ###
+# confusion matrix as pheatmap ###
 ##################################
+
 p <- vector(mode="list", length=length(conv.tbl))
 names(conv.tbl) <- names(files_labels)
+
+
+pheat.list <- vector(mode="list", length=length(conv.tbl))
 
 for (i in seq_len(length(conv.tbl))){
   
   dd <- melt(conv.tbl[[i]])
-  print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2], fill=value))+geom_tile()
-        +geom_text(aes(label=dd$value),colour="white")
-        +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 15),axis.text.y=element_text(size = 15))
-        +ylab("labels")+xlab("cluster")
-        
+  
+  pheat.plot[[i]] <- pheatmap(conv.tbl[[i]], 
+                              color = colorRampPalette(brewer.pal(7, "GnBu"))(100), 
+                              display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
+                              cluster_rows = FALSE, cluster_cols = FALSE, 
+                              main = paste0(names(conv.tbl[i])), 
+                              width = 6, 
+                              height = 6,
+                              number_format="%.0f",
+                              filename=paste0("results/plots/confusion_matrix_PCAreduce",names(conv.tbl[i]),".pdf")
   )
 }
-
 
 
 dev.off()

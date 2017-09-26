@@ -72,3 +72,48 @@ for (i in seq_len(length(conv.tbl))){
 
 dev.off()
 ### Appendix
+### Appendix
+
+
+##################################
+# confusion matrix as ggplot ###
+##################################
+
+p <- vector(mode="list", length=length(conv.tbl))
+names(conv.tbl) <- names(files_labels)
+
+for (i in seq_len(length(conv.tbl))){
+  
+  dd <- melt(conv.tbl[[i]])
+  print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2], fill=value))+geom_tile(interpolate=FALSE)
+        +geom_text(aes(label=dd$value),colour="white")
+        +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))
+        +ylab("labels")+xlab("cluster")
+        
+  )
+}
+
+
+
+#dev.off()
+
+
+##############
+
+print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2]))+
+        geom_raster(aes(fill=dd$value), hjust = 0.5, vjust=0.5, interpolate=FALSE)+
+        scale_fill_gradient(low="white", high="blue")+
+        theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))+
+        ylab("labels")+xlab("cluster")+theme_linedraw()
+)
+
+ggplot(dd, aes(as.factor(dd[,1]), dd[,2]))+
+  geom_raster(aes(fill=dd$value), hjust = 0.5, vjust=0.5, interpolate=FALSE)+
+  scale_fill_gradient(low="white", high="blue")+
+  theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))+
+  ylab("labels")+xlab("cluster")+theme_linedraw()
+
+
+
+
+

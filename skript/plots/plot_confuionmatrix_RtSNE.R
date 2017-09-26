@@ -2,7 +2,7 @@
 ### plot confusion matrix for method RtSNE 
 ###################################
 
-pdf("results/plots/confusion_matrix_RtSNEkmeans.pdf")
+#pdf("results/plots/confusion_matrix_RtSNEkmeans.pdf")
 
 # load libraries
 source("skript/helper_files/Helper_functions.R")
@@ -11,6 +11,9 @@ library(reshape)
 library(caret)
 library(dplyr)
 library(magrittr)
+library(pheatmap)
+library(RColorBrewer)
+library(cowplot)
 
 ###########################
 # load labels and cluster #
@@ -39,9 +42,6 @@ files_clusters <- list(
 )
 cluster <- read.cluster(files_clusters = files_clusters)
 
-
-
-
 #####################
 # confusion matrix #
 #####################
@@ -52,39 +52,30 @@ for (i in seq_len(length(cluster))){
 }
 
 ##################################
-# confusion matrix as ggplot ###
+# confusion matrix as pheatmap ###
 ##################################
-p <- vector(mode="list", length=length(conv.tbl))
-names(conv.tbl) <- names(files_labels)
+
+pheat.plot <- vector(mode="list", length=length(conv.tbl))
+
+names(pheat.plot) <- names(conv.tbl) <- names(files_labels)
 
 for (i in seq_len(length(conv.tbl))){
   
   dd <- melt(conv.tbl[[i]])
-  print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2], fill=value))+geom_tile(interpolate=FALSE)
-        +geom_text(aes(label=dd$value),colour="white")
-        +ggtitle(paste0(names(conv.tbl[[i]])))+theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))
-        +ylab("labels")+xlab("cluster")
-        
+  
+  pheat.plot[[i]] <- pheatmap(conv.tbl[[i]], 
+                              color = colorRampPalette(brewer.pal(7, "GnBu"))(100), 
+                              display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
+                              cluster_rows = FALSE, cluster_cols = FALSE, 
+                              main = paste0(names(conv.tbl[i])), 
+                              width = 6, 
+                              height = 6,
+                              number_format="%.0f",
+                              filename=paste0("results/plots/confusion_matrix_RtSNE",names(conv.tbl[i]),".pdf")
   )
 }
 
-
-
-dev.off()
-### Appendix
-print(ggplot(dd, aes(as.factor(dd[,1]), dd[,2]))+
-        geom_raster(aes(fill=dd$value), hjust = 0.5, vjust=0.5, interpolate=FALSE)+
-        scale_fill_gradient(low="white", high="blue")+
-        theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))+
-        ylab("labels")+xlab("cluster")+theme_linedraw()
-)
-
-ggplot(dd, aes(as.factor(dd[,1]), dd[,2]))+
-  geom_raster(aes(fill=dd$value), hjust = 0.5, vjust=0.5, interpolate=FALSE)+
-  scale_fill_gradient(low="white", high="blue")+
-  theme(axis.text.x=element_text(size = 10),axis.text.y=element_text(size = 10))+
-  ylab("labels")+xlab("cluster")+theme_linedraw()
-  
+#dev.off()
 
 
 

@@ -7,13 +7,16 @@
 # substantially rewritten, renamed calcF1Scores -> calc_f1_scores, 
 # added Hungarian alg. from 'clue' package
 # input: prd are the predicted clusters, act is the "ground" truth
+# changed code to transpose matrix if number cols is < nrow, have to rewrite the rest of the code
 calc_f1_scores=function(prd,act){
   require(clue)
   #act and prd must be integers
   stopifnot(is.integer(act))
   stopifnot(is.integer(prd))
   
+  
   tb <- table(act,prd)
+  ifelse(ncol(tb) >= nrow(tb), tb <- tb, tb <- t(tb))
   ha <- solve_LSAP(tb, maximum=TRUE) # hungarian alg.
   
   df <- data.frame(act=as.integer(rownames(tb)),

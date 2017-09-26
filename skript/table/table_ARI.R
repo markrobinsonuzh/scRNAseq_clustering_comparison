@@ -43,9 +43,18 @@ ARI <- sapply(unlist(file_names),read.csv)
 #### Table
 ari.m <- matrix(ARI,nrow = length(DATASET), dimnames = list(DATASET,METHOD)) 
 ari.m[] <- lapply(ari.m, round,2)
+
+
+
 tbl.ari <- stargazer(ari.m, title = "Adjusted rand index ")
 
+### new table
 
+ari.m2 <- ari.m[1:4,c(-4) ]
+rownames(ari.m2) <- c("Kumar 2015", "Trapnell 2014", "Xue 2013", "Koh 2016")
+colnames(ari.m2) <- c("tSNE kmeans", "SIMLR", "SC3" , "pcaReduce" ,"SEURAT" ,"dbscan")
+
+ stargazer(ari.m2, title = "Results of comparison of clustering methods for data set Kumar 2015, Trapnell 2014, Xue 2013 and Koh 2016. Shown is the Adjusted Rand Index for the methods tSNE and kmeans, SIMLR, SC3, pcaReduce, SEURAT and dbscan")
 
 
 ### Appendix

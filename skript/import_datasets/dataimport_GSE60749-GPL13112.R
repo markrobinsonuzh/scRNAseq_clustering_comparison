@@ -95,8 +95,38 @@ sink()
 dev.off()
 
 
+
+
+
+
 ## Appendix
-### Automatic Cell filtering
+tsne <- scater::plotTSNE(sceset[!duplicated(tpm(sceset)), ], exprs_values = "tpm", return_SCESet = TRUE)
+
+
+pdf("results/QC_data/Kumar2014tsne.pdf")
+print(scater::plotReducedDim(tsne, colour_by = "phenoid") + 
+        guides(fill = guide_legend(byrow = TRUE)) )
+dev.off()
+
+
+
+
+
+tsne <- scater::plotTSNE(sceset[!duplicated(tpm(sceset)), ], exprs_values = "tpm", return_SCESet = TRUE)
+phenoid <- as.data.frame(pData(tsne)$phenoid)
+
+tsne.data <- as.data.frame(tsne@reducedDimension)
+tsne.data <- cbind(tsne.data, phenoid)
+colnames(tsne.data) <- c("Dimension 1","Dimension 2", "phenoid")
+
+pdf("results/QC_data/Kumar2014tsne.pdf")
+ggplot(data = tsne.data , mapping = aes(x=`Dimension 1`,y=`Dimension 2`))+
+  geom_point(aes(colour=phenoid), size=2)+labs(colour=phenoid)+scale_colour_manual(values=c("#000000", "#E69F00", "#0072B2"))
+
+dev.off()
+
+
+$### Automatic Cell filtering
 sceset <-plotPCA(sceset,
                  size_by = "total_features", 
                  pca_data_input = "pdata",
