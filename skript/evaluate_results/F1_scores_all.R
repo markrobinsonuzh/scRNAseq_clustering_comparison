@@ -4,12 +4,13 @@
 #load libraries
 library(dplyr)
 library(plyr)
+library(clue)
 
 #load helper file
 source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/helper_calc_f1_scores.R")
 source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/Helper_functions.R")
 # load data files
-DATASET <-   c("Koh2016", "kumar2015", "trapnell2014", "xue2013")
+DATASET <-   c("koh2016", "kumar2015", "trapnell2014", "xue2013")
 
 #DATASET <-  "kumar2015"
 
@@ -28,7 +29,7 @@ look <- lapply(clusters$labels, function(x) levels(x) <- c(1:length(levels(x))) 
 
 levels(clusters$labels) <- c(1:length(levels(clusters$labels)))
 clusters$labels <- as.integer(clusters$labels)
-# change levels to integer
+
 
 ### calculate F1 scores
 res.f1 <- vector("list", length(clusters))

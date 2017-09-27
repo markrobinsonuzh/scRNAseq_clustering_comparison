@@ -5,8 +5,12 @@
 
 ## load libraries
 library(plyr)
-
+library(tidyr)
 library(dplyr)
+library(reshape2)
+library(pheatmap)
+library(RColorBrewer)
+
 ## define the data directories
 DATA_DIR <-  "results/run_results"
 
@@ -21,32 +25,29 @@ files_f1 <- list(
   koh2016 = file.path(DATA_DIR, "f1_koh2016.rda")
 )
 
+for ( i in names(files_f1)){
 # load dataset
-load(files_f1[[1]])
-
+tmp <- lapply(files_f1[[i]], function(x) get(load(x)))
 ## plot pheatmap
 # create table with data 
-res.f1$pcaReduce$f1
-res.f1$pcaReduce$act
-
-unique(rapply(res.f1, function(x) head(x, 1)))
-sapply(res.f1, mean)
-
-lapply(res.f1, function(x) x[1])
-
-
-
-x <- lapply(res.f1, function(x)cbind(f1=x$f1, label=x$act)) 
-x <- x[-c(7,8)]
-table(x)
-?table
-%>%unlist()%>%as.matrix(nrow=3,ncol=7)
-?as.matrix
-names(res.f1[res.f1])
-
-cbind(f1=res.f1$pcaReduce$f1,label=res.f1$pcaReduce$act)
-
-unlist(res.f1)
 # rearrange data 
+tmp <- ldply(tmp[[1]], data.frame) %>% select(.id, f1, act)
+tmp <- daply(tmp, .(act, .id), function(x) x$f1)
 
-##############
+##plot it
+pheatmap(tmp , color = colorRampPalette(brewer.pal(3, "YlGnBu"))(10),
+         display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
+         cluster_rows = FALSE, cluster_cols = FALSE, 
+         main = "f1 plot", 
+         width = 6, 
+         height = 6,
+         number_format="%.2f",
+         filename=paste0("results/plots/plot_f1_",names(files_f1[i]),".pdf")
+         )
+
+
+
+}
+
+
+# Appendix

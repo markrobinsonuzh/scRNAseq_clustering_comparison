@@ -2,12 +2,18 @@
 # tSNE + kmeans
 #####################
 
+# The following method uses the Barnes-Hut implementation of t-Distributed Stochastic Neighbor Embedding for dimensionality reduction and kmeans foe clustering.
+# Set Random seed for reproducible results.  Rtsne uses by  PCA for dimensionality reduction, by default 50 dimension are retained.
+# In Rtsne the perplexity parameter has to be defined, typical values are between 5 and 50. Perplexity parameter is loosly speaking a guess about the number of close neighbors each point has. 
+# Perplexity has to at least to be smaller than the number of points. 
+# Other hyperparameters as the learning rate epsilon and the number of iteration which can give different results for different value ranges. 
+
 #load libraries
 source("skript/helper_files/Helper_functions.R")
-
 library(Rtsne)
 library(scater)
 library(dplyr)
+
 # file paths
 
 DATA_DIR <- "data"
@@ -22,7 +28,7 @@ files <- list(
 
 # load data sets
 
- list<- vector("list", length(files))
+list<- vector("list", length(files))
 names(list) <- names(files)
 
 list->data->labels->tinput_matrix->sys.time->res.rtsne->res.cluster 
@@ -45,21 +51,22 @@ for (i in 1:(length(tinput_matrix))){
 }
 
 # RUN tSNE and kmeans
-
-# define perplexitz parameter for tsne an number of clusters in kmeans
+# set random seed
 rand.seed <- 1234
-par.k <- list(
-  kumar2015 = 3,
-  trapnell2014 = 3,
-  xue2013 = 8,
-  koh2016= 10
-)
 
+# define the perplexity parameter for tSNE
 par.perp <- list(
   kumar2015 = 20,
   trapnell2014 = 20,
   xue2013 = 5,
   koh2016 = 20
+)
+# define the number of cluster for kmeans clustering 
+par.k <- list(
+  kumar2015 = 3,
+  trapnell2014 = 3,
+  xue2013 = 8,
+  koh2016= 10
 )
 
 
@@ -104,14 +111,4 @@ sessionInfo()
 sink()
 
 ### Appendix
-# tidy up
-tidy.data <- res.rtsne[[1]]$Y %>% as.data.frame()%>% mutate(truth=as.factor(pData(data[[1]])$phenoid)) %>% mutate(col=truth) %>% mutate(cluster=res.cluster[[1]])
-levels(tidy.data$col) <- c(1,2,3 )
-
-ggplot(data = tidy.data  , mapping = aes(x=V1,y=V2))+geom_point(aes(shape=truth))
-
-
-
-
-
 

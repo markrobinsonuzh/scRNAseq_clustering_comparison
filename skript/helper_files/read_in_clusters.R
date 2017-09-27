@@ -2,6 +2,10 @@
 ### create results file      ####
 #################################
 
+# This file reads in the text files from the cluster runs for each method as well as the labels with the ground truth for the respective dataset. 
+# The cluster and labels are then saved as a single list per dataset and stored as a .rdata file.
+
+
 #load libraries
 library(plyr)
 library(dplyr)
@@ -12,11 +16,11 @@ source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skr
 
 
 # define method
-METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNCliq")
+METHOD <- c("PCAReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNCliq")
 
 # file paths to the clustering results
 DATA_DIR <-  "results"
-DATASET <-   "Koh2016"
+DATASET <-   "trapnell2014"
 
 
 
@@ -48,6 +52,7 @@ for (i in names(clusters)) {
 }
 
 #### generate object with cluster and files
-clusters$labels <- labels$pcaReduce
+clusters$labels <- labels$RtSNEkmeans
 ### Save object
 save(clusters,file = paste0("results/run_results/",DATASET,".rda"))
+
