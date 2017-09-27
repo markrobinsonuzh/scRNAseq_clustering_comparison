@@ -11,6 +11,7 @@ library(reshape)
 library(caret)
 library(dplyr)
 library(magrittr)
+library(RColorBrewer)
 
 ###########################
 # load labels and cluster #
