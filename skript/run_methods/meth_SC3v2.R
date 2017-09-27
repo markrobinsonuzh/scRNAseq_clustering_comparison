@@ -1,7 +1,7 @@
 ####################
 # SC3
 ######################
-
+# change sc 3 prepare
 source("skript/helper_files/Helper_functions.R")
 
 # load libraries
@@ -21,7 +21,7 @@ files <- list(
   koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
 )
 
-# load data sets
+# load data sets
 
 data <- vector("list", length(files))
 labels <- data
@@ -64,9 +64,9 @@ par.ks <- list(
 
 for (i in names(data)){
   sys.time[[i]] <- system.time({
-  data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, normalized data
-  data[[i]]<- sc3_estimate_k(data[[i]])# optional
-  data[[i]]<- sc3(data[[i]], ks = data[[i]]@sc3$k_estimation, biology = FALSE)
+    data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, normalized data
+    data[[i]]<- sc3_estimate_k(data[[i]])# optional
+    data[[i]]<- sc3(data[[i]], ks = data[[i]]@sc3$k_estimation, biology = FALSE)
   })
   # store clusters
   p_data <- pData(data[[i]])
@@ -104,5 +104,4 @@ sink()
 
 ### Appendix
 #
-
 

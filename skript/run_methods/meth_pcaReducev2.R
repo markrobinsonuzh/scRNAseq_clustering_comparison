@@ -64,17 +64,17 @@ for (i in 1:(length(input_matrix))){
 }
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 = 30,
-  trapnell2014 = 30,
-  xue2013 = 30,
-  koh2016 = 30
+  kumar2015 = 100,
+  trapnell2014 = 100,
+  xue2013 = 100,
+  koh2016 = 100
 
 )
 
 par.q <- list(
   kumar2015 = 50,
   trapnell2014 = 50,
-  xue2013 = 29,
+  xue2013 = 15,
   koh2016 = 50
 )
 n.cluster <- list(
