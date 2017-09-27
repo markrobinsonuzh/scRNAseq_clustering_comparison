@@ -1,11 +1,20 @@
 ###################
-# pcaReduce
+# pcaReduce #######
 ###################
-source("skript/helper_files/Helper_functions.R")
+
+# pcaReduce uses a PCA and hierarchical clustering to find the number of clusters in the reduced dimension given by PCA. 
+# The method ex- pects that large classes of cells ar contained in low dimension PC representation
+# and more refined (subsets) of these cells types are contained in higher dimensional PC representations.
+# Parameters to define are the number the method should be repeated, as pcaReduce is stochastic. Sampling without replacement; we choose nbt = 100, if the number samples is bigger than 100.
+# The number of starting principal components q, we choose 50 as the default.
+# And the number clusters n which is given by the "ground truth". the stepwise merging of the clusters can be done using sampling based merging S or
+# merging based on largest probability M.
+
+
 
 
 #load libraries
-
+source("skript/helper_files/Helper_functions.R")
 library(pcaReduce)
 
 # import data as sceset
@@ -53,21 +62,20 @@ res.cluster <- sys.time<- input_matrix<- pca.red <- list
 for (i in 1:(length(input_matrix))){
   input_matrix[[i]] <- exprs(data[[i]]) # use count scaled length scaled tpms, normalized and log2 transformed
 }
-
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 = 10,
-  trapnell2014 = 10,
-  xue2013 = 10,
-  koh2016 = 10
+  kumar2015 = 30,
+  trapnell2014 = 30,
+  xue2013 = 30,
+  koh2016 = 30
 
 )
 
 par.q <- list(
-  kumar2015 = 30,
-  trapnell2014 = 30,
-  xue2013 = 8,
-  koh2016 = 30
+  kumar2015 = 50,
+  trapnell2014 = 50,
+  xue2013 = 29,
+  koh2016 = 50
 )
 n.cluster <- list(
   kumar2015=3,

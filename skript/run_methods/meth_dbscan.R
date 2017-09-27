@@ -1,7 +1,13 @@
 #####################
 # DBscan
 #####################
-
+# dbscan is a density based clustering method. The k neirest neighborhoud parameter and neighborhood size (epsilon) has to be defined.
+# This is usually done using a k neirest neighbour distance plot. for this strategy the k-nearest neighbor distance is plotted (k-NN distance)
+# this is the distance from a choosen point to its k nearest neighbors. As a rule of thumb k >= d+1, here d is the dimension of the data.
+# A sharp change in the distance plot indicates the epsilon distance. 
+# If only one single cluster is obtained, then often epsilon is too large or MinPts is too small.
+# similary, if epsilon is too small or MinPts is too large then every point becomes a noise point.
+# note that dbscan has problems with high dim data , so we should reduce the dimension, which is not done yet!
 source("skript/helper_files/Helper_functions.R")
 
 
@@ -51,13 +57,24 @@ res.cluster <- res.dbscan <- sys.time<- input_matrix<- pca.red <- list
 for (i in names(input_matrix)){
   input_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
 }
+
+# perform linear dimension reduction using PCA
+for (i in names(input_matrix)) {
+  if ( nrow( input_matrix[[i]])>50 ) {
+    input_matrix[[i]] <- prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:50]
+  } else {
+    input_matrix[[i]] <-  prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:nrow( input_matrix[[i]])/2]
+  }
+}
+
+
 # RUN dbscan, k is nearest neighbor
 
 par.k <- list(
-  kumar2015 = 97,
-  trapnell2014 = 97,
+  kumar2015 = 51,
+  trapnell2014 = 51,
   xue2013 = 5,
-  koh2016 = 25
+  koh2016 = 51
   
 )
 
@@ -72,20 +89,21 @@ for (i in names(input_matrix)){
 
 # run dbscan
 par.eps <- list(
-  kumar2015 = 280,
-  trapnell2014 = 400,
-  xue2013 = 600,
-  koh2016 = 300
+  kumar2015 = 150,
+  trapnell2014 = 250,
+  xue2013 = 250,
+  koh2016 = 150
 )
 par.Pts <- list(
-  kumar2015 = 5,
-  trapnell2014 = 5,
+  kumar2015 = 51,
+  trapnell2014 = 51,
   xue2013 = 5,
-  koh2016 = 5
+  koh2016 = 51
   
 )
 
 for(i in names(input_matrix)){
+  
 res.cluster[[i]] <- dbscan(input_matrix[[i]], eps = par.eps[[i]] ,minPts = par.Pts[[i]])$cluster
 
 }
@@ -121,12 +139,4 @@ sink()
 
 ### Appendix
 
-
-
-# plot Data
-
-# with Rtsne
-#library(Rtsne)
-#rtsne <- Rtsne(dd, perplexity =5)
-#plot(rtsne$Y)
 
