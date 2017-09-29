@@ -3,8 +3,10 @@
 ###################
 
 # pcaReduce uses a PCA and hierarchical clustering to find the number of clusters in the reduced dimension given by PCA. 
-# The method ex- pects that large classes of cells ar contained in low dimension PC representation
+# The method expects that large classes of cells ar contained in low dimension PC representation
 # and more refined (subsets) of these cells types are contained in higher dimensional PC representations.
+# On the latent space (nxq) a kmeans clustering with q+1 clusters is performed. And the PC with the lowest variance is deleted. this process is iteratively repeated until only one single cluster remains.
+# The resulting matrix has dimension nxq with q+1 clusters.
 # Parameters to define are the number the method should be repeated, as pcaReduce is stochastic. Sampling without replacement; we choose nbt = 100, if the number samples is bigger than 100.
 # The number of starting principal components q, we choose 50 as the default.
 # And the number clusters n which is given by the "ground truth". the stepwise merging of the clusters can be done using sampling based merging S or
@@ -66,7 +68,7 @@ for (i in 1:(length(input_matrix))){
 par.nbt <- list(
   kumar2015 = 100,
   trapnell2014 = 100,
-  xue2013 = 100,
+  xue2013 = 20,
   koh2016 = 100
 
 )
@@ -132,4 +134,6 @@ sessionInfo()
 sink()
 
 # Appendix
-
+dim(pca.red[[1]])
+pca.red[[1]][,1]
+hist(pca.red[[1]][,49])

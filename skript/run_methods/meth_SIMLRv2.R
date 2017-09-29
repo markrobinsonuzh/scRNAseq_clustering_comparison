@@ -1,6 +1,10 @@
 #####################
 # SIMLR
 #####################
+# Given a gene expression matrix ( normalized , log transformed ) SIMLR learns a distance metric through multiple kernels (Gaussian) that best fits the data. 
+# These similiraties are then used for a RtSNE step to represent the data in lower dimension space and clustering using kmeans. 
+# Parameterrs given by the user are the number of cluster c to be estimated over the expression matrix. 
+# 
 
 source("skript/helper_files/Helper_functions.R")
 
@@ -58,7 +62,7 @@ par.c <-  list(
 # 
 for (i in names(data)){
   sys.time[[i]] <- system.time({
-  res.SIMLR[[i]] = SIMLR(X = exprs(data[[i]]), c = par.c[[i]], cores.ratio = 0) # use exprs slot of SCeset; log2, normalized count_lstpm
+  res.SIMLR[[i]] = SIMLR(X = exprs(data[[i]]), c = par.c[[i]], no.dim = NA,k=10, if.impute=FALSE, normalize = FALSE,cores.ratio = 0) # use exprs slot of SCeset; log2, normalized count_lstpm
   })
   res.cluster[[i]] <- res.SIMLR[[i]]$y$cluster  
 

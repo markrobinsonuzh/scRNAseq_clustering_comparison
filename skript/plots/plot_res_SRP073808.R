@@ -25,7 +25,8 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "Seurat",
                               "SC3",
                               "pcaReduce",
-                              "dbscan"))
+                              "dbscan",
+                              "cidr"))
 
 # define method name for writing file
 method <- list(
@@ -35,7 +36,8 @@ method <- list(
   Seurat= NULL,
   SC3 = NULL,
   pcaReduce = NULL,
-  dbscan = NULL
+  dbscan = NULL,
+  cidr = NULL
   
 )
 
@@ -64,7 +66,9 @@ fileslabels <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
   SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
   pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_koh2016.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_koh2016.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_koh2016.txt"),
+  cidr = file.path(RES_DIR, "cidr/cidr_labels_koh2016.txt")
+  
 )
 
 # load cell labels
@@ -85,7 +89,9 @@ filesclusters <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_koh2016.txt"),
   SC3 = file.path(RES_DIR, "SC3/sc3_clus_koh2016.txt"),
   pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_koh2016.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_koh2016.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_koh2016.txt"),
+  cidr = file.path(RES_DIR, "cidr/cidr_clus_koh2016.txt")
+  
 )
 
 
@@ -108,7 +114,8 @@ plot.method <- list(
   Seurat= NULL,
   SC3 = NULL,
   pcaReduce = NULL,
-  dbscan = NULL
+  dbscan = NULL,
+  cidr = NULL
 )
 
 

@@ -22,7 +22,8 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "Seurat",
                               "SC3",
                               "pcaReduce",
-                              "dbscan"))
+                              "dbscan", 
+                              "cidr"))
 # define method name
 method <- list(
   tSNEkmeans = NULL,
@@ -32,6 +33,7 @@ method <- list(
   SC3 = NULL,
   pcaReduce = NULL,
   dbscan=NULL
+  cidr=NULL
   
 )
 
@@ -60,7 +62,9 @@ fileslabels <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
   SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
   pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_trapnell2014.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_trapnell2014.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_trapnell2014.txt"),
+  cidr = file.path(RES_DIR, "cidr/cidr_labels_trapnell2014.txt")
+  
 )
 
 # load cell labels
@@ -81,7 +85,9 @@ filesclusters <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_trapnell2014.txt"),
   SC3 = file.path(RES_DIR, "SC3/sc3_clus_trapnell2014.txt"),
   pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_trapnell2014.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_trapnell2014.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_trapnell2014.txt"),
+  cidr = file.path(RES_DIR, "cidr/cidr_clus_trapnell2014.txt")
+  
 )
 
 
@@ -119,6 +125,9 @@ save_plot("results/plots/plot_cluster_trapnell2014.pdf", plot2by3, base_height =
 
 
 ## appendix
+mid <- median(pData(data[[1]])$total_count)
+ggplot(data = pc.data, aes(x=PC1,y=PC2, color=pData(data[[1]])$total_count, shape = clusters[[1]])) + geom_point() + scale_color_gradient2(midpoint = mid, low="blue", mid = "brown",high = "red")
+
 
 
 

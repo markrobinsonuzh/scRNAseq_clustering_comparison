@@ -1,6 +1,9 @@
 #####################
 # SNN-Cliq
 #####################
+# SNN-Cliq uses shared nearest neighbour graphs to model the high dimensional data given by the expression matrix. The identification of clusters is done by merging the quasi cliques obtained by the graph.
+# Paramteres supplied by the user are a threshold r which defines the connectivity of the quasi-cliques, a threshold m which defines the merging rate of the quasi-cliques. r and m is typically set to 0.7 and 0,5, respectively.
+# The number nearest neighbors k has to be defined by the user, higher number of neighbors gives lower number of clusters. Working distances are euclidean but diferent can be used, defined by the distan argument.
 
 source("skript/helper_files/Helper_functions.R")
 
@@ -52,10 +55,10 @@ setwd("skript/run_methods/snn-cliq")
 distan <- "euclidean"
 
 par.k <-  list(
-  kumar2015 = 15,
-  trapnell2014 = 20,
+  kumar2015 = 3,
+  trapnell2014 = 5,
   xue2013 = 3,
-  koh2016 = 20
+  koh2016 = 3
 )
 
 par.r <- list(

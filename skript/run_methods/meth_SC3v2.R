@@ -2,6 +2,10 @@
 # SC3
 ######################
 # change sc 3 prepare
+# SC3 uses distance measures of the filtered and log transformed expression matrix. PCA or Laplacian graphs are used for  dimension reduction. 
+# Kmeans clustering is then performed on the d different dimensions. Using the d different clustering results a consensus matrix is computed. On the distances of this consenus matrix a hierarchical
+# clustering step is performed. A range of number of clusters can be used by used. Its also possible to estimate the number of clusters.
+# 
 source("skript/helper_files/Helper_functions.R")
 
 # load libraries
@@ -55,7 +59,7 @@ res.cluster <- sys.time<- list
 # run the analysis
 par.ks <- list(
   kumar2015=3,
-  trapnell2015=3,
+  trapnell2014=3,
   xue2013=8,
   koh2016 = 10
   
@@ -64,9 +68,9 @@ par.ks <- list(
 
 for (i in names(data)){
   sys.time[[i]] <- system.time({
-    data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, normalized data
-    data[[i]]<- sc3_estimate_k(data[[i]])# optional
-    data[[i]]<- sc3(data[[i]], ks = data[[i]]@sc3$k_estimation, biology = FALSE)
+    data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, normalized data, filter data 
+    #data[[i]]<- sc3_estimate_k(data[[i]]) # optional estimate the number of clusters
+    data[[i]]<- sc3(data[[i]], ks = par.ks[[i]]) # perform sc3 clustering
   })
   # store clusters
   p_data <- pData(data[[i]])

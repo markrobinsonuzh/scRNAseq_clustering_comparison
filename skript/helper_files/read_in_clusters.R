@@ -16,11 +16,11 @@ source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skr
 
 
 # define method
-METHOD <- c("PCAReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNCliq")
+METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNCliq", "cidr")
 
 # file paths to the clustering results
 DATA_DIR <-  "results"
-DATASET <-   "trapnell2014"
+DATASET <-   "xue2013"  # "kumar2015" ,"trapnell2014" ,"xue2013" , "koh2016" 
 
 
 

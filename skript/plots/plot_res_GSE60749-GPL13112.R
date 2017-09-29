@@ -23,7 +23,8 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                  "Seurat",
                  "SC3",
                  "pcaReduce",
-                 "dbscan"))
+                 "dbscan",
+                 "cidr"))
 
 # define method name for writing file
 method <- list(
@@ -33,7 +34,8 @@ method <- list(
   Seurat= NULL,
   SC3 = NULL,
   pcaReduce = NULL,
-  dbscan=NULL
+  dbscan=NULL,
+  cidr=NULL
   
 )
 
@@ -62,7 +64,8 @@ fileslabels <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
   SC3 = file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
   pcaReduce = file.path(RES_DIR, "Seurat/Seurat_labels_kumar2015.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_kumar2015.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_labels_kumar2015.txt"),
+  cidr=file.path(RES_DIR, "cidr/cidr_labels_kumar2015.txt")
 )
 
 # load cell labels
@@ -83,7 +86,9 @@ filesclusters <- list(
   Seurat= file.path(RES_DIR, "Seurat/Seurat_clus_kumar2015.txt"),
   SC3 = file.path(RES_DIR, "SC3/sc3_clus_kumar2015.txt"),
   pcaReduce = file.path(RES_DIR, "PCAreduce/PCAreduce_clus_kumar2015.txt"),
-  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_kumar2015.txt")
+  dbscan = file.path(RES_DIR, "dbscan/dbscan_clus_kumar2015.txt"),
+  cidr = file.path(RES_DIR, "cidr/cidr_clus_kumar2015.txt")
+  
 )
 
 
@@ -106,7 +111,8 @@ plot.method <- list(
   Seurat= NULL,
   SC3 = NULL,
   pcaReduce = NULL,
-  dbscan = NULL
+  dbscan = NULL,
+  cidr = NULL
 )
 
 
@@ -125,8 +131,10 @@ vec <- c(1:6)
 
 for (i in 1:length(clusters)){
   
-  plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
-    geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])+guides(shape=FALSE)
+  plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))
+  +geom_point(aes_string(color=clusters[[i]]))
+  +scale_colour_manual(values=cbbPalette)
+  +labs(colour=METHOD_NAME[i])+guides(shape=FALSE)
     theme(legend.justification=c(0,0), legend.position=c(0,0))
 
 }
@@ -135,7 +143,14 @@ for (i in 1:length(clusters)){
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
 save_plot("results/plots/plot_cluster_kumar2015.pdf", plot2by3, base_height = 10, base_width = 15)
-# Appendix
 
+# Appendix
+ggplot(data = pc.data, aes(x=PC1,y=PC2, color=pData(data[[1]])$total_count), shape=clusters[[1]]) + geom_point() + scale_color_gradient(low="blue", high="red")
+
+mid <- median(pData(data[[1]])$total_count)
+ggplot(data = pc.data, aes(x=PC1,y=PC2, color=pData(data[[1]])$total_count, shape = clusters[[1]])) + geom_point() + scale_color_gradient2(midpoint = mid, low="blue", mid = "yellow",high = "red")
+
+
+ 
 
 

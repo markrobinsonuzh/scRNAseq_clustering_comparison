@@ -1,9 +1,7 @@
 ########################
 # CIDR
 ########################
-#####################
-# tSNE + kmeans
-#####################
+
 
 #load libraries
 source("skript/helper_files/Helper_functions.R")
@@ -60,6 +58,7 @@ par.k <-  list(
   xue2013 = 8,
   koh2016 = 10
 )
+
 for  (i in names(sData)) {
 
 sys.time[[i]] <- system.time({
@@ -110,7 +109,6 @@ sink()
 
 ### Appendix
 
-
 par(mfrow=c(2,2))
 
 for (i in names(sData)){
@@ -119,5 +117,4 @@ for (i in names(sData)){
      pch=sData[[i]]@clusters, main=paste0(names(sData[i])), xlab="PC1", ylab="PC2")
 }
 
-adjustedRandIndex(sData@clusters,labels[[1]])
-
+names(par.k)
