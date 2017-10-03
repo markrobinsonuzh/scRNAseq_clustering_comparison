@@ -30,8 +30,8 @@ for ( i in names(files_f1)){
 tmp <- lapply(files_f1[[i]], function(x) get(load(x)))
 ## plot pheatmap
 # create table with data , remove the column with the "ground truth" (label)
-tmp <- ldply(tmp[[1]], data.frame) %>% select(.id, f1, act) %>% filter(!(.id=="labels") )
-tmp <- daply(tmp, .(act, .id), function(x) x$f1) 
+tmp <- ldply(tmp[[1]], data.frame) %>% select(.id, f1, labels) %>% filter(!(.id=="labels") )
+tmp <- daply(tmp, .(labels, .id), function(x) x$f1) 
 # remove the label column from the table
 
 ##plot it
