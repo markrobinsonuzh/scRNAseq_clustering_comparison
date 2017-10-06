@@ -8,7 +8,9 @@ source("skript/helper_files/Helper_functions.R")
 
 library(Rtsne)
 library(scater)
+
 library(dplyr)
+
 library(cidr)
 
 # file paths
@@ -48,7 +50,7 @@ for (i in 1:(length(tinput_matrix))){
 }
 
 
-# RUN SNN-CLIQUE
+# RUN cidr
 sData <- vector("list", length(files))
 names(sData) <-  names(files)
 # define number of clusters.
@@ -81,20 +83,20 @@ res.cluster[[i]] <- sData[[i]]@clusters
 
 # save clusters
 
-dir_cluster <- paste0("results/cidr/cidr_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0( "results/cidr/cidr_clus_", names(res.cluster), ".txt" )
 
 
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0("results/cidr/cidr_systime_",names(sys.time),".txt")
+dir_systime <-  paste0( "results/cidr/cidr_systime_",names(sys.time),".txt" )
 
 save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 
-file_names <-  paste0("results/cidr/cidr_labels_",names(labels), ".txt")
+file_names <-  paste0( "results/cidr/cidr_labels_", names(labels), ".txt" )
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
@@ -117,4 +119,3 @@ for (i in names(sData)){
      pch=sData[[i]]@clusters, main=paste0(names(sData[i])), xlab="PC1", ylab="PC2")
 }
 
-names(par.k)

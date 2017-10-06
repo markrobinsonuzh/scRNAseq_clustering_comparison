@@ -20,6 +20,8 @@ library(dbscan)
 # file paths
 
 DATA_DIR <- "data"
+
+
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
