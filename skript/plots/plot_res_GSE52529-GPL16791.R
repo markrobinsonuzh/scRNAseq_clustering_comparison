@@ -24,18 +24,7 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "pcaReduce",
                               "dbscan", 
                               "cidr"))
-# define method name
-method <- list(
-  tSNEkmeans = NULL,
-  SNNCliq = NULL,
-  SIMLR = NULL,
-  Seurat= NULL,
-  SC3 = NULL,
-  pcaReduce = NULL,
-  dbscan=NULL
-  cidr=NULL
-  
-)
+
 
 # load data sets
 
@@ -116,7 +105,9 @@ vec <- c(1:6)
 for (i in 1:length(clusters)){
   
   plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
-    geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])
+    geom_point(aes_string(color=clusters[[i]]))+
+    scale_colour_manual(values=cbbPalette)+
+    labs(colour=METHOD_NAME[i])
 
 }
 

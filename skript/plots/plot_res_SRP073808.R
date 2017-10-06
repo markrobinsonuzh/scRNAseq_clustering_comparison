@@ -28,18 +28,7 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "dbscan",
                               "cidr"))
 
-# define method name for writing file
-method <- list(
-  tSNEkmeans = NULL,
-  SNNCliq = NULL,
-  SIMLR = NULL,
-  Seurat= NULL,
-  SC3 = NULL,
-  pcaReduce = NULL,
-  dbscan = NULL,
-  cidr = NULL
-  
-)
+
 
 # load data sets
 
@@ -121,7 +110,7 @@ plot.method <- list(
 
 
 # PCA dim reduce on log2 transformed, normalized count_lstpm
-data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" ,return_SCESet=TRUE, scale_features=TRUE)
+data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" ,return_SCESet=TRUE, scale_features=TRUE, draw_plot=FALSE)
 # extract components
 pc.data <-as.data.frame(data[[1]]@reducedDimension)
 
@@ -134,7 +123,9 @@ pc.data <-as.data.frame(data[[1]]@reducedDimension)
 for (i in 1:length(clusters)){
   
   plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
-    geom_point(aes_string(color=clusters[[i]]))+labs(colour=METHOD_NAME[i])+scale_shape_manual(values=c(1:10), guide=FALSE)
+    geom_point(aes_string(color=clusters[[i]]))+
+    labs(colour=METHOD_NAME[i])+
+    scale_shape_manual(values=c(1:10), guide=FALSE)
   
 }
 

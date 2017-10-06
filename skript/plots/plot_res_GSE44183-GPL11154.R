@@ -20,18 +20,7 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "pcaReduce",
                               "dbscan",
                               "cidr"))
-# define method name
-method <- list(
-  tSNEkmeans = NULL,
-  SNNCliq = NULL,
-  SIMLR = NULL,
-  Seurat= NULL,
-  SC3 = NULL,
-  pcaReduce = NULL,
-  dbscan =NULL,
-  cidr = NULL
-  
-)
+
 
 # load data sets
 
@@ -110,13 +99,12 @@ plot.method <- list(
 
 
 # PCA dim reduce on log2 transformed, normalized count_lstpm
-data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" , return_SCESet=TRUE, scale_features=TRUE)
+data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" , return_SCESet=TRUE, scale_features=TRUE, draw_plot=FALSE)
 # extract components
 pc.data <-as.data.frame(data[[1]]@reducedDimension)
 
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#000001","#000002","#000003","#000005")
 
-vec <- c(1:6)
 
 for (i in 1:length(clusters)){
   
@@ -124,8 +112,14 @@ for (i in 1:length(clusters)){
     geom_point(aes_string(color=clusters[[i]]))+scale_colour_manual(values=cbbPalette)+labs(colour=METHOD_NAME[i])+
     scale_shape_manual(values=c(1:10), guide=FALSE)
    
-  
 }
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto")
 save_plot("results/plots/plot_cluster_xue2013.pdf", plot2by3, base_height = 10, base_width = 15)
+
+ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))+
+  geom_point(aes(color=clusters))+scale_colour_manual(values=cbbPalette)+
+  scale_shape_manual(values=c(1:10), guide=FALSE)
+
+
+

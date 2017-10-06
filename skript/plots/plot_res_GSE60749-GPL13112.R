@@ -26,22 +26,9 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                  "dbscan",
                  "cidr"))
 
-# define method name for writing file
-method <- list(
-  tSNEkmeans = NULL,
-  SNNCliq = NULL,
-  SIMLR = NULL,
-  Seurat= NULL,
-  SC3 = NULL,
-  pcaReduce = NULL,
-  dbscan=NULL,
-  cidr=NULL
-  
-)
-
 # load data sets
 
-data <- labels<- vector("list", length(files))
+data <- labels <- vector("list", length(files))
 
 names(data) <-names(labels) <-  names(files)
 
@@ -54,7 +41,7 @@ for (i in 1:length(data)){
 
 # load the the labels:
 
-# create filenames
+# define filenames
 RES_DIR <- "results"
 
 fileslabels <- list(
@@ -116,26 +103,21 @@ plot.method <- list(
 )
 
 
-
 # PCA dim reduce on log2 transformed, normalized count_lstpm
-data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" ,return_SCESet=TRUE, scale_features=TRUE)
+data[[1]] <- plotPCA(object=data[[1]],  exprs_values="exprs" ,return_SCESet=TRUE, scale_features=TRUE, draw_plot=FALSE)
 # extract components
 pc.data <-as.data.frame(data[[1]]@reducedDimension)
 
-
-
-
+# define the color palette
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
-vec <- c(1:6)
-
+# plot it
 for (i in 1:length(clusters)){
   
-  plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels))
-  +geom_point(aes_string(color=clusters[[i]]))
-  +scale_colour_manual(values=cbbPalette)
-  +labs(colour=METHOD_NAME[i])+guides(shape=FALSE)
-    theme(legend.justification=c(0,0), legend.position=c(0,0))
+  plot.method[[i]] <- ggplot(data = pc.data , mapping = aes(x=PC1,y=PC2, group=Labels, shape=Labels)) +
+   geom_point(aes_string(color=clusters[[i]])) +
+   scale_colour_manual(values=cbbPalette) +
+   labs(colour=METHOD_NAME[i])+guides(shape=FALSE) +
+   theme(legend.justification=c(0,0), legend.position=c(0,0))
 
 }
 
