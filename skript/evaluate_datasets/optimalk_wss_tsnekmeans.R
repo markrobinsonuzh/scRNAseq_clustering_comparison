@@ -34,6 +34,7 @@ names(list) <- names(files)
 list->data->labels->tinput_matrix->sys.time->res.rtsne->res.cluster 
 
 for (i in names(data)){
+
   f <- files[[i]]
   load(f)
   data[[i]] <- res
@@ -74,7 +75,7 @@ par.nk <- list(
 # Run tSNE and kmeans
 # run tSNE
 for (i in names(tinput_matrix)){
-res.rtsne[[i]] <- Rtsne(X = tinput_matrix[[i]] , perplexity = par.perp[[i]] , pca = TRUE)
+res.rtsne[[i]] <- Rtsne(X = tinput_matrix[[i]] , perplexity = par.perp[[i]] , pca = TRUE, dim = 10)
 }
 
 # compute the wss
@@ -98,4 +99,5 @@ for ( i in 1:length(files)) {
   plot(1:15, wss[[i]][1:15], type="b", xlab="Number of Clusters",
        ylab="Within groups sum of squares", main=paste0(names(files)[i]))
 }
+
 dev.off()
