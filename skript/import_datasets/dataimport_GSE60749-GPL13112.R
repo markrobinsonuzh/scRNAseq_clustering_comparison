@@ -66,7 +66,8 @@ if (sum(rowSums(counts(sceset)[grep("^ERCC-", rownames(sceset)), ] > 0) >
   sceset <- calculateQCMetrics(sceset)
   withcontrols <- FALSE
 }
-
+head(colnames(pData(sceset)))
+pData(sceset)
 
 #keep only those features that are observed in at least 1 cell.
 keep_features <- rowSums(counts(sceset) > 0) >= 1
