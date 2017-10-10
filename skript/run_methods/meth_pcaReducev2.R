@@ -9,8 +9,8 @@
 # The resulting matrix has dimension nxq with q+1 clusters.
 # Parameters to define are the number the method should be repeated, as pcaReduce is stochastic. Sampling without replacement; we choose nbt = 100, if the number samples is bigger than 100.
 # The number of starting principal components q, we choose 50 as the default.
-# And the number clusters n which is given by the "ground truth". the stepwise merging of the clusters can be done using sampling based merging S or
-# merging based on largest probability M.
+# And the number clusters n which is given by the "ground truth". the stepwise merging of the clusters can be done using sampling based merging (S) or
+# merging based on largest probability (M).
 
 
 
@@ -66,10 +66,10 @@ for (i in 1:(length(input_matrix))){
 }
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 = 100,
-  trapnell2014 = 100,
-  xue2013 = 20,
-  koh2016 = 100
+  kumar2015 = 1,
+  trapnell2014 = 1,
+  xue2013 = 2,
+  koh2016 = 1
 
 )
 
@@ -92,7 +92,7 @@ par.k <- function(i){
   (par.q[[i]]+2)-(n.cluster[[i]])
 }
 
-
+i <- 1
 # run pce Reduce, vary q
 for (i in names(input_matrix)){
   sys.time[[i]] <- system.time({
