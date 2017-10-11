@@ -9,7 +9,6 @@ library(clue)
 #load helper file
 source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/helper_calc_f1_scores.R")
 source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/calc_f1_score.R")
-
 source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/Helper_functions.R")
 # load data files
 DATASET <-   c("koh2016", "kumar2015", "trapnell2014", "xue2013")
