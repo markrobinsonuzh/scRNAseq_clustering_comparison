@@ -1,0 +1,243 @@
+---
+title: "Import_QC_GSE60749-GPL13112"
+output: html_document
+---
+
+Script and code follows "A step-by-step workflow for low-level analysis of single-cell RNA-seq data with Bioconductor". Aaron T. L. Lun1, Davis J. McCarthy2 and John C. Marioni. and the 
+
+# Load and process data set: Kumar 2014 GSE60749-GPL13112
+```{r load libraries, include=FALSE}
+# load packages
+
+suppressPackageStartupMessages(library(MultiAssayExperiment))
+suppressPackageStartupMessages(library(scater))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(scran))
+
+```
+
+## load multiassay dataset from IMLS conquer
+
+```{r load dataset}
+# load multiassay dataset from IMLS conquer
+maex <- readRDS("data/GSE60749-GPL13112.rds")
+# summary of data set
+
+print(maex)
+dim(assay(maex)) # 45686 x 268
+
+
+# extract the gene-level TPM and the counts obtaines by scaling the TPMs
+cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
+tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
+
+```
+# extract the Phenotype data
+There are three different subpopulations: knockout mouse and v6.5 mouse treated with serum or 2i.
+```{r phentotypes, echo=TRUE}
+# extract the phenotype data
+
+phn <- colData(maex)
+
+# extract the cell annotation to phenoid column and rename it 
+phn[, "phenoid"] <- as.character(interaction(as.data.frame(phn[, c("source_name_ch1","characteristics_ch1.1")])))
+phn[, "phenoid"] <-  revalue(phn[, "phenoid"] , c("Dgcr8 knockout mouse embryonic stem cells.culture conditions: serum+LIF"="Dgcr8 knockout mouse serum+LIF", "v6.5 mouse embryonic stem cells.culture conditions: 2i+LIF"="v6.5 mouse 2i+LIF","v6.5 mouse embryonic stem cells.culture conditions: serum+LIF"="v6.5 mouse serum+LIF"))
+
+
+table(phn[, "phenoid"]) 
+
+```
+# create an SCEset
+The expr slot is populated with the count data; obtained from the length-scalaed , count-scaled tpms. The values are automatically log2 transformed. gene-level tpms for the tpm slot.
+
+```{r create SCEset, echo=TRUE }
+# Create an SCEobject 
+sceset <- newSCESet(countData = cts, 
+                    phenoData = new("AnnotatedDataFrame", data = as.data.frame(phn)))
+exprs(sceset)[1:3,1:3]
+
+set_exprs(sceset, "tpm") <- tpms # tpm is populated with the gene level tpms
+
+get_exprs(sceset, "tpm")[1:3,1:3] # untransformed tpm
+get_exprs(sceset, "counts")[1:3,1:3] # untransformed counts
+exprs(sceset)[1:3,1:3] # log2 transformed counts
+
+```
+# Identify the ERCCC spike-ins.
+There are 92 ERCCC spike-inn genes. No mitochondrial genes , probably they are not annotaed yet.
+```{r ERCC and mt genes }
+is.spike <- grepl("^ERCC", rownames(sceset))
+is.mito <- grepl("^mt-", rownames(sceset))
+print( table(is.spike) )
+print( table(is.mito) )
+
+
+
+```
+# reduce expression set
+Keep only those features that are observed in at least 1 cell. 435 features are filtered out. The original counts are used.
+
+```{r reduce}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset <- sceset[keep_features, ]
+
+```
+
+
+# Compute some QC metrics
+
+```{r QC}
+sceset <- calculateQCMetrics(sceset, feature_controls = list(ERCC = grepl("^ERCC", rownames(sceset))) )
+setSpike(sceset) <- "ERCC"
+colnames(pData(sceset))
+
+
+```
+
+# Quality control on cells
+The number of expressed genes shows a bimodal distribution. Use log transforamtion for a shift in lower libsizes. 
+```{r  histogramms }
+par(mfrow=c(2,2))
+hist(sceset$total_counts/1e6, xlab="Library sizes ", main="", 
+    breaks=20, col="grey80", ylab="Number of cells")
+hist(sceset$total_features, xlab="Number of expressed genes", main="", 
+    breaks=20, col="grey80", ylab="Number of cells")
+
+    
+```
+
+
+# Filter dataset gene wise and by librarysize 
+Remove cells with log-library sizes that are more than 3 median absolute deviations (MADs) below the median log-library size. 21 cells were dropped according to this criteria, regarding the untransformed count data. add plot with threshold...
+```{r save unfiltered data }
+
+libsize.drop <- isOutlier(sceset$total_counts, nmads=3, type="lower", log=TRUE)
+feature.drop <- isOutlier(sceset$total_features, nmads=3, type="lower", log=TRUE)
+table(libsize.drop,feature.drop)
+
+```
+# Filter dataset by ERCCC spike inns
+The amount of endogenous should be constant. Cells with a high proportion are removed.
+```{r  filter by spike inn }
+hist(sceset$pct_counts_feature_controls_ERCC, xlab="ERCC proportion (%)", 
+    ylab="Number of cells", breaks=20, main="", col="grey80")
+    
+spike.drop <- isOutlier(sceset$pct_counts_feature_controls_ERCC, nmads=3, type="higher")
+names(pData(sceset))
+```
+Total 24 cells were filtered out.  
+```{r overview filtered cells }
+
+sceset.red <- sceset[,!(libsize.drop | feature.drop |  spike.drop)]
+data.frame(ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop),
+    BySpike=sum(spike.drop), Remaining=ncol(sceset.red))
+```
+
+# Quality control using PCA and highest expressed genes
+PCA plot based the quality metrics for each cell, e.g., the total number of reads, the total number of features and the proportion of mitochondrial or spike-in reads. 
+```{r  Quality control using PCA }
+
+plotPCA(sceset, pca_data_input="pdata", size_by="total_counts")
+plotPCA(sceset.red, pca_data_input="pdata", size_by="total_counts")
+
+```
+
+
+Plotting the 50 highest expressed genes. No ERCC spike inn in the top 50. The profile should look relatively "flat".
+```{r  highest expressed genes}
+plotQC(sceset.red, type = "highest-expression", n=50)
+
+```
+
+
+Normalize data according to Lun etal. 2016 using pooled counts to estimate size factors. The size factors are positevely correlated with the library sizes for all cells. We see two groups, possibly coming from the two cell  populations.
+```{r normalize through pool-based size factors }
+sceset <- computeSumFactors(sceset, sizes=c(20, 40, 60, 80))
+summary(sizeFactors(sceset))
+
+sceset.red <- computeSumFactors(sceset.red, sizes=c(20, 40, 60, 80))
+summary(sizeFactors(sceset.red))
+
+plot(sizeFactors(sceset), sceset$total_counts/1e6, log="xy",
+    ylab="Library size (millions)", xlab="Size factor")
+plot(sizeFactors(sceset.red), sceset.red$total_counts/1e6, log="xy",
+    ylab="Library size (millions)", xlab="Size factor")
+```
+Use size factors to normalize gene expression
+```{r spike inn}
+sceset <- computeSpikeFactors(sceset, type="ERCC", general.use=FALSE)
+sceset.red <- computeSpikeFactors(sceset.red, type="ERCC", general.use=FALSE)
+
+```
+
+The counts are normalized using log2 transformation using the edgeR::calcNormFactors function.
+```{r normalization }
+sceset <- normaliseExprs(sceset)
+
+
+sceset.red <- normaliseExprs(sceset.red)
+
+```
+
+# Save the normalized and cell filtered datasets
+```{r save data }
+res <- sceset
+save(res,file = "data/sceset_org_GSE60749-GPL13112.rda")
+
+res <- sceset.red
+save(res,file = "data/sceset_red_GSE60749-GPL13112.rda")
+
+```
+
+
+# Identifying HVGs from the normalized log-expression
+
+```{r High variable genes }
+
+var.fit <- trendVar(sceset.red, trend="loess", use.spikes=FALSE, span=0.2) 
+var.out <- decomposeVar(sceset.red, var.fit)
+
+
+```
+
+
+```{r High variable genes using the variance of the log-expression }
+
+plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression",
+    ylab="Variance of log-expression")
+o <- order(var.out$mean)
+lines(var.out$mean[o], var.out$tech[o], col="dodgerblue", lwd=2)
+cur.spike <- isSpike(sceset.red)
+points(var.out$mean[cur.spike], var.out$total[cur.spike], col="red", pch=16)
+
+
+hvg.out <- var.out[which(var.out$FDR <= 0.05 & var.out$bio >= 0.5),]
+hvg.out <- hvg.out[order(hvg.out$bio, decreasing=TRUE),]
+nrow(hvg.out)
+head(hvg.out)
+plotExpression(sceset.red, rownames(hvg.out)[1:10])
+
+```
+# select only high variable genes and save sceset
+```{r}
+
+sceset.hvg <-sceset.red[ rownames(hvg.out), ]
+dim(sceset.hvg)
+
+res <- sceset.hvg
+save(res,file = "data/sceset_hvg_GSE60749-GPL13112.rda")
+
+
+```
+
+```{r plot tSNE} 
+set.seed(1234)
+out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Perplexity = 5")
+out10 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=10, colour_by="total_features") + ggtitle("Perplexity = 10")
+out20 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="total_features") + ggtitle("Perplexity = 20") 
+multiplot(out5, out10, out20, cols=3)
+```
+
