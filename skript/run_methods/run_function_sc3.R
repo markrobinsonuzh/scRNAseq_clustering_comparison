@@ -48,33 +48,30 @@ for(i in names(data)) {
 # RUN SC3
 
 
-# QC data
-# done in scater
-
 # run the analysis
-par.ks <- list(
+par.k <- list(
   kumar2015=c(2:10),
   trapnell2014=c(2:10),
   xue2013=c(2:10),
-  koh2016 =c(2:10)
+  koh2016 =c(2:12)
   
 )
 
-run_sc3 <- function( data, par.ks ){
+run_sc3 <- function( data, par.k ){
   # list to store results
   list <- vector("list", length(data))
   names(list) <- names(data)
   res.cluster <- sys.time<- list
 for (i in names(data)){
  
-    data[[i]]<- sc3_prepare(data[[i]], ks = par.ks[i])  # uses the exprs slot of SCEset ; log2transformed, normalized data, filter data 
+    data[[i]]<- sc3_prepare(data[[i]], ks = par.k[i])  # uses the exprs slot of SCEset ; log2transformed, normalized data, filter data 
     #data[[i]]<- sc3_estimate_k(data[[i]]) # optional estimate the number of clusters
-    data[[i]]<- sc3(data[[i]], ks = par.ks[[i]]) # perform sc3 clustering
+    data[[i]]<- sc3(data[[i]], ks = par.k[[i]]) # perform sc3 clustering
 
   # store clusters
   p_data <- pData(data[[i]])
   res.cluster[[i]] <- p_data[ , grep("sc3_", colnames(p_data))]
-  
+  colnames(res.cluster[[i]]) <-  c( paste0("par.k", par.k[[i]]) )
 }
 
 return(res.cluster)
@@ -82,7 +79,7 @@ return(res.cluster)
 # mach dataframe
 # run the function
 
-res.cluster <-  run_sc3( data, par.ks )
+res.cluster <-  run_sc3( data, par.k )
 
 # save clusters
 

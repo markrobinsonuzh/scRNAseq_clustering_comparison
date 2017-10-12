@@ -28,7 +28,7 @@ files <- list(
 list<- vector("list", length(files))
 names(list) <- names(files)
 
-list->data->labels->tinput_matrix->sys.time->res.rtsne->res.cluster 
+list->data->labels->tinput_matrix->sys.time
 
 for (i in names(data)){
   f <- files[[i]]
@@ -52,8 +52,8 @@ for (i in 1:(length(tinput_matrix))){
 run_cidr <- function(tinput_matrix, par.k ){
   require(cidr)
 # RUN cidr
-sData <- vector("list", length(files))
-names(sData) <-  names(files)
+res.cluster<- sData <- vector("list", length(files))
+names(res.cluster) <- names(sData) <-  names(files)
 
 for  (i in names(sData)) {
     sData[[i]] <- scDataConstructor(t(tinput_matrix[[i]])) # creates a scData object with slots for the expression table, lib size, dropout candidates etc...
@@ -69,7 +69,7 @@ for  (i in names(sData)) {
       df.clus[,j] <- scCluster(object=sData[[i]], nCluster = par.k[[i]][j], cMethod = "ward.D2")@clusters# hierarchical clustering on PC , nCluster if user defines cluster number, nPC is the number of PC used for clustering (default is 4), cMethod is hierarchical clustering method default is ward.D2
     
       }
-
+  colnames(df.clus) <-  c( paste0("par.k",par.k[[i]]) )
   res.cluster[[i]] <-  df.clus
 
 }
@@ -82,7 +82,7 @@ par.k <-  list(
   kumar2015 = c(2:10),
   trapnell2014 = c(2:10),
   xue2013 = c(2:10),
-  koh2016 = c(2:10)
+  koh2016 = c(2:11)
 )
 
 #### run the function

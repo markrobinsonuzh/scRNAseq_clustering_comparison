@@ -89,10 +89,10 @@ for (i in names(input_matrix)){
 
 # parameter epsilon, size of the epsilon neighborhood. Bent in kNN dist plot. choose range for.
 par.eps <- list(
-  kumar2015 = c(10,50,150,500),
-  trapnell2014 = c(10,100,200,500),
-  xue2013 = c(10,50,200,500),
-  koh2016 = c(10,50,150, 500)
+  kumar2015 = c(10,50,150,500,1000),
+  trapnell2014 = c(10,100,200,500,1000),
+  xue2013 = c(10,50,200,500,600,1000),
+  koh2016 = c(10,50,150, 500,1000)
 )
 # parameter Pts, number of minimum points in the eps region (for core points). Default is 5 points.
 
@@ -111,6 +111,7 @@ run_dbscan <-  function( par.eps, par.Pts ){
     for (j in seq_len( length( par.eps[[i]])) ){
       df.clus[,j] <- dbscan(input_matrix[[i]], eps = par.eps[[i]][j] ,minPts = par.Pts[[i]])$cluster
     }
+    colnames(df.clus) <-  c( paste0("par.eps",par.eps[[i]]) )
     res.cluster[[i]] <- df.clus
   }
   return(res.cluster)

@@ -113,6 +113,7 @@ run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
       # remove files that were created during the analysis
       system("rm snn-cliq.txt res-snn-cliq.txt")
     }
+    colnames(df.clus) <- c( paste0("par.k",par.k[[i]]) )
     res.cluster[[i]] <- df.clus
   }
   return( res.cluster )

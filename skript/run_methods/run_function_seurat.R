@@ -43,10 +43,10 @@ for(i in names(data)) {
 # Seurat
 # Resolution parameter, higher number gives more cluster, lower less cluster.
 par.resolution <- list(
-    kumar2015 = c(0.5,0.6,0.7,0.8,0.9,1,1.2,1.3),
-    trapnell2014 = c(0.5,0.6,0.7,0.8,0.9,1,1.2,1.3),
-    xue2013 = c(0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6),
-    koh2016 = c(0.5,0.6,0.7,0.8,0.9,1,1.2, 1.3)
+    kumar2015 = round(seq(0.1, 2,length.out = 10),1),
+    trapnell2014 = round(seq(0.1, 2,length.out = 10),1),
+    xue2013 = rep(0.6,10),
+    koh2016 = round(seq(0.1, 2,length.out = 10),1)
   )
 par.dims.use <-  list(
   kumar2015 = 1:10,
@@ -91,9 +91,9 @@ for (i in names(data)) {
                             dims.use = par.dims.use[[i]] , resolution = par.resolution[[i]][j] , 
                             print.output = 0, save.SNN = TRUE  )@ident
                            
-    }
+    } 
   })
-  
+  colnames(df.clus) <- c( paste0("par.res", par.resolution[[i]]) )
   res.cluster[[i]] <-  df.clus
 }
   return( res.cluster )

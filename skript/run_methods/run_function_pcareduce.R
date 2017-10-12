@@ -54,7 +54,7 @@ for(i in names(data)) {
 # create store files
 list <- vector("list", length(data))
 names(list) <- names(data)
-res.cluster <- sys.time<- input_matrix<- pca.red <- list
+input_matrix <- list
 
 
 
@@ -73,8 +73,6 @@ par.nbt <- list(
   koh2016 = 50
   
 )
-
-
 
 par.q <- list(
   kumar2015 = 30,
@@ -98,30 +96,27 @@ run_pcareduce <- function(input_matrix, par.nbt,par.q,n.cluster){
   list <- vector("list", length(data))
   names(list) <- names(data)
   res.cluster <- sys.time<- pca.red <- list
-  
 # PCAREDUCE
 for (i in names(input_matrix)){
     pca.red[[i]] <- PCAreduce(t(input_matrix[[i]]), nbt = par.nbt[[i]], q = par.q[[i]], method = 'S')[[1]]
     res.cluster[[i]]  <- pca.red[[i]][, (par.q[[i]]-9):par.q[[i]] ]
+    colnames(res.cluster[[i]]) <-  c(paste0( "par.k", rev(seq_len(length( (par.q[[i]]-9):par.q[[i]] ) )))
+ )
 }
   return( res.cluster  )
 }
-
 # run PCAreduce
-res.cluster <- run_pcareduce(input_matrix,par.nbt, par.q)
+res.cluster <- run_pcareduce(input_matrix,par.nbt, par.q,n.cluster)
 
 
 # save clusters
 
 dir_cluster <- paste0("results/PCAreduce/PCAreduce_krange_clus_", names(res.cluster), ".txt")
-
-
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
 dir_systime <-  paste0("results/PCAreduce/PCAreduce_krange_systime_",names(sys.time),".txt")
-
 save_systemtime(sys.time, dir_systime)
 
 
