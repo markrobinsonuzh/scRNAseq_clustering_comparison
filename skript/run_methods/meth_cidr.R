@@ -18,10 +18,10 @@ library(cidr)
 DATA_DIR <- "data"
 files <- list(
   
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
+  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
+  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
+  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
   
 )
 
