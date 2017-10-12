@@ -19,7 +19,6 @@ files.ari <- list(
   koh2016 = file.path(DATA_DIR, "ari_krange_koh2016.rda")
 )
 
-names(files.ari)
 
 # function to plot 
 plot_ari <- function(x){
@@ -27,18 +26,19 @@ plot_ari <- function(x){
 tmp <- lapply(x[[1]], function(x) get(load(x)))
 #remove the label column, sort to long format
 tmp <- ldply(tmp[[1]], data.frame)  %>% filter(!(.id=="labels") )
-
 # plot the ARIs per dataset
 ggplot(data = tmp, aes(x = factor(par), y = ARI, colour = .id))+       
   geom_line(aes(group=.id))+
   geom_point()+
   facet_grid(.id~.)
-
+return(tmp)
 }
-
+tmp <- lapply(files.ari, plot_ari)
+tmp <- tmp%>%lapply(mutate(parameter=grepl("ˆ.")))
 
 # plot the data
 pdf("plot_ari_krange.pdf")
+
 
 lapply(files.ari, plot_ari)
 dev.off()
