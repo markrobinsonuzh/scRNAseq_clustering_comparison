@@ -7,7 +7,7 @@
 # A sharp change in the distance plot indicates the epsilon distance. 
 # If only one single cluster is obtained, then often epsilon is too large or MinPts is too small.
 # similary, if epsilon is too small or MinPts is too large then every point becomes a noise point.
-# note that dbscan has problems with high dim data , so we should reduce the dimension, which is not done yet!
+# note that dbscan has problems with high dim data , so we should reduce the dimension, which is done using PCA and working on latent space with 50 dim.
 source("skript/helper_files/Helper_functions.R")
 
 

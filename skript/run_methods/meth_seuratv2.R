@@ -47,7 +47,7 @@ for (i in names(data)) {
   # the next step is to normalize the data. By default, we employ a global-scaling normalization method "LogNormalize" 
   #that normalizes the gene expression measurements for each cell by the total expression, 
   #multiplies this by a scale factor (10,000 by default), and log-transforms the result. 
-  data[[i]] <- NormalizeData(object = (data[[i]]), normalization.method = "LogNormalize", scale.factor = 1e4)
+  data[[i]] <- NormalizeData(object = (data[[i]]), normalization.method = "LogNormalize", scale.factor = 1e6)
   # Detection of variable genes across the single cells
   data[[i]] <- FindVariableGenes(object =(data[[i]]), mean.function = ExpMean, dispersion.function = LogVMR)
   ### Scaling the data and removing unwanted sources of variation

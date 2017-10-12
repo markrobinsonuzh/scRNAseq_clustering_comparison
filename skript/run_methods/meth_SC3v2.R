@@ -2,6 +2,7 @@
 # SC3
 ######################
 # change sc 3 prepare
+# Input in SC3 is by default the exprs slot in a SCEset object. So the data should be normalized and log transformed. AS an option one can also set the argument gene_filter, if a filtering beforhand should br performed.
 # SC3 uses distance measures of the filtered and log transformed expression matrix. PCA or Laplacian graphs are used for  dimension reduction. 
 # Kmeans clustering is then performed on the d different dimensions. Using the d different clustering results a consensus matrix is computed. On the distances of this consenus matrix a hierarchical
 # clustering step is performed. A range of number of clusters can be used by used. Its also possible to estimate the number of clusters.
