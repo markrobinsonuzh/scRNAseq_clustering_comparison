@@ -1,15 +1,15 @@
 ########################
 # 
 #######################
-
+# is not workin
 #load libraries
 library(dplyr)
 library(plyr)
 library(clue)
 
 #load helper file
-source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/calc_f1_score.R")
-source("/Users/angeloduo/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/Helper_functions.R")
+source("skript/helper_files/calc_f1_score.R")
+source("skript/helper_files/Helper_functions.R")
 
 
 ##########################
