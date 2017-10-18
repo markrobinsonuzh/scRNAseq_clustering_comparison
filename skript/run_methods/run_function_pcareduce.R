@@ -19,6 +19,7 @@
 source("skript/helper_files/Helper_functions.R")
 
 library(dplyr)
+library(pcaReduce)
 
 # import data as sceset
 # file paths
@@ -99,9 +100,8 @@ run_pcareduce <- function(input_matrix, par.nbt,par.q,n.cluster){
 # PCAREDUCE
 for (i in names(input_matrix)){
     pca.red[[i]] <- PCAreduce(t(input_matrix[[i]]), nbt = par.nbt[[i]], q = par.q[[i]], method = 'S')[[1]]
-    res.cluster[[i]]  <- pca.red[[i]][, (par.q[[i]]-9):par.q[[i]] ]
-    colnames(res.cluster[[i]]) <-  c(paste0( "par.k", rev(seq_len(length( (par.q[[i]]-9):par.q[[i]] ) )))
- )
+    res.cluster[[i]]  <- pca.red[[i]][, (par.q[[i]]-9):par.q[[i]] ] # improve this!
+    colnames(res.cluster[[i]]) <-  c(paste0( rev(seq_len(length( (par.q[[i]]-9):par.q[[i]] ) ))) ) # this as well
 }
   return( res.cluster  )
 }

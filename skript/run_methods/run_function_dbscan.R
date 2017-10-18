@@ -111,7 +111,7 @@ run_dbscan <-  function( par.eps, par.Pts ){
     for (j in seq_len( length( par.eps[[i]])) ){
       df.clus[,j] <- dbscan(input_matrix[[i]], eps = par.eps[[i]][j] ,minPts = par.Pts[[i]])$cluster
     }
-    colnames(df.clus) <-  c( paste0("par.eps",par.eps[[i]]) )
+    colnames(df.clus) <-  c( paste0(par.eps[[i]]) )
     res.cluster[[i]] <- df.clus
   }
   return(res.cluster)

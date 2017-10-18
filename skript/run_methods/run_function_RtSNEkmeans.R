@@ -83,7 +83,7 @@ for (i in names(data)){
     for ( j in seq_len(length(par.k[[i]])) ) {
       df.clus[,j]<- as.integer( kmeans(res.rtsne[[i]]$Y, centers = par.k[[i]][j])$cluster )
     }
-    colnames(df.clus) <-  c( paste0("par.k",par.k[[i]]) )
+    colnames(df.clus) <-  c( paste0(par.k[[i]]) )
     res.cluster[[i]] <- df.clus
 }
   return(res.cluster)

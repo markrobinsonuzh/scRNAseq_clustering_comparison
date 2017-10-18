@@ -69,7 +69,7 @@ for  (i in names(sData)) {
       df.clus[,j] <- scCluster(object=sData[[i]], nCluster = par.k[[i]][j], cMethod = "ward.D2")@clusters# hierarchical clustering on PC , nCluster if user defines cluster number, nPC is the number of PC used for clustering (default is 4), cMethod is hierarchical clustering method default is ward.D2
     
       }
-  colnames(df.clus) <-  c( paste0("par.k",par.k[[i]]) )
+  colnames(df.clus) <-  c( paste0(par.k[[i]]) )
   res.cluster[[i]] <-  df.clus
 
 }
@@ -118,11 +118,11 @@ sink()
 
 ### Appendix
 
-par(mfrow=c(2,2))
+#par(mfrow=c(2,2))
 
-for (i in names(sData)){
+#for (i in names(sData)){
   
-  plot(sData[[i]]@PC[,c(1,2)], 
-       pch=sData[[i]]@clusters, main=paste0(names(sData[i])), xlab="PC1", ylab="PC2")
-}
+ # plot(sData[[i]]@PC[,c(1,2)], 
+ #      pch=sData[[i]]@clusters, main=paste0(names(sData[i])), xlab="PC1", ylab="PC2")
+#}
 

@@ -93,7 +93,7 @@ for (i in names(data)) {
                            
     } 
   })
-  colnames(df.clus) <- c( paste0("par.res", par.resolution[[i]]) )
+  colnames(df.clus) <- c( paste0( par.resolution[[i]]) )
   res.cluster[[i]] <-  df.clus
 }
   return( res.cluster )

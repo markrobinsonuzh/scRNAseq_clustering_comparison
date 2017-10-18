@@ -73,7 +73,7 @@ for (i in names(data)){
   for  ( j in seq_len( length( par.k[[i]]) ) ){
   df.clus[,j] <- SIMLR(X = exprs(data[[i]]), c = par.k[[i]][j], no.dim = NA,k=10, if.impute=FALSE, normalize = FALSE)$y$cluster # use exprs slot of SCeset; log2, normalized count_lstpm
   }
-  colnames(df.clus) <-  c( paste0("par.k",par.k[[i]]) )
+  colnames(df.clus) <-  c( paste0(par.k[[i]]) )
   res.cluster[[i]] <- df.clus
 }
 return(res.cluster)  

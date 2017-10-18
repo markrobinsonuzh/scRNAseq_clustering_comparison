@@ -71,7 +71,7 @@ for (i in names(data)){
   # store clusters
   p_data <- pData(data[[i]])
   res.cluster[[i]] <- p_data[ , grep("sc3_", colnames(p_data))]
-  colnames(res.cluster[[i]]) <-  c( paste0("par.k", par.k[[i]]) )
+  colnames(res.cluster[[i]]) <-  c( paste0(par.k[[i]]) )
 }
 
 return(res.cluster)

@@ -1,4 +1,4 @@
-#####################
+################a#####
 # SNN-Cliq
 #####################
 # SNN-Cliq uses shared nearest neighbour graphs to model the high dimensional data given by the expression matrix. The identification of clusters is done by merging the quasi cliques obtained by the graph.
