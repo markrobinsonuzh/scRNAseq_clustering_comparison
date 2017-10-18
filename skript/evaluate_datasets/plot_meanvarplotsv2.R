@@ -10,6 +10,7 @@ library(cowplot)
 library(DESeq2)
 library(gridExtra)
 library(DESeq)
+library(cowplot)
 
 
 
@@ -19,7 +20,6 @@ DATA_DIR <- "data"
 files <- list(
   kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
   koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
   
 )
@@ -44,13 +44,13 @@ for (i in 1:length(data)){
 #rld <- rlog((round(count_lstpm,0)), blind=TRUE) # takes too much time
 
 ###### define funcion  meansd_plot for transformation and plotting of count data
-meansd_plot <- function(data, ranks ){
+meansd_plot <- function(data, ranks,cofactor ){
 # compute transformations
 count_lstpm <- ( as.matrix(get_exprs(data, "counts")) ) # extect count data
-# transformaations
+# log and asin transformaations
 count_lstpm.log <- log2(count_lstpm +1)  # log2
-cofactor <- 1
-count_lstpm.asinh <- asinh(count_lstpm/cofactor)# arc sin
+cofactor <- cofactor
+count_lstpm.asinh <- asin(sqrt(count_lstpm/cofactor) )# arc sin
 # vst transform
 countdata <- newCountDataSet((round(count_lstpm,0)), conditions = array(1,dim = ncol(count_lstpm)))
 countdata <- estimateSizeFactors( countdata)
@@ -65,7 +65,7 @@ msd.asin <- meanSdPlot(count_lstpm.asinh, plot = FALSE, ranks = ranks)
 msd.vst <- meanSdPlot(count_lstpm.vst , plot = FALSE, ranks = ranks)
 # in grid
 
-plot(grid.arrange( msd.log$gg+ggtitle("log transformed"), msd.asin$gg+ggtitle(paste0("arcussin cofactor=", cofactor)), msd.vst$gg+ggtitle("vst"),ncol=2))
+grid.arrange( msd.non$gg+ggtitle("untransformed"), msd.log$gg+ggtitle("log transformed"), msd.asin$gg+ggtitle(paste0("arcussin cofactor=", cofactor)), msd.vst$gg+ggtitle("vst"),ncol=2)
 
 }
 
@@ -74,7 +74,7 @@ for (i in seq_len(length(data))){
   
   FILE_NAME<- paste0("results/QC_data/meanvarplots_", names(data)[i],".pdf")
   pdf(FILE_NAME)
-  meansd_plot(data=data[[i]],ranks= TRUE)
+  meansd_plot(data=data[[i]],ranks= FALSE,cofactor=100)
   dev.off()
 }
 
