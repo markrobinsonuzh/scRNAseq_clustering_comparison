@@ -113,7 +113,7 @@ system("rm snn-cliq.txt res-snn-cliq.txt")
 
 # save clusters
 
-setwd("~/Desktop/masterthesis/scRNAseq_clustering_comparison")
+setwd("~/Desktop/masterarbeit/scRNAseq_clustering_comparison")
 for (i in seq_len(length(res.cluster))){
   res.cluster[[i]] <- pData(data[[i]])$SNNCliq
 }
