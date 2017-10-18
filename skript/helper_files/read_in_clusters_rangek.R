@@ -15,15 +15,19 @@ source("skript/helper_files/Helper_functions.R")
 # define method
 METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "cidr")
 
+
 # file paths to the clustering results
 DATA_DIR <-  "results"
-DATASET <- "koh2016"      # "kumar2015" ,"trapnell2014" ,"xue2013" , "koh2016" 
+
+DATASET <-"xue2013"    # "kumar2015" ,"trapnell2014" ,"xue2013" , "koh2016" 
 
 files_labels <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_krange_labels_",DATASET,".txt"))%>%as.list()
 names(files_labels) <- METHOD
 
 labels <- vector("list", length(files_labels))
 names(labels) <- names(files_labels) 
+
+
 
 for (i in names(labels)) {
   lab_i <-  read.csv(files_labels[[i]], sep="")
@@ -39,8 +43,9 @@ names(files_cluster) <- METHOD
 clusters <- vector("list", length(files_cluster))
 names(clusters) <- names(files_cluster) 
 
+
 for (i in names(clusters)) {
-  lab_i <-  read.csv(files_cluster[[i]], sep="")
+  lab_i <-  read.csv(files_cluster[[i]], sep="", check.names = FALSE)
   clusters[[i]] <- as.data.frame(lab_i)
   
 }
