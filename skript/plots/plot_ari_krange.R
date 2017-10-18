@@ -4,9 +4,12 @@
 ######################################################
 
 # load libraries
-library(dplyr)
 library(plyr)
+library(dplyr)
 library(ggplot2)
+library(cowplot)
+library("gridExtra")
+
 ## define the data directories
 DATA_DIR <-  "results/run_results"
 ## read in ARI results from Rdata files
@@ -18,28 +21,63 @@ files.ari <- list(
   xue2013 = file.path(DATA_DIR, "ari_krange_xue2013.rda"),
   koh2016 = file.path(DATA_DIR, "ari_krange_koh2016.rda")
 )
-
-
 # function to plot 
 plot_ari <- function(x){
-# load files
-tmp <- lapply(x[[1]], function(x) get(load(x)))
-#remove the label column, sort to long format
-tmp <- ldply(tmp[[1]], data.frame)  %>% filter(!(.id=="labels") )
-# plot the ARIs per dataset
-ggplot(data = tmp, aes(x = factor(par), y = ARI, colour = .id))+       
-  geom_line(aes(group=.id))+
-  geom_point()+
-  facet_grid(.id~.)
-return(tmp)
+  # load files
+  tmp <- lapply(x[[1]], function(x) get(load(x)))
+  #remove the label column, sort to long format
+  tmp <- ldply(tmp[[1]], as.data.frame)  
+  tmp$par <- as.character(tmp$par)
+  tmp$par <- as.numeric(tmp$par)
+  tmp.k <- tmp%>%subset( .id %in% c("cidr","pcaReduce","RtSNEkmeans","SC3","SIMLR"))  
+
+  tmp.eps <- subset( tmp, .id  %in% c("dbscan") )
+
+  tmp.res <- subset( tmp, .id %in% c("Seurat") )
+  # plot the ARIs per dataset
+  
+  p1 <- ggplot(data = tmp.k, aes(x = par, y = ARI, colour = .id))+       
+    geom_line(aes(group=.id))+
+    geom_point()+
+    facet_grid(.id~.)+
+    guides(colour = "none")+
+    labs(x="k")
+  
+  
+  p2 <- ggplot(data = tmp.eps, aes(x = par, y = ARI, colour = .id))+       
+    geom_line(aes(group=.id))+
+    geom_point()+
+    labs(x="epsilon")
+
+  p3 <- ggplot(data = tmp.res, aes(x = par, y = ARI, colour = .id))+       
+    geom_line(aes(group=.id))+
+    geom_point()+
+    labs(x="resolution")
+  
+  #pgrid <- plot_grid(p1,p2, p3, ncol=2)
+  grid.arrange(p1,                             # First row with one plot spaning over 2 columns
+               arrangeGrob(p2,p3, nrow = 2), # Second row with 2 plots in 2 different columns
+               ncol = 2)                       # Number of rows
+  
 }
-tmp <- lapply(files.ari, plot_ari)
-tmp <- tmp%>%lapply(mutate(parameter=grepl("ˆ.")))
-
-# plot the data
-pdf("plot_ari_krange.pdf")
 
 
+# plot all the data
+pdf("results/plots/plot_ari_krange_all.pdf")
 lapply(files.ari, plot_ari)
+
 dev.off()
+
+# plot by dataset, not working right now........
+for (i in seq_len(length(files.ari) )){
+  
+  p <- plot_ari(files.ari[[i]])
+  #save_plot( paste0("results/plot_ari_krange_",names(files.ari)[i],".pdf") ,p)
+  grid.arrange(p1,                             # First row with one plot spaning over 2 columns
+               arrangeGrob(p2,p3, ncol = 2), # Second row with 2 plots in 2 different columns
+               nrow = 2)                       # Number of rows
+
+}
+
 ### Appendix
+paste0("results/plot_ari_krange_",names(files.ari[i]),".pdf")
