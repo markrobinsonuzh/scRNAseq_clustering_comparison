@@ -1,14 +1,17 @@
 ---
 title: "Import_QC_GSE60749-GPL13112"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 Script and code follows "A step-by-step workflow for low-level analysis of single-cell RNA-seq data with Bioconductor". Aaron T. L. Lun1, Davis J. McCarthy2 and John C. Marioni. and the 
 
 # Load and process data set: Kumar 2014 GSE60749-GPL13112
 ```{r load libraries, include=FALSE}
-# load packages
+pdf("results/QC_data/QC_plots_kumar2015.pdf")
 
+#knittr options 
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(dplyr))
@@ -38,7 +41,6 @@ tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 There are three different subpopulations: knockout mouse and v6.5 mouse treated with serum or 2i.
 ```{r phentotypes, echo=TRUE}
 # extract the phenotype data
-
 phn <- colData(maex)
 
 # extract the cell annotation to phenoid column and rename it 
@@ -100,12 +102,25 @@ colnames(pData(sceset))
 # Quality control on cells
 The number of expressed genes shows a bimodal distribution. Use log transforamtion for a shift in lower libsizes. 
 ```{r  histogramms }
-par(mfrow=c(2,2))
+size.med <- median(log10(sceset$total_counts), na.rm = TRUE)
+size.mad <- mad(log10(sceset$total_counts), center = size.med, na.rm = TRUE)
+lower.limit.size <- 10^(size.med - 3 * size.mad)/1e6
+    
+feature.med <- median(log10(sceset$total_features), na.rm = TRUE)
+feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE)
+lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
+
+
+pdf("results/QC_data/hist_Kumar2014.pdf")
+
+par(mfrow=c(1,2))
 hist(sceset$total_counts/1e6, xlab="Library sizes ", main="", 
     breaks=20, col="grey80", ylab="Number of cells")
+abline(v=lower.limit.size,col=2, lty=2 )
 hist(sceset$total_features, xlab="Number of expressed genes", main="", 
     breaks=20, col="grey80", ylab="Number of cells")
-
+abline(v=lower.limit.feat, col=2, lty=2 )
+dev.off()
     
 ```
 
@@ -180,6 +195,8 @@ sceset <- normaliseExprs(sceset)
 
 sceset.red <- normaliseExprs(sceset.red)
 
+
+
 ```
 
 # Save the normalized and cell filtered datasets
@@ -218,7 +235,7 @@ hvg.out <- var.out[which(var.out$FDR <= 0.05 & var.out$bio >= 0.5),]
 hvg.out <- hvg.out[order(hvg.out$bio, decreasing=TRUE),]
 nrow(hvg.out)
 head(hvg.out)
-plotExpression(sceset.red, rownames(hvg.out)[1:10])
+p6 <- plotExpression(sceset.red, rownames(hvg.out)[1:10])
 
 ```
 # select only high variable genes and save sceset
@@ -233,11 +250,44 @@ save(res,file = "data/sceset_hvg_GSE60749-GPL13112.rda")
 
 ```
 
+```{r create QC plots} 
+# some features have no zero counts, we remove them
+keep_features <- rowSums(counts(sceset.red) > 0) >= 1
+table(keep_features)
+sceset.red <- sceset.red[keep_features, ]
+
+selected_vars <- c("log10_total_counts", "log10_total_features", "pct_dropout",
+               "pct_counts_top_200_features")
+
+p1 <- plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata", selected_variables=selected_vars)
+p2 <- plotQC(sceset.red, type = "find-pcs", variable = "total_features")
+
+expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dropout",
+               "pct_counts_top_200_features", "log10_counts_feature_controls",
+               "pct_counts_feature_controls")
+p3 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
+p4 <- plotQC(sceset.red, type = "highest-expression", n=50)
+p5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+
+save_plot("results/QC_data/qc_summary_kumar.png", plot.qc,
+          ncol = 2, # we're saving a grid plot of 2 columns
+          nrow = 2 # and 2 rows
+          )
+
+```
+
 ```{r plot tSNE} 
 set.seed(1234)
-out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Perplexity = 5")
-out10 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=10, colour_by="total_features") + ggtitle("Perplexity = 10")
-out20 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="total_features") + ggtitle("Perplexity = 20") 
+
+out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",return_SCESet=FALSE) + ggtitle("Perplexity = 5")
+out10 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=10, colour_by="total_features",return_SCESet=FALSE) + ggtitle("Perplexity = 10")
+out20 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="total_features",return_SCESet=FALSE) + ggtitle("Perplexity = 20") 
 multiplot(out5, out10, out20, cols=3)
+
+ggsave("results/QC_data/tsnelibsize_kumar2014.pdf")
+
+dev.off()
 ```
 

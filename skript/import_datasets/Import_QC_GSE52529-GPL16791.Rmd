@@ -8,14 +8,13 @@ Script and code follows "A step-by-step workflow for low-level analysis of singl
 # Load and process data set: Trapnell2014 GSE52529-GPL16791
 ```{r load libraries, include=FALSE}
 # load packages
-
+pdf("results/QC_data/QC_plots_trapnell2014.pdf")
 suppressPackageStartupMessages(library(MultiAssayExperiment))
 suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(plyr))
 suppressPackageStartupMessages(library(scran))
-
 ```
 
 ## load multiassay dataset from IMLS conquer
@@ -107,12 +106,26 @@ table((pData(sceset))$characteristics_ch1.5)
 # Quality control on cells
 Some cells have small library sizes (< 1 mio total counts) and show almost no expression. Candidates for filtering out.
 ```{r  histogramms }
-par(mfrow=c(2,2))
+
+size.med <- median(log10(sceset$total_counts), na.rm = TRUE)
+size.mad <- mad(log10(sceset$total_counts), center = size.med, na.rm = TRUE)
+lower.limit.size <- 10^(size.med - 3 * size.mad)/1e6
+    
+feature.med <- median(log10(sceset$total_features), na.rm = TRUE)
+feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE)
+lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
+
+pdf("results/QC_data/hist_Trapnell2014.pdf")
+
+par(mfrow=c(1,2))
 hist(sceset$total_counts/1e6, xlab="Library sizes ", main="", 
     breaks=20, col="grey80", ylab="Number of cells")
+abline(v=lower.limit.size,col=2, lty=2 )
 hist(sceset$total_features, xlab="Number of expressed genes", main="", 
     breaks=20, col="grey80", ylab="Number of cells")
+abline(v=lower.limit.feat, col=2, lty=2 )
 
+dev.off()
 
 ```
 
@@ -238,12 +251,45 @@ res <- sceset.hvg
 save(res,file = "data/sceset_hvg_GSE52529-GPL16791.rda")
 
 ```
+Plot a summary of the QC
+```{r create QC plots} 
+# some features have no zero counts, we remove them
+keep_features <- rowSums(counts(sceset.red) > 0) >= 1
+table(keep_features)
+sceset.red <- sceset.red[keep_features, ]
+
+selected_vars <- c("log10_total_counts", "log10_total_features", "pct_dropout",
+               "pct_counts_top_200_features")
+
+p1 <- plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata", selected_variables=selected_vars)
+p2 <- plotQC(sceset.red, type = "find-pcs", variable = "total_features")
+
+expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dropout",
+               "pct_counts_top_200_features", "log10_counts_feature_controls",
+               "pct_counts_feature_controls")
+p3 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
+p4 <- plotQC(sceset.red, type = "highest-expression", n=50)
+p5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+
+save_plot("results/QC_data/qc_summary_trapnell.png", plot.qc,
+          ncol = 2, # we're saving a grid plot of 2 columns
+          nrow = 2 # and 2 rows
+          )
+
+
+
+```
 
 ```{r plot tSNE} 
 set.seed(1234)
+out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Trapnell 2014")
 out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Perplexity = 5")
 out10 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=10, colour_by="total_features") + ggtitle("Perplexity = 10")
 out20 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="total_features") + ggtitle("Perplexity = 20") 
 multiplot(out5, out10, out20, cols=3)
+ggsave("results/QC_data/tsnelibsize_trapnell2014.pdf")
+dev.off()
 ```
 
