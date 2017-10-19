@@ -11,6 +11,7 @@ library(DESeq2)
 library(gridExtra)
 library(DESeq)
 library(cowplot)
+library(scater)
 
 
 
