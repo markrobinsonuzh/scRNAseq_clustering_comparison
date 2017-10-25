@@ -14,10 +14,10 @@ library(Seurat)
 DATA_DIR <- "data"
 files <- list(
   
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda" ),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda" ),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda" ),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda" )
+  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
+  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
+  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
   
 )
 
@@ -41,22 +41,23 @@ for(i in names(data)) {
 }
 
 # Seurat
-# Resolution parameter, higher number gives more cluster, lower less cluster.
-par.resolution <- list(
-    kumar2015 = round(seq(0.1, 2,length.out = 10),1),
-    trapnell2014 = round(seq(0.1, 2,length.out = 10),1),
-    xue2013 = rep(0.6,10),
-    koh2016 = round(seq(0.1, 2,length.out = 10),1)
+# Resolution parameter resolution, higher number gives more cluster, lower less cluster. we define as the standart by 0.8
+# k.param is the number of neirest neighbors
+# th number of PC dim to use was deterimned by an elbow plot and by the jackstraW FUNCTION, ALTOUGH ITS DIFFICULT TO 
+k.param <- list(
+    kumar2015 =ncol(data[[i]])* c(0.01,0.05,0.1,0.15),
+    trapnell2014 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15),
+    zhengmix2016 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15),
+    koh2016 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15)
   )
 par.dims.use <-  list(
-  kumar2015 = 1:10,
-  trapnell2014 = 1:10,
-  xue2013 = 1:10,
-  koh2016 = 1:10
+  kumar2015 = 1:9,
+  trapnell2014 = 1:12,
+  zhengmix2016 = 1:10,
+  koh2016 = 1:15
 )
 
 #Seurat function
-
 run_seurat <- function( data, par.resolution, par.dims.use ) {
   require(Seurat)
   res.cluster <-  sys.time <-  vector("list", length(files))
@@ -71,7 +72,7 @@ for (i in names(data)) {
   #multiplies this by a scale factor (10,000 by default), and log-transforms the result. 
   data[[i]] <- NormalizeData(object = (data[[i]]), normalization.method = "LogNormalize", scale.factor = 1e4)
   # Detection of variable genes across the single cells
-  data[[i]] <- FindVariableGenes(object =(data[[i]]), mean.function = ExpMean, dispersion.function = LogVMR, do.plot = FALSE)
+  data[[i]] <- FindVariableGenes(object =(data[[i]]), mean.function = ExpMean, dispersion.function = LogVMR, do.plot = TRUE)
   ### Scaling the data and removing unwanted sources of variation
   data[[i]] <- ScaleData(object = data[[i]])
 
@@ -80,27 +81,30 @@ for (i in names(data)) {
   sys.time[[i]] <- system.time({
     
     data[[i]] <- RunPCA(object = data[[i]], pc.genes = data[[i]]@var.genes, do.print = FALSE)
-    #data[[i]] <- JackStraw(object = data[[i]], num.replicate = 30, do.print = FALSE)
+    data[[i]] <- JackStraw(object = data[[i]], num.replicate = 100, do.print = TRUE)
+    JackStrawPlot(data[[i]] , PCs=1:15)
+    PCElbowPlot(object =   data[[i]])
+    
     ### Cluster the cells
     # save.SNN = T saves the SNN so that the clustering algorithm can be rerun using the same graph
     # but with a different resolution value (see docs for full details)
-    df.clus <- matrix( nrow = ncol(data[[i]]@raw.data), ncol = length( par.resolution[[i]]  ))
+    df.clus <- matrix( nrow = ncol(data[[i]]@raw.data), ncol = length( k.param[[i]]  ))
     for ( j in seq_len( length(par.resolution) ) ){
 
-    df.clus[,j] <- FindClusters(object = data[[i]], reduction.type = "pca", 
-                            dims.use = par.dims.use[[i]] , resolution = par.resolution[[i]][j] , 
+    df.clus[,j] <- FindClusters(object = data[[i]], reduction.type = "pca", k.param = k.param[[i]][j],
+                            dims.use = par.dims.use[[i]] , resolution = 0.8 , 
                             print.output = 0, save.SNN = TRUE  )@ident
                            
     } 
   })
-  colnames(df.clus) <- c( paste0( par.resolution[[i]]) )
+  colnames(df.clus) <- c( paste0(  k.param[[i]]) )
   res.cluster[[i]] <-  df.clus
 }
   return( res.cluster )
 }
 # Run seurat
 
-res.cluster <-  run_seurat( data, par.resolution, par.dims.use )
+res.cluster <-  run_seurat( data,  k.param, par.dims.use )
 
 # save clusters
 

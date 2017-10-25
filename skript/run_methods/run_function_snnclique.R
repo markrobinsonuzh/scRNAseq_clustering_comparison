@@ -4,7 +4,7 @@
 # SNN-Cliq uses shared nearest neighbour graphs to model the high dimensional data given by the expression matrix. The identification of clusters is done by merging the quasi cliques obtained by the graph.
 # Paramteres supplied by the user are a threshold r which defines the connectivity of the quasi-cliques, a threshold m which defines the merging rate of the quasi-cliques. r and m is typically set to 0.7 and 0,5, respectively.
 # The number nearest neighbors k has to be defined by the user, higher number of neighbors gives lower number of clusters. Working distances are euclidean but diferent can be used, defined by the distan argument.
-library(scater)
+require(scater)
 source("skript/helper_files/Helper_functions.R")
 
 
@@ -12,10 +12,12 @@ source("skript/helper_files/Helper_functions.R")
 
 DATA_DIR <- "data"
 files <- list(
+  
   kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR, "sceset_red_SRP073808.rda")
+  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
+  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
+  
 )
 
 # load data sets
@@ -53,18 +55,18 @@ setwd("skript/run_methods/snn-cliq")
 # Set parameters, k is number of nearest neighbours, r is cutoff for quasi-clique, m is threshold of overlapping quasicliques to be merged (standart threshold is half of the points)
 
 distan <- "euclidean"
-
+# set number of cluster , below 3 cluster doesent work
 par.k <-  list(
-  kumar2015 = c(2:10),
-  trapnell2014 = c(2:10),
-  xue2013 = c(2:10),
-  koh2016 = c(2:10)
+  kumar2015 = c(3:10),
+  trapnell2014 = c(3:10),
+  zhengmix2016 = c(3:10),
+  koh2016 = c(3:10)
 )
 
 par.r <- list(
   kumar2015 = 0.7,
   trapnell2014 = 0.7,
-  xue2013 = 0.7,
+  zhengmix2016 = 0.7,
   koh2016 = 0.7
 )
 par.m <-  list(
@@ -91,7 +93,6 @@ run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
       
       # find clusters in the graph
       
-      sys.time[[i]] <- system.time({
         snn.res <- 
           system(
             paste0(
@@ -103,7 +104,7 @@ run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
             ),
             intern = TRUE
           )
-      })
+     
       #
       cat(paste(snn.res, collapse = "\n"))
       snn.res <- read.table("res-snn-cliq.txt")
@@ -111,7 +112,7 @@ run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
       
       df.clus[,j]<- as.integer(snn.res[,1])
       # remove files that were created during the analysis
-      system("rm snn-cliq.txt res-snn-cliq.txt")
+      #system("rm snn-cliq.txt res-snn-cliq.txt")
     }
     colnames(df.clus) <- c( paste0(par.k[[i]]) )
     res.cluster[[i]] <- df.clus

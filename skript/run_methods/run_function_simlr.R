@@ -20,10 +20,12 @@ set.seed(1234)
 
 DATA_DIR <- "data"
 files <- list(
+  
   kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
+  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
   koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
+  
 )
 
 # load data sets
@@ -51,11 +53,11 @@ for(i in names(data)) {
 list <- vector("list", length(data))
 names(list) <- names(data)
 res.SIMLR <- sys.time <- res.cluster <-  list
-# Set paramaeters
+# Set parameter number of cluster c
 par.k <-  list(
   kumar2015 = c(2:10),
   trapnell2014 = c(2:10),
-  xue2013 =  c(2:10),
+  zhengmix2016 =  c(2:10),
   koh2016 =  c(2:10)
 )
 ### SIMLR function
