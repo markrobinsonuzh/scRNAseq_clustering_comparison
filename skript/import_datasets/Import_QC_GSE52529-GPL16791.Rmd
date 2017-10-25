@@ -156,8 +156,8 @@ is.debris <- pData(sceset)$characteristics_ch1.2=="debris: TRUE" # filter out de
 is.multiplecell <-  pData(sceset)$characteristics_ch1.4 != "cells in well: 1"
 sceset.red <- sceset[,!(libsize.drop | feature.drop|is.debris| is.multiplecell )]
 
-data.frame(ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop), ByCellnumber=sum(is.multiplecell), Bydebris=sum(is.debris )
-    , Remaining=ncol(sceset.red))
+data.frame( ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop), ByCellnumber=sum(is.multiplecell), Bydebris=sum(is.debris )
+    , Remaining=ncol(sceset.red) )
 
 
 ```

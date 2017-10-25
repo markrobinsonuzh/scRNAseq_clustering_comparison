@@ -30,9 +30,9 @@ plot_ari <- function(x){
   tmp$par <- as.character(tmp$par)
   tmp$par <- as.numeric(tmp$par)
   tmp.k <- tmp%>%subset( .id %in% c("cidr","pcaReduce","RtSNEkmeans","SC3","SIMLR"))  
-
+  
   tmp.eps <- subset( tmp, .id  %in% c("dbscan") )
-
+  
   tmp.res <- subset( tmp, .id %in% c("Seurat") )
   # plot the ARIs per dataset
   
@@ -48,36 +48,24 @@ plot_ari <- function(x){
     geom_line(aes(group=.id))+
     geom_point()+
     labs(x="epsilon")
-
+  
   p3 <- ggplot(data = tmp.res, aes(x = par, y = ARI, colour = .id))+       
     geom_line(aes(group=.id))+
     geom_point()+
     labs(x="resolution")
   
   #pgrid <- plot_grid(p1,p2, p3, ncol=2)
-  grid.arrange(p1,                             # First row with one plot spaning over 2 columns
-               arrangeGrob(p2,p3, nrow = 2), # Second row with 2 plots in 2 different columns
-               ncol = 2)                       # Number of rows
+  p <- grid.arrange(p1,                             # First row with one plot spaning over 2 columns
+                    arrangeGrob(p2,p3, nrow = 2), # Second row with 2 plots in 2 different columns
+                    ncol = 2)                       # Number of rows
+  return(p)
   
 }
+# plot all the data, store in list
+p.all <- lapply(files.ari, plot_ari)
+# save it to different files
 
-
-# plot all the data
-pdf("results/plots/plot_ari_krange_all.pdf")
-lapply(files.ari, plot_ari)
-
-dev.off()
-
-# plot by dataset, not working right now........
-for (i in seq_len(length(files.ari) )){
-  
-  p <- plot_ari(files.ari[[i]])
-  #save_plot( paste0("results/plot_ari_krange_",names(files.ari)[i],".pdf") ,p)
-  grid.arrange(p1,                             # First row with one plot spaning over 2 columns
-               arrangeGrob(p2,p3, ncol = 2), # Second row with 2 plots in 2 different columns
-               nrow = 2)                       # Number of rows
-
-}
+lapply(names(p.all), 
+       function(x)ggsave(filename=paste0("results/plots/plot_ari_krange_",x,".pdf"), plot=p.all[[x]]))
 
 ### Appendix
-paste0("results/plot_ari_krange_",names(files.ari[i]),".pdf")

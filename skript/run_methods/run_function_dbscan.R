@@ -42,7 +42,6 @@ for (i in names(data)){
   
 }
 
-
 # load cell labels
 for(i in names(data)) {
   labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
@@ -69,12 +68,12 @@ for (i in names(input_matrix)) {
     input_matrix[[i]] <-  prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:nrow( input_matrix[[i]])/2]
   }
 }
-# parameter k is nearest neighbor, as a rule of thumb k >= dimension+1
+# parameter k is nearest neighbor, as a rule of thumb k >= dimension+1, here we use 10 % of the cell data set
 par.k <- list(
-  kumar2015 = 51,
-  trapnell2014 = 51,
-  xue2013 = 6,
-  koh2016 = 51
+  kumar2015 = nrow(input_matrix[[1]])*0.1,
+  trapnell2014 = nrow(input_matrix[[2]])*0.1,
+  xue2013 = nrow(input_matrix[[3]])*0.1,
+  koh2016 = nrow(input_matrix[[4]])*0.1
 )
 
 # run k neirest neighbour distance plot to find epsilon
@@ -84,15 +83,14 @@ for (i in names(input_matrix)){
   kNNdistplot(input_matrix[[i]], k = par.k[[i]]) 
   
 }
-
 # RUN dbscan, k is nearest neighbor
 
 # parameter epsilon, size of the epsilon neighborhood. Bent in kNN dist plot. choose range for.
 par.eps <- list(
-  kumar2015 = c(10,50,150,500,1000),
-  trapnell2014 = c(10,100,200,500,1000),
-  xue2013 = c(10,50,200,500,600,1000),
-  koh2016 = c(10,50,150, 500,1000)
+  kumar2015 = c(10,20,50,150,250,500),
+  trapnell2014 = c(10,20,50,150,250,500),
+  xue2013 = c(10,50,200,300,400,600),
+  koh2016 = c(10,20,50,150,250,500)
 )
 # parameter Pts, number of minimum points in the eps region (for core points). Default is 5 points.
 

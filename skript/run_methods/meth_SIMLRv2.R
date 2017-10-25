@@ -53,7 +53,7 @@ for(i in names(data)) {
 list <- vector("list", length(data))
 names(list) <- names(data)
 res.SIMLR <- sys.time <- res.cluster <-  list
-# Set paramaeters
+# Set paramaeters, we define the tuning parameter k to ten as it is the standart parameter, the number of dimension are NA
 par.c <-  list(
   kumar2015 = 3,
   trapnell2014 = 3,

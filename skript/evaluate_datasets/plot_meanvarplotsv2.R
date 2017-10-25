@@ -38,8 +38,6 @@ for (i in 1:length(data)){
   
 }
 
-
-
 # rlog
 
 #rld <- rlog((round(count_lstpm,0)), blind=TRUE) # takes too much time
@@ -47,7 +45,7 @@ for (i in 1:length(data)){
 ###### define funcion  meansd_plot for transformation and plotting of count data
 meansd_plot <- function(data, ranks,cofactor ){
 # compute transformations
-count_lstpm <- ( as.matrix(get_exprs(data, "counts")) ) # extect count data
+count_lstpm <- ( as.matrix(get_exprs(data, "counts")) ) # extract count data
 # log and asin transformaations
 count_lstpm.log <- log2(count_lstpm +1)  # log2
 cofactor <- cofactor
