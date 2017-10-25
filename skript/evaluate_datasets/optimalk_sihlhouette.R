@@ -23,14 +23,7 @@ set.seed(1234)
 
 # Directories
 
-DATA_DIR <- "data"
-
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
-)
+source("FILES.R")
 
 
 # load data sets
@@ -75,6 +68,10 @@ for (i in names(tinput_matrix)){
   res.si[[i]]<- silhouette(pam(tinput_matrix[[i]], k=par.k[[i]] ))
   plot(res.si[[i]], main=names(data[i]))
 }
+
+# save the data 
+
+save(res.si,file="results/number_k/ressilhouette.rda")
 
 dev.off()
 

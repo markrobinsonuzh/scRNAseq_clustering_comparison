@@ -1,32 +1,24 @@
 #####################################
 ## Gap statistic for datasets      ##  
 #####################################
-# Workin directory
-source("~/Desktop/masterthesis/scRNAseq_clustering_comparison/skript/helper_files/WORKIN_DIR.R")
 
-### load libraries
-source(paste0(WORKIN_DIR,"skript/helper_files/Helper_functions.R"))
+### load libraries and helper files
+source("skript/helper_files/Helper_functions.R")
 
 library(cluster)
 library(dplyr)
 library(fpc)
 library(scater)
 
-pdf(paste0(WORKIN_DIR,"results/plots/plot_optimalk_gap.pdf"))
+# define plot directories
+pdf("results/plots/plot_optimalk_gap.pdf")
 
 ### set seed
 
 set.seed(1234)
 
 # load data
-
-DATA_DIR <- paste0(WORKIN_DIR,"data")
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda")
-  
-)
+source("FILES.R")
 
 
 # load data sets
@@ -47,6 +39,7 @@ for (i in names(data)){
 for (i in 1:(length(input_matrix))){
   input_matrix[[i]] <- exprs(data[[i]]) # use count scaled length scaled tpms, normalized and log2 transformed
 }
+
 input_matrix[[i]] <- t(input_matrix[[i]])
 ################################################
 ##### Compute gap statistic, number of Monte Carlo samples = 100 (increase it to 1000) , maximum of clusters K.max=10
@@ -73,7 +66,7 @@ par.K.max <- list(
 for (i in names(input_matrix))
 res.clusgap[[i]] <- clusGap(input_matrix[[i]], kmeans, K.max=par.K.max[[i]], B = par.B[[i]] , verbose = interactive(), spaceH0 = "scaledPCA")
 
-save(res.clusgap,file=paste0(WORKIN_DIR,"results/number_k/resclusgap.rda"))
+save(res.clusgap,file="results/number_k/resclusgap.rda")
 #### store results for further use
 
 

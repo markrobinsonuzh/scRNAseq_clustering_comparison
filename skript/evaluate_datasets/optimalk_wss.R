@@ -18,14 +18,7 @@ set.seed(1234)
 
 # Directories
 
-DATA_DIR <- "data"
-
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
-)
+source("FILES.R")
 
 
 # load data sets
@@ -57,10 +50,12 @@ for (i in 1:(length(tinput_matrix))){
 par.nk <- list(
   kumar2015=15,
   trapnell2014=15,
-  xue2013=15,
+  zhengmix2016=15,
   koh2016=15
   
 )
+
+
 # 
 wss <- vector("list", length(files))
 names(wss) <- names(files)
@@ -71,11 +66,15 @@ wss[[i]] <- (nrow(tinput_matrix[[i]] )-1)*sum(apply(tinput_matrix[[i]],2,var))
 
 
 # compute wss for different k
+
 for (i in seq_len(length(tinput_matrix))) {{
   for (j in 2:par.nk[[i]] ) wss[[i]][j] <- sum(kmeans(tinput_matrix[[i]],
                                        centers=j)$withinss)
 
 }}
+
+# save data
+save(wss,file="results/number_k/rescluswss.rda")
 
 # plot
 par(mfrow=c(2,2))
