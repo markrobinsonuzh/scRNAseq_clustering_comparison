@@ -12,8 +12,10 @@ library(clue)
 source("skript/helper_files/helper_calc_f1_scores.R")
 source("skript/helper_files/calc_f1_score.R")
 source("skript/helper_files/Helper_functions.R")
-# load data files
-DATASET <-   c("koh2016", "kumar2015", "trapnell2014", "xue2013")
+# load data files, define which dataset to work with
+DATASET <-   c("koh2016", "kumar2015", "trapnell2014", "zhengmix2016")
+
+########
 for (h in seq_len(length(DATASET)) ){
 
 data_files <- as.list(paste0("results/run_results/",DATASET[h],".rda"))
