@@ -15,15 +15,9 @@ library(scater)
 
 
 
-# file paths
+# file paths, defined in FILES.R
 
-DATA_DIR <- "data"
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_GSE52529-GPL16791.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_SRP073808.rda")
-  
-)
+source("FILES.R")
 
 # load data sets
 
@@ -49,7 +43,7 @@ count_lstpm <- ( as.matrix(get_exprs(data, "counts")) ) # extract count data
 # log and asin transformaations
 count_lstpm.log <- log2(count_lstpm +1)  # log2
 cofactor <- cofactor
-count_lstpm.asinh <- asin(sqrt(count_lstpm/cofactor) )# arc sin
+count_lstpm.asinh <- asinh(sqrt(count_lstpm/cofactor) )# arc sin
 # vst transform
 countdata <- newCountDataSet((round(count_lstpm,0)), conditions = array(1,dim = ncol(count_lstpm)))
 countdata <- estimateSizeFactors( countdata)
