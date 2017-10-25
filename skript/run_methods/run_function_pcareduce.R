@@ -24,14 +24,8 @@ library(pcaReduce)
 # import data as sceset
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR, "sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
+
 
 # load data sets
 
@@ -56,11 +50,6 @@ for(i in names(data)) {
 list <- vector("list", length(data))
 names(list) <- names(data)
 input_matrix <- list
-
-
-
-
-
 # extract expression data
 
 for (i in 1:(length(input_matrix))){
@@ -70,7 +59,7 @@ for (i in 1:(length(input_matrix))){
 par.nbt <- list(
   kumar2015 = 50,
   trapnell2014 = 50,
-  xue2013 = 20,
+  zhengmix2016 = 20,
   koh2016 = 50
   
 )
@@ -78,16 +67,15 @@ par.nbt <- list(
 par.q <- list(
   kumar2015 = 30,
   trapnell2014 = 30,
-  xue2013 = 15,
+  zhengmix2016 = 15,
   koh2016 = 30
 )
 n.cluster <- list(
   kumar2015=3,
   trapnell2014=3,
-  xue2013=8,
+  zhengmix2016=8,
   koh2016 = 10
 )
-
 # extract k dimension,  
 # run pce Reduce, vary q
 run_pcareduce <- function(input_matrix, par.nbt,par.q,n.cluster){

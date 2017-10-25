@@ -11,23 +11,14 @@
 source("skript/helper_files/Helper_functions.R")
 
 
-
 #load libraries
 
 library(dbscan)
 
 # import data as sceset
 # file paths
+source("FILES.R")
 
-DATA_DIR <- "data"
-
-
-files <- list(
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-)
 
 # load data sets
 
@@ -68,11 +59,12 @@ for (i in names(input_matrix)) {
     input_matrix[[i]] <-  prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:nrow( input_matrix[[i]])/2]
   }
 }
+
 # parameter k is nearest neighbor, as a rule of thumb k >= dimension+1, here we use 10 % of the cell data set
 par.k <- list(
   kumar2015 = nrow(input_matrix[[1]])*0.1,
   trapnell2014 = nrow(input_matrix[[2]])*0.1,
-  xue2013 = nrow(input_matrix[[3]])*0.1,
+  zhengmix2016 = nrow(input_matrix[[3]])*0.1,
   koh2016 = nrow(input_matrix[[4]])*0.1
 )
 
@@ -89,19 +81,21 @@ for (i in names(input_matrix)){
 par.eps <- list(
   kumar2015 = c(10,20,50,150,250,500),
   trapnell2014 = c(10,20,50,150,250,500),
-  xue2013 = c(10,50,200,300,400,600),
-  koh2016 = c(10,20,50,150,250,500)
+  zhengmix2016 = c(10,50,200,300,400,600),
+  koh2016 = c(5,10,20,50,100)
 )
+names(par.eps) <- names(files)
 # parameter Pts, number of minimum points in the eps region (for core points). Default is 5 points.
 
 par.Pts <- list(
   kumar2015 = 5,
   trapnell2014 = 5,
-  xue2013 = 5,
+  zhengmix2016 = 5,
   koh2016 = 5
   
 )
 
+# function dbscan
 run_dbscan <-  function( par.eps, par.Pts ){
   
   for(i in names(input_matrix)){
@@ -117,6 +111,7 @@ run_dbscan <-  function( par.eps, par.Pts ){
 # run dbscan
 
 res.cluster <-  run_dbscan(par.eps, par.Pts)
+#
 # save clusters
 
 dir_cluster <- paste0("results/dbscan/dbscan_krange_clus_", names(res.cluster), ".txt")
