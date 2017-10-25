@@ -20,7 +20,7 @@ METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNC
 
 # file paths to the clustering results
 DATA_DIR <-  "results"
-DATASET <- "trapnell2014"    # "kumar2015" ,"trapnell2014" ,"xue2013" , "koh2016" 
+DATASET <- "trapnell2014"    # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
 
 
 
