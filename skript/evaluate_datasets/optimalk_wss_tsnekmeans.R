@@ -52,7 +52,7 @@ rand.seed <- 1234
 par.perp <- list(
   kumar2015 = 20,
   trapnell2014 = 20,
-  xue2013 = 5,
+  zhengmix2016 = 5,
   koh2016 = 20
 )
 # define the number of cluster for kmeans clustering 
@@ -60,7 +60,7 @@ par.perp <- list(
 par.nk <- list(
   kumar2015=10,
   trapnell2014=15,
-  xue2013=15,
+  zhengmix2016=15,
   koh2016=15
 )
 

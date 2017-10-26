@@ -59,7 +59,7 @@ for (i in 1:(length(tinput_matrix))){
 par.k= list(
   kumar2015 = 3,
   trapnell2014 = 2,
-  xue2013 = 2,
+  zhengmix2016 = 2,
   koh2016= 10
   
 )
