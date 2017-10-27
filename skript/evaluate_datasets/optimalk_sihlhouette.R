@@ -58,8 +58,8 @@ for (i in 1:(length(tinput_matrix))){
 # pam
 par.k= list(
   kumar2015 = 3,
-  trapnell2014 = 2,
-  zhengmix2016 = 2,
+  trapnell2014 = 3,
+  zhengmix2016 = 4,
   koh2016= 10
   
 )

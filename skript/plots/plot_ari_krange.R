@@ -29,7 +29,7 @@ plot_ari <- function(x){
   tmp <- ldply(tmp[[1]], as.data.frame)  
   tmp$par <- as.character(tmp$par)
   tmp$par <- as.numeric(tmp$par)
-  tmp.k <- tmp%>%subset( .id %in% c("cidr","pcaReduce","RtSNEkmeans","SC3","SIMLR"))  
+  tmp.k <- tmp%>%subset( .id %in% c("cidr","pcaReduce","RtSNEkmeans","SC3","SIMLR","SNNCliq"))  
   
   tmp.eps <- subset( tmp, .id  %in% c("dbscan") )
   
@@ -52,7 +52,7 @@ plot_ari <- function(x){
   p3 <- ggplot(data = tmp.res, aes(x = par, y = ARI, colour = .id))+       
     geom_line(aes(group=.id))+
     geom_point()+
-    labs(x="resolution")
+    labs(x="kNN")
   
   #pgrid <- plot_grid(p1,p2, p3, ncol=2)
   p <- grid.arrange(p1,                             # First row with one plot spaning over 2 columns
@@ -64,7 +64,6 @@ plot_ari <- function(x){
 # plot all the data, store in list
 p.all <- lapply(files.ari, plot_ari)
 # save it to different files
-
 lapply(names(p.all), 
        function(x)ggsave(filename=paste0("results/plots/plot_ari_krange_",x,".pdf"), plot=p.all[[x]]))
 

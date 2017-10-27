@@ -2,6 +2,7 @@
 title: "Import_QC_SRP073808"
 output: html_document
 ---
+todo: Size factors are negative, improve number of sizes in estimation.
 
 Script and code follows "A step-by-step workflow for low-level analysis of single-cell RNA-seq data with Bioconductor". Aaron T. L. Lun1, Davis J. McCarthy2 and John C. Marioni. and the 
 
@@ -16,6 +17,8 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(plyr))
 suppressPackageStartupMessages(library(scran))
+suppressPackageStartupMessages(library(cowplot))
+
 
 ```
 
@@ -52,6 +55,17 @@ table(phn[, "phenoid"])
 
 
 ```
+
+
+```{r have a closer look to pheno, echo=TRUE}
+phn.tbl <- as_data_frame(phn)
+glimpse(phn.tbl)
+# extract the plate information
+
+
+```
+
+
 # create an SCEset
 The expr slot is populated with the count data; obtained from the length-scalaed , count-scaled tpms. The values are automatically log2 transformed. gene-level tpms for the tpm slot.
 
@@ -242,6 +256,7 @@ res <- sceset.hvg
 save(res,file = "data/sceset_hvg_SRP073808.rda")
 
 ```
+
 Plot a summary of the QC
 ```{r create QC plots} 
 # some features have no zero counts, we remove them
@@ -249,11 +264,11 @@ keep_features <- rowSums(counts(sceset.red) > 0) >= 1
 table(keep_features)
 sceset.red <- sceset.red[keep_features, ]
 
-selected_vars <- c("log10_total_counts", "log10_total_features", "pct_dropout",
-               "pct_counts_top_200_features")
 
-p1 <- plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata", selected_variables=selected_vars)
-p2 <- plotQC(sceset.red, type = "find-pcs", variable = "total_features")
+
+p1 <- scater::plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata")
+
+p2 <- scater::plotQC(sceset.red, type = "find-pcs", variable = "total_features")
 
 expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
@@ -261,13 +276,17 @@ expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dro
 p3 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
 p4 <- plotQC(sceset.red, type = "highest-expression", n=50)
 p5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+p7 <- plotQC(sceset.red, type = "exprs-freq-vs-mean")
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p7, ncol = 2)
 
 save_plot("results/QC_data/qc_summary_koh.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns
           nrow = 2 # and 2 rows
           )
+
+
+
 ```
 
 
@@ -283,3 +302,19 @@ ggsave("results/QC_data/tsnelibsize_koh2016.pdf")
 dev.off()
 ```
 
+```{r remove  batch effects}
+
+require(limma)
+
+adj.exprs <- exprs(sceset.red)
+
+adj.exprs <- removeBatchEffect(adj.exprs, batch=sceset.red$total_features )
+
+norm_exprs(sceset.red) <- adj.exprs
+
+
+plotTSNE(sceset.red, exprs_values="norm_exprs", perplexity=20, colour_by="phenoid",return_SCESet=FALSE) + ggtitle("adjusted for total features") 
+plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="phenoid",return_SCESet=FALSE) + ggtitle("non adjusted") 
+
+
+```

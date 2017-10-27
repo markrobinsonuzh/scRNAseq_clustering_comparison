@@ -59,7 +59,7 @@ for (i in 1:(length(input_matrix))){
 par.nbt <- list(
   kumar2015 = 50,
   trapnell2014 = 50,
-  zhengmix2016 = 20,
+  zhengmix2016 = 50,
   koh2016 = 50
   
 )
@@ -67,13 +67,13 @@ par.nbt <- list(
 par.q <- list(
   kumar2015 = 30,
   trapnell2014 = 30,
-  zhengmix2016 = 15,
+  zhengmix2016 = 30,
   koh2016 = 30
 )
 n.cluster <- list(
   kumar2015=3,
   trapnell2014=3,
-  zhengmix2016=8,
+  zhengmix2016=4,
   koh2016 = 10
 )
 # extract k dimension,  

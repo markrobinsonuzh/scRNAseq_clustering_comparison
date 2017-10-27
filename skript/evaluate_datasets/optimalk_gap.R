@@ -50,16 +50,18 @@ res.clusgap <- vector("list", length(files))
 names(res.clusgap)  <-  names(input_matrix)
 
 par.B <- list(
-  kumar2015=1,
-  trapnell2014=1,
-  xue2013=1
+  kumar2015=100,
+  trapnell2014=100,
+  zhengmix2016=100,
+  koh2016=100
   
 )
 
 par.K.max <- list(
-  kumar2015=2,
-  trapnell2014=2,
-  xue2013=2
+  kumar2015=12,
+  trapnell2014=12,
+  zhengmix2016=12,
+  koh2016=12
 )
 
 

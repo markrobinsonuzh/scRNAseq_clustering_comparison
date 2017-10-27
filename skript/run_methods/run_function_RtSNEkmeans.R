@@ -16,15 +16,7 @@ library(dplyr)
 
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
 
 # load data sets
 
@@ -58,14 +50,14 @@ rand.seed <- 1234
 par.perp <- list(
   kumar2015 = 20,
   trapnell2014 = 20,
-  xue2013 = 5,
+  zhengmix2016 = 20,
   koh2016 = 20
 )
 # define the number of cluster for kmeans clustering 
 par.k <- list(
   kumar2015 = c(2:10),
   trapnell2014 = c(2:10),
-  xue2013 = c(2:10),
+  zhengmix2016 = c(2:10),
   koh2016= c(2:10)
 )
 
@@ -121,6 +113,5 @@ sessionInfo()
 sink()
 
 ### Appendix
-res.cluster
 
 

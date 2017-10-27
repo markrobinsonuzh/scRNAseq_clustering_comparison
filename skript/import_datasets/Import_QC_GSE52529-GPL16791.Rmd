@@ -15,6 +15,8 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(plyr))
 suppressPackageStartupMessages(library(scran))
+suppressPackageStartupMessages(library(cowplot))
+
 ```
 
 ## load multiassay dataset from IMLS conquer
@@ -34,7 +36,7 @@ tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 
 ```
 # extract the Phenotype data
-There are three different subpopulations: knockout mouse and v6.5 mouse treated with serum or 2i.
+There are three different populations from different timepoints.
 ```{r phentotypes, echo=TRUE}
 # extract the phenotype data
 
@@ -50,6 +52,15 @@ phn[, "phenoid"] <- mapvalues(phn[, "phenoid"], from = c(grep("T0",phn[, "phenoi
 table(phn[, "phenoid"]) 
 
 ```
+Have a closer look to the phenotype. Based on the platenames the experiment is confounded.
+```{r have a closer look to pheno, echo=TRUE}
+phn.tbl <- as_data_frame(phn)
+glimpse(phn.tbl)
+# extract the plate information
+phn$title
+grep("A01", phn$title, value=TRUE)
+```
+
 # create an SCEset
 The expr slot is populated with the count data; obtained from the length-scalaed , count-scaled tpms. The values are automatically log2 transformed. gene-level tpms for the tpm slot.
 
@@ -183,10 +194,10 @@ Normalize data according to Lun etal. 2016 using pooled counts to estimate size 
 The size factor is correlated with the library sizes. As we have a homogenous cell population there's no obvious grouping. The difference of library size between cells is possibly due the seqeuncing depth.
 
 ```{r normalize through pool-based size factors }
-sceset <- computeSumFactors(sceset, sizes=c(20, 40, 60, 80))
+sceset <- computeSumFactors(sceset, sizes=c(20, 40, 60, 80,120,240))
 summary(sizeFactors(sceset))
 
-sceset.red <- computeSumFactors(sceset.red, sizes=c(20, 40, 60, 80))
+sceset.red <- computeSumFactors(sceset.red, sizes=c(20, 40, 60, 80,120))
 summary(sizeFactors(sceset.red))
 
 plot(sizeFactors(sceset), sceset$total_counts/1e6, log="xy",
@@ -258,11 +269,11 @@ keep_features <- rowSums(counts(sceset.red) > 0) >= 1
 table(keep_features)
 sceset.red <- sceset.red[keep_features, ]
 
-selected_vars <- c("log10_total_counts", "log10_total_features", "pct_dropout",
-               "pct_counts_top_200_features")
 
-p1 <- plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata", selected_variables=selected_vars)
-p2 <- plotQC(sceset.red, type = "find-pcs", variable = "total_features")
+
+p1 <- scater::plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata")
+
+p2 <- scater::plotQC(sceset.red, type = "find-pcs", variable = "total_features")
 
 expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
@@ -270,8 +281,9 @@ expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dro
 p3 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
 p4 <- plotQC(sceset.red, type = "highest-expression", n=50)
 p5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+p7 <- plotQC(sceset.red, type = "exprs-freq-vs-mean")
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p7, ncol = 2)
 
 save_plot("results/QC_data/qc_summary_trapnell.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns
@@ -293,3 +305,19 @@ ggsave("results/QC_data/tsnelibsize_trapnell2014.pdf")
 dev.off()
 ```
 
+```{r remove  batch effects}
+
+require(limma)
+
+adj.exprs <- exprs(sceset.red)
+
+adj.exprs <- removeBatchEffect(adj.exprs, batch=sceset.red$total_features )
+
+norm_exprs(sceset.red) <- adj.exprs
+
+
+plotTSNE(sceset.red, exprs_values="norm_exprs", perplexity=20, colour_by="phenoid",return_SCESet=FALSE) + ggtitle("adjusted for total features") 
+plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="phenoid",return_SCESet=FALSE) + ggtitle("non adjusted") 
+
+
+```

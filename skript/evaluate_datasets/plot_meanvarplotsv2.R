@@ -67,7 +67,7 @@ for (i in seq_len(length(data))){
   
   FILE_NAME<- paste0("results/QC_data/meanvarplots_", names(data)[i],".pdf")
   pdf(FILE_NAME)
-  meansd_plot(data=data[[i]],ranks= FALSE,cofactor=100)
+  meansd_plot(data=data[[i]],ranks= FALSE,cofactor=1)
   dev.off()
 }
 

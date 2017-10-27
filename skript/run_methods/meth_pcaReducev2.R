@@ -27,7 +27,7 @@ files <- list(
   
   kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
   trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
+  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
   koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
   
 )
@@ -67,10 +67,10 @@ for (i in 1:(length(input_matrix))){
 }
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 = 1,
-  trapnell2014 = 1,
-  xue2013 = 2,
-  koh2016 = 1
+  kumar2015 = 10,
+  trapnell2014 = 10,
+  xue2013 = 10,
+  koh2016 = 10
 
 )
 
