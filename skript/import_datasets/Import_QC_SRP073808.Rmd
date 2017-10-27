@@ -293,7 +293,6 @@ save_plot("results/QC_data/qc_summary_koh.png", plot.qc,
 Plot some tSNE plots showing the realtionsship between clusters and lib sizes
 ```{r plot tSNE} 
 set.seed(1234)
-out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Koh 2016")
 out5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features") + ggtitle("Perplexity = 5")
 out10 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=10, colour_by="total_features") + ggtitle("Perplexity = 10")
 out20 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=20, colour_by="total_features") + ggtitle("Perplexity = 20") 
