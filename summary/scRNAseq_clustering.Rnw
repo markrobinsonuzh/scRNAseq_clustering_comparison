@@ -91,14 +91,23 @@ Using log transformation and VST the mean-variance dependence is less extreme ( 
 \caption{Histogramm of Koh 2016. }
 \label{fig:three}
 \end{figure}
+\section{Filtering and normalization}
 
-Length scaled, count scaled transcript per million (TPM) were used for the datasets Kumar, Trapnell and Koh. The expression values in the Zheng dataset are UMI counts.
-Cells with log10-library sizes that are more than 3 median absolute deviations (MADs) below the median log-library size were filtered out. The same filtered was used with respect to the total number of genes per cell. 
-For the Trapnell 2014 data set information about the cell quality was available. In this dataset cells that were marked as debris, or if a single library consist of more than one cell were as well filtered out. Leaving 531 cells in the Koh dataset, 246 in the Kumar dataset and 222 in the Trapnell dataset. The filtering was therefore less strict in the Koh data set compared to the original analysis 2016 were they retained 498 cells. Kumar et al. filtered out.....
+The quality control of the datasets follows Lun et al.
+Length scaled, count scaled transcript per million (TPM) were used for the datasets Kumar, Trapnell and Koh.For the Koh dataset UMI counts are used.
+To find potential outliers PCA on the pheno type characteristic (example) of each cell can be used (Figure  \ref{fig:qckoh},\ref{fig:qckumar},\ref{fig:qctrapnell},\ref{fig:qczheng}). Kumar and Trapnell show some potential ouliers.
+
+Cells with log10-library sizes that are more than 3 median absolute deviations (MADs) below the median log-library size were filtered out. The same filtered was used with respect to the total number of genes per cell. For the Kumar and the Zheng dataset ERCCs and MT counts were available. Cells with large proportions of ERCC or mitochondrial RNA are seen as low quality cells. In the Kumar dataset cells with a ERCC proportion above 3 MADs are as well removed. The same filter was used for mitochondrial gene expressionin in the Zheng data.
+For the Trapnell 2014 data set information about the cell quality was available. In this dataset cells that were marked as debris, or if a single library consist of more than one cell were as well filtered out. Leaving 531 cells in the Koh dataset, 246 in the Kumar dataset and 222 in the Trapnell dataset. The filtering was less strict in the Koh data set compared to the original analysis 2016 were they retained 498 cells. 
+
+Low-abundance genes were filterd out by removing features that have an average count below 0.0001. For the Zheng data features which are not expressed in at least two cells are removed.
 
 
-To find potential outliers PCA on the pheno type characteristic (example) of each cell can be used (Figure  \ref{fig:qckoh},\ref{fig:qckumar},\ref{fig:qctrapnell},\ref{fig:qczheng}). Kumar and Trapnell show some potential ouliers. To find batch effects a linear model regressing the PC value against the total features was used (Lun et al, 2016). No correlation can be seen in the dataset Trapnell and Zheng. Wheras for Kumar and Koh PC1 has a high correalation with the number of features.
-Another examination of the technical factors that have  an influence on the variances can bo done using the marginal variances. For that a linear model with the expresion values per gene as response variables and a chosen  explanatory variable is fitted. The correlation coefficant can than be seen as the marginal explained variance for the explanatory variables. In  Kumar a big part of the variance is explained by the total number of genes, the expression of ERCC but also by biological variation. Around 0.1 to 10 percent of the varation is explained by the library size, number of genes and the putative cell type. Koh and Zheng is largely dominated by the biological variation.
+To find batch effects a linear model regressing the PC values against the total features was used (Lun et al, 2016). No correlation can be seen in the dataset Trapnell and Zheng. Wheras for Kumar and Koh PC1 has a high correalation with the number of features.
+
+Another examination of the technical factors that have  an influence on the variances can bo done using the marginal variances. For that a linear model with the expresion values per gene as response variables and a chosen  explanatory variable is fitted. The correlation coefficant can than be seen as the marginal explained variance for the explanatory variables.
+In  Kumar similar amount  of the variance is explained by the total number of genes, the proportion of ERCC and the phenotype. This indicates that the data set is heavily influenced by batch effects. They same holds in the Trapnell data, but on a lower scale. Variance in Koh data is largely influenced by the phenotype and to a lesser extend by total number of genes and the top 200 features. 
+Zheng is largely dominated by the biological variation with the other explantory factors contributiong only marginally to the complete variances.
 
 
 scRNA-seq data has an excess of zero counts. These can be split into systematic, semi-systematic and stochastic zeros (Lun, 2016). Systematic zeros are silent across all cells. These features were removed prior to the analysis. Stochastic zeros are zero counts that were obtained due to sampling. It affects genes with a count distribution near zero. Semi-systematic zeros come from genes that are silent in a subpopulation of cells. Different methods exist to normalize RNA-seq data like TMM normalization, DEseq normalization and by library size. However, none of these methods are designed to deal specifically with the zero-inflated nature of scRNA-seq data.
@@ -162,7 +171,7 @@ Minimization of within sum of squares was also done in the tSNE latent space wit
      SC3 & PCA  dimension reduction or Laplacian graph. Kmeans clustering on different dimensions. Hierarchical clustering on conensus matrix obtained by kmeans. & PCA & repeated kmeans, hierarchical clustering on similarity matrix of kmeans results & no & no & yes \\ \hline
     SNN-cliq & Shared nearest neighbor  graph based on similarities. Clustering through forming of cliques and subsequent merging. & graph based & merging of cliques & no & no &  \\ \hline
         dbscan & Density based clustering & none &density based clustering & no & no & yes \\ \hline
-     SIMLR &  & tSNE & kmeans & no & no & yes \\ \hline
+     SIMLR &  & tSNE & kmeans & yes & no & yes \\ \hline
     CIDR & PCA dimension reduction based on zero imputed similarities. Hierarchical clustering on a number of PC determined by variation of scree method. & PCA onimputed distances & hierarchical clustering& yes & no & yes \\ \hline
    Seurat v1.4 & Neirest neighbor graph based on PCA latent space & HVG and PCA & & no & yes & yes \\ \hline
 
@@ -174,65 +183,82 @@ Minimization of within sum of squares was also done in the tSNE latent space wit
 
 \paragraph{tSNE}
 
-In contrast to other dimensionality reduction techniques like  multidimensional scaling (MDS; Torgerson, 1952) tSNE (t-distributed stochastic neighbourhood embedding) is a non-linear mapping. Stochastic neighbour embedding (SNE) transforms euclidean distances to conditional probabilities p{j|i}. That is the probability of \(x_j\) is the nearest neighbour of $x_i$ under a Gaussian centred at $x_i$. The low dimensional counterpart $q_{i|j}$ is similar with a Gaussian centred at $y_i$ and variance $1/sqrt(2)$. SNE minimizes the divergence between $p_{j|i}$ and $q_{j|i}$ using the Kullback-Leiber divergence. formula...
+In contrast to other dimensionality reduction techniques like  multidimensional scaling (MDS; Torgerson, 1952) tSNE (t-distributed stochastic neighbourhood embedding) is a non-linear mapping. Stochastic neighbour embedding (SNE) transforms euclidean distances to conditional probabilities p{j|i}. That is the probability of \(x_j\) is the nearest neighbour of $x_i$ under a Gaussian centred at $x_i$. The low dimensional counterpart $q_{i|j}$ is similar with a Gaussian centred at $y_i$ and variance $1/sqrt(2)$. SNE minimizes the divergence between $p_{j|i}$ and $q_{j|i}$ using the Kullback-Leiber divergence. 
 tSNE implements a Student-t distribution for the low dimensional space and symmetric version of the cost function to simplify optimization and to overcome the crowding problem. crowding problem explains.... 
 In tSNE the cost function uses joint propabilities $p_{ij}$ and $q_{ij}$  instead of conditional probability. Where $p_{ij}$ is formula...
 To deal with large data sets the Barnes-Hut implementation uses random walks on the nearest neighbour network with PCA step to reduce the dimensionality of the high dimensional data.
 
 \paragraph{K-means}
-K-means clustering tries to minimize the within-group sum of squares with a predefined number of clusters k. With the within-group sum of squares formula....
-K-means clustering uses K centres for the K clusters. The data points are then assigned to the nearest centre using Euclidean distances. The centres are then recomputed using the average of the data points that are assigned to each of the K centres. This procedure is iterated until the algorithm converges. The assigning of the centres is random. Also it's not guaranteed to find the global minimum.  As the variable with the largest range can dominate the other others, it is often advised to use scaled data.
-PAM is a similar method with the cluster centres defined as a data point in the respective cluster.
+K-means clustering minimizes the within-group sum of squares with a predefined number of clusters k. 
+K-means clustering uses K centres for the K clusters. The data points are then assigned to the nearest centre using Euclidean distances. The centres are then recomputed using the average of the data points that are assigned to each of the K centres. This procedure is iterated until the algorithm converges. The assigning of the centres is random. Also it's not guaranteed to find the global minimum.  As the variable with the largest range can dominate the other others, it is often advised to use scaled data. PAM is a similar method with the cluster centres defined as a data point in the respective cluster.
 
-\paragraph{Gaussian mixture models}
 
-Gaussian mixture models are defined as  formula....
-with $k$ different distributions, the prior that any point belongs to cluster $m$ and $k$ different Gaussian distribution is $x$ given that $x$ lies in cluster $m$. Using a Expectation -maximization algorithm the parameters $\theta$ and priors $p_j$ 
-were found. The observation $x$ are assigned to cluster $j$  such that P(x element of j|x) = pjgj(x, thetaj) / f (x;p,theta) is maximal.
 \paragraph{pcaReduce}
-pcaReduce uses a PCA and kmeans clustering to find the number of clusters in the reduced dimension given by PCA. The method expects that large classes of cells ar contained in low dimension PC representation and more refined (subsets) of these cells types are contained in higher dimensional PC representations. Given an original gene expression matrix Xnxg, the clustering algorithm starts with a K-means clustering on the projections Ynxq with q+1 clusters. The number of initial clusters K is typically around 30. In an iterative process subsets of the Clusters Yi and Yj were merged together according to their probabilities that they belong to the same cluster.  The clusters pairs with the highest probabilities P(i,j) are merged together. The number of clusters is now decreased to K-1. Next, the PC with the lowest variance is deleted. And a k means clustering with K-2 centres is performed. This process is repeated until only one single cluster remains.
+pcaReduce uses PCA and kmeans clustering to find the number of clusters in the reduced dimension given by PCA. The method expects that large classes of cells are contained in low dimension PC representation and more refined (subsets) of these cells types are contained in higher dimensional PC representations. Given an gene expression matrix, the clustering algorithm starts with a K-means clustering on the projections Ynxq with q+1 clusters. The number of initial clusters K is typically around 30,  guraenteering that most cell types are captured. For all pairs of clusters the joint probabilties are computed.  two cluster are merged togeter by selecting the pair with the highset probability or by sampling proportionally by the joint probabilities. The number of clusters is now decreased to K-1. Next, the PC with the lowest variance is deleted. And a k means clustering with K-2 centres is performed. This process is repeated until only one single cluster remains.
 
 \paragraph{SC3}
-SC3 uses distance measures of the filtered and log transformed expression matrix and then uses PCA or Laplacian graph for a lower dimensional representation of the data. The distance measures can be Euclidean, Pearson or Spearman. K means clustering is then performed on the d different dimensions. Next, a consensus matrix of the different clustering results is computed. The consensus matrix is a binary similarity matrix with 1 if two cells belong to the same cluster and 0 otherwise. The consensus matrix is obtained by averaging the individual clustering(how?). The last step is a hierarchical clustering step with complete linkage. The cluster is inferred by the k level of hierarchy, where k is supplied by the user.
+Implement in the SC3 method is a filtering and log transformation step of the expression matrix. By PCA or Laplacian graphs  a lower dimensional representation of the data is obtained. The distance measures can be Euclidean, Pearson or Spearman. K means clustering is then performed on the d different dimensions. Next, a consensus matrix of the different clustering results is computed. The consensus matrix is a binary similarity matrix with 1 if two cells belong to the same cluster and 0 otherwise. The consensus matrix is obtained by averaging the individual clustering(how?). The last step is a hierarchical clustering step with complete linkage. The cluster is inferred by the k level of hierarchy, where k is supplied by the user.
 
 \paragraph{SNNcliq}
 In SNNcliq the high-dimensional data is modelled as a shared nearest neighbour graph. Nodes are the data points and weighted edges are the similarities between the data points. Cells are defined as a cluster if they have a defined number of edges between them, forming a "clique". 
-A similarity matrix using Euclidean or other similarity measures is computed. Using this similarity matrix the  k-nearest-neighbors (KNN) for each data point xi are listed, with xi as its first entry. The parameter KNN has to be supplied by the user. An edge e(xi,xj) to data point xi and xj is assigned if they share at least one KNN. The weights of the edges e(xi,xj) are defined as followed:
-formula....
+A similarity matrix using Euclidean or other similarity measures is computed. Using this similarity matrix the  k-nearest-neighbors (KNN) for each data point are listed. The parameter KNN has to be supplied by the user. Edges between datapoints are assigned if they share at least one KNN. The weights of the edges are defined by a function of the number of neirest neighbors and their respective ranks. 
 Identification of clusters is done by finding quasi-cliques associated with each node and merging them to unique clusters.
-To find maximal quasi-cliques a greedy algorithm is used. A node v induces a sub graph S which consists of all its neighbour nodes and edges. The degrees di are computed and the node si is removed from the sub graph if di/S < r. The threshold r is supplied by the user and is typically set to 0.7. Next the degrees between the nodes are recomputed and the process is repeated until di/S > r. If the Sub graph S has more than three nodes the quasi-clique is assigned to v. To reduce redundancy quasi-cliques that are completely included in other cliques are removed.
-Clusters are identified by merging the quasi-cliques. For the Sub graphs Si and Sj an overlapping rate is computed. If it exceeds a predefined threshold m the sub graphs are merged. Merging in different orders lead to different results so the pair Si and Sj with the largest size are prioritized.
+To find maximal quasi-cliques a greedy algorithm is used. A node induces a sub graph  which consists of all its neighbour nodes and edges. For each node a local degree is computed and a node removed from the sub graph if the degree is lower as a threshold which is proportional to the size of the clique. The threshold is supplied by the user and is typically set to 0.7. Next the degrees between the nodes are recomputed and the process is repeated until no more nodes can be removed. A sub graph  is assigned to a quasi clique if it contains more than three nodes. To reduce redundancy quasi-cliques that are completely included in other cliques are removed.
+Clusters are then identified by merging the quasi-cliques. For each pair an overlapping rate is computed. If it exceeds a predefined threshold m the sub graphs are merged. Merging in different orders lead to different results so pairs with larger sizes are prioritized.
 
 \paragraph{SIMLR}
-SIMLR uses a gene expression matrix (normalized) to solve for a similarity matrix S. Assumptions are that S should have a block-diagonal structure with C blocks, where C represents the clusters. Using an optimization framework it minimizes S,L and w. Where S is the similarity matrix, L is a low-dimensional matrix (NxC) and w is the weights vector for the multiple kernels. the Kernels are Gaussian kernels with with a range of hyper parameters defining the variance of each kernel.The similarities are then used for data visualization with tSNE (Barnes hut implementation) or clustering using k means and the latent space representations of the similarities.
+Most clustering method rely on standart similarity metrics like euclidean distances. SIMLR uses a weighted function of multiple kernels to compute a distance matrix. Assumptions are that the matrix has a block-diagonal structure , where the blocks represents the clusters. the Kernels are Gaussian kernels with a range of hyper parameters defining the variance of each kernel.The similarities are then used for data visualization with tSNE  or clustering using k means and the latent space representations of the similarities.
 
 \paragraph{dbscan}
 dbscan is a density based clustering method. A general assumption is that high density areas are well separated by low-density areas.  The methods work with euclidean distances, as well as other distant measures. Data points are defined as core points, border points and noise points. A core point is defined as point that lies in a neighbourhood of a neighbourhood with a predefined number of other points. Border points are in the neighbourhood of core points. Noise points are all other points. 
 Each of the points were labeled as core, noise or border points. Edges between all core points that lie inside a neighborhood $\epsilon$ were assigned. Connected core points belong to the same cluster. Border points are then assigned to the cluster of the respective core points. The border points can belong to different clusters so there's no unique solution. The number of cluster is not predefined and the cluster can have different forms (but not densities). A disadvantages is that the method performs badly with high dimensional data. So a dimensional reduction step is recommended.
 \paragraph{CIDR}
-Clustering through Imputation and Dimensionality Reduction (CIDR) takes the high dropout rate in scRNA seq data into account. The method splits the squared euclidean distance in three terms. One in which both genes k for the pairs i an j are non-zero, one in which one gene is zero and both are zero. The authors state that only the cases were one gene is zero has an strong influence on the distances and the subsequent  dimension reduction and clustering. To reduce the dropout-induced zero inflation the method imputes the third term by its expected value given the distribution of the dropouts. CIDR works basicallz in five steps. (i) Find feature that are dropout candidates. That is genes that show a expression level below a threshold T. (ii) Find the empirical drop-out probability $\hat P(u)$ using the whole data set. (iii) Calculation of dissimilarity using euclidean distances together with pairwise imputation process. Features that fall below the threshold T are imputed using a weighting function. The weighting is based on the probability of beeing a drop-out. (iv) Dimension reduction using PCA on the imputed distance matrix. (v) Hierarchical clustering using the first few PC. the number of PC is determined by a variation of the scree method.
+Clustering through Imputation and Dimensionality Reduction (CIDR) takes the high dropout rate in scRNA seq data into account. CIDR uses TPMs as expression data. The method splits the squared euclidean distance in three terms. One in which both genes k for the pairs i an j are non-zero, one in which one gene is zero and both are zero. The authors state that only the cases were one gene is zero has an strong influence on the distances and the subsequent  dimension reduction and clustering. To reduce the dropout-induced zero inflation the method imputes the third term by its expected value given the distribution of the dropouts. CIDR works basicallz in five steps. (i) Find feature that are dropout candidates. That is genes that show a expression level below a threshold T. (ii) Find the empirical drop-out probability $\hat P(u)$ using the whole data set. (iii) Calculation of dissimilarity using euclidean distances together with pairwise imputation process. Features that fall below the threshold T are imputed using a weighting function. The weighting is based on the probability of beeing a drop-out. (iv) Dimension reduction using PCA on the imputed distance matrix. (v) Hierarchical clustering using the first few PC. the number of PC is determined by a variation of the scree method.
 \paragraph{ZIFA}
 ZIFA is a dimensionality reduction technique for scRNA-seq data. To reduce the dimensionality a probabilistic Principal Components Analysis (PCA) that includes a 
 zero inflated model to account for dropout events. 
 
 \section{Results}
-\section{Methods}
-\paragraph{tSNEkmeans}
-To reduce dimensionality the Barnes-Hut tSNE implemenation is used. Normalized and filtered counts were used as a input.  Perplexity was set to 30 for all datsets. tSNE is performed on the default 30 dimension in the initial PCA step. Kmeans clustering was done using 2 to 10 initial cluster centers.
-\paragraph{pcaReduce}
-PcaReduce was run using normalized , filtered counts. The range of clusters cannot be specified, instead number of starting dimension q are to be specified. Resulting in q-1 different clustering solutions. For all datasets 30 dimensions were chosen and the results for 10 to 2 clusters were used in the subsequent analysis. The method is based on kmeans clustering and has to be run several times for stable results. Here 50 samples were chosen.
-\paragraph{SC3}
-Clustering on 2 to 10 clusters was done using normalized, filtered counts. A gene filtering step is implenemented in the method but was not used as the data was already filtered in the previous steps. A range of 2 to 10 clusterd were used.  
-\paragraph{SNNCliq}
-The connectivity of the quasicliques was set to the default value 0.7 , like wise the merging threshold parameter was set to 0.5. The method was run with normalized , filtered data and the number of clusters was set to a range from 3 to 10 in all datasets. 
-
-
-\paragraph{SIMLR}
- 
 \section{Clustering}
+\paragraph{tSNEkmeans}
+To reduce dimensionality the Barnes-Hut tSNE implemenation is used. Normalized and filtered counts were used as a input.  Perplexity was set to 20 for all datsets. tSNE is performed on the default 30 dimension in the initial PCA step. Kmeans clustering was done using 2 to 10 initial cluster centers.
+\paragraph{pcaReduce}
+PcaReduce was run on the normalized, filtered counts. The range of clusters cannot be specified, instead the number of  dimension q in the PCA latent spave are to be specified. The results are q-1 different clustering solutions. For all datasets 30 dimensions were chosen and the results for 2 to 10 clusters were used in the subsequent analysis. The method is based on kmeans clustering and has to be run several times for stable results. Here 50 samples were chosen. Merging of clusters was done by default sampling proportional to the joint probablities. 
+\paragraph{SC3}
+Clustering was done using normalized, filtered counts. A gene filtering step is implenemented in the method but was not used as the data was already filtered in the previous steps. The number of cluster is to be supplied by the user and clustering on 2 to 10 clusters was done.
+\paragraph{SNNCliq}
+The connectivity of the quasi-cliques was set to the default value 0.7. Like wise the merging threshold parameter was set to the default of 0.5. The method was run with normalized, filtered data and the number of clusters was set to a range from 3 to 10 in all datasets. SNNclique works different distance metrics, here the default euclidean distances are used.
+\paragraph{SIMLR}
+The tuning parameter was set to the default value of 10. Clustering was done by estimating 2 to 10 clusters.
+\paragraph{Seurat}
+Implemented in the method are normalizations and a gene filtering step. For the clustering raw counts were used. Several parameters have to be defined. A cutoff value for the minimal expression and the number of total features per cell. Here we used the default value of zero for the anlysis. The expression threshold for a feature was as well set to the default value of zero. The default log normalization is used, currently the only option. scale factor for cell-level normalization was set to 10000. As a default no explanatory variables were choosen to be regressed out. 
+In the clustering paramters to be defined were a resolution parameter and the number PCA dimension to use for the clustering. The resolution parameter was set to the default value of 0.8 . The number of PC was determined by the methods recommended by the authors. Using scree plots and a jacknife permutation test (more exact)to determine the number of principial components. 9, 12, 10 and 15 principal compoments were used for the Kumar, Trapnell, Zheng and Koh dataset, respectively.
+1, 5, 10 and 15 percent of cells were used for the number of neighbors in the k-nearest neighbor algorithm. 
+\paragraph{dbscan}
+To choose appriobiate parameters for the size of neighborhood epsilon and the minimun number of points in neighborhood the k-nearest neighbor distance is used. As a initial number of neighbors 10 percent of cells is used. then for each point the k-NN distance is computed and plot by increasing order. The chosen values for the distances are 280, 410, 35 and 380 for the Kumar, Trapnell, Zheng and Koh datasets, respectively.
+The default value for the minimum number of points is 5.
+For each of the dataset a range of epsilon around the theoretical optimum was chosen to optimize the clustering results.
+\paragraph{CIDR}
+Log transformed TPMs were used to analyse the datasets KOH,Kumar and Trapnell. The Zheng data were excluded from analysis as the method is not impemented for UMIs. Parameters to define are the number of    
 
-As it is not possible to determine the true subpopulations in the datasets
-clustering of the dataset was done using a range of parameters. For the semi-supervised methods cidr, pcaReduce, tSNE and kmeans, SC3 and SIMLR a range of number of clusters were used. To compare the results the Adjusted Rand Index (ARI) was computed. For all three datasets the scores were realtively stable. In the Kumar dataset all methods show a maximum with three clusters.
+\section{Clustering}
+Based on the cell annotation the optimal number of clusters are 3, 3, 4 and 10 for the Kumar, Trapnell, Zheng and Koh datasets, respecteviely. The Elbowplots showed similar results, with exception of the Koh data where within sum of squares was maximized with 8 clusters.
+The true cell populations are unknown, as a ground truth the annotation given by the authors were chosen.
+The datasets were clustered on a range of parameters. For methods where the number of clusters can be defined a range of number of clusters were used. 
+For the semi-supervised methods cidr, pcaReduce, tSNE and kmeans, SC3 and SIMLR a range of number of clusters were used. For Seurat a range in k-NN and for dbscan different neighborhood sizes were picked. 
+
+To compare the results the Adjusted Rand Index (ARI) was computed, with the ground truth set by cell annotation. The scores were realtively stable. In the Kumar dataset all methods show a maximum with three clusters, set to be the ground truth. pcaReduce, RtSNEkmeans, SIMLR  and CIDR show similarly high scores with a clear maximum with three clusters. For these methods the clusterings are almost or exactely the same as in the annotated ground truth.
+Altough SC3 has a maximum with 3 clusters of 1 , also higher number of cluster gives relatively high scores (see Figure \ref{}). In SNNClique almost half of all the clustering labels are in disagreement with the annotaed cell labeling.
+
+Similarly pcaReduce, RtSNEkmeans, SIMLR and cidr have a clear maximum with 3 clusters in the trapnell data. However more than half of the cells were clusterd differently. The best agreement is given by SC3.
+
+In the Koh data cidr, pcaReduce, tSNEkmeans, SC3 and SIMLR show similar results. Scores are increasing monotonely with a maximum value at 9 cluster. 
+
+
+
+
+
+
 CIDR, pcaReduce, tSNE and kmeans show a maximum score with three clusters in the Trapnell dataset. Where as for SIMLR the optimal number of clusters is 4 and 2 for SC3. In the Koh dataset the highest score is with 9 clusters. 
 
 
@@ -306,7 +332,7 @@ CIDR, pcaReduce, tSNE and kmeans show a maximum score with three clusters in the
 \newpage
 
 
-
+\bibliographystyle{plain}
 
 
 \end{document}
