@@ -51,14 +51,6 @@ for (i in names(input_matrix)){
 }
 
 
-# perform linear dimension reduction using PCA
-for (i in names(input_matrix)) {
-  if ( nrow( input_matrix[[i]])>50 ) {
-    input_matrix[[i]] <- prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:50]
-  } else {
-    input_matrix[[i]] <-  prcomp(input_matrix[[i]], center=TRUE, scale = FALSE )$x[,1:nrow( input_matrix[[i]])/2]
-  }
-}
 
 # parameter k is nearest neighbor, as a rule of thumb k >= dimension+1, here we use 10 % of the cell data set
 par.k <- list(
