@@ -57,7 +57,7 @@ run_seurat <- function( data, par.resolution, par.dims.use ) {
 ### Run SEurat
 for (i in names(data)) {
   # create Seurat object
-  data[[i]] <- CreateSeuratObject(raw.data = counts(data[[i]]), min.cells = -Inf, min.genes = -Inf, project = "test") # use raw count_lstpm
+  data[[i]] <- CreateSeuratObject(raw.data = counts(data[[i]]), min.cells = 0, min.genes = 0, project = "test") # use raw count_lstpm
   ## Normalizing the data. After removing unwanted cells from the dataset, 
   # the next step is to normalize the data. By default, we employ a global-scaling normalization method "LogNormalize" 
   #that normalizes the gene expression measurements for each cell by the total expression, 
