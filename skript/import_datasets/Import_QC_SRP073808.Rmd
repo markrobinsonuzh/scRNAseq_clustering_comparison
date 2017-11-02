@@ -108,9 +108,8 @@ sceset <- sceset[keep_features, ]
 The ERCC is not set as a control feature. 3 cells were debris. Others cells were not well seperated, two ore more cells in a well.
 
 ```{r QC}
-sceset <- calculateQCMetrics(sceset )
+sceset <- calculateQCMetrics(sceset)
 colnames(pData(sceset))
-
 
 ```
 
@@ -137,7 +136,14 @@ abline(v=lower.limit.feat, col=2, lty=2 )
 dev.off()
 
 ```
+# Quality control using PCA and highest expressed genes
+PCA plot based the quality metrics for each cell, e.g., the total number of reads, the total number of features and the proportion of mitochondrial or spike-in reads. 
+```{r  Quality control using PCA }
+p1 <- scater::plotPCA(sceset, exprs_values="exprs",pca_data_input="pdata",colour_by="phenoid")
+p2 <- scater::plotQC(sceset, type = "find-pcs", variable = "total_features")
 
+
+```
 
 # Filter dataset gene wise and by librarysize 
 Remove cells with log-library sizes that are more than 3 median absolute deviations (MADs) below the median log-library size. 52 cells were dropped according to this criteria, regarding the untransformed count data. add plot with threshold...
@@ -150,9 +156,12 @@ table(libsize.drop,feature.drop)
 
 ```
 # Filter dataset by ERCCC spike inns
-The amount of endogenous features should be constant. Cells with a high proportion should be removed. however as almost all cells have no spike-inns we dont use this filter. 
-```{r  filter by spike inn }
+The amount of endogenous features should be constant. Cells with a high proportion should be removed.Most cells have no spike-inns, we dont use this filter. 
 
+```{r  filter by spike inn }
+hist(sceset$pct_counts_feature_controls_ERCC, xlab="ERCC proportion (%)", 
+    ylab="Number of cells", breaks=20, main="", col="grey80")
+    
 ```
 
 Total 120  cells were filtered out. For the the subsequent analysis these were filtered out as well. After filtering t 531 cells are remaing. Filter is maybe too strict. The cells with low Lib sizes and total expressed features could be true subpopulations.
@@ -169,20 +178,34 @@ data.frame(ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop)
 # Quality control using PCA and highest expressed genes
 PCA plot based the quality metrics for each cell, e.g., the total number of reads, the total number of features. Where as in the unreduced set we have two distinct groups (totalcounts < 1 M. and > 1 M ),this is not the case in the reduced set. The difference is possibly driven by the library size and the seqencuing depth. 
 ```{r  Quality control using PCA }
-p1 <- plotPCA(sceset, pca_data_input="pdata", colour_by= "phenoid")
-p2 <- plotPCA(sceset.red, pca_data_input="pdata", colour_by= "phenoid")
-p3 <- plotPCA(sceset, pca_data_input="pdata", size_by= "total_counts")
-p4 <- plotPCA(sceset.red, pca_data_input="pdata", size_by= "total_counts")
-multiplot(p1,p2,p3,p4, cols=2)
+plotPCA(sceset, pca_data_input="pdata", colour_by= "phenoid")
+plotPCA(sceset.red, pca_data_input="pdata", colour_by= "phenoid")
+plotPCA(sceset, pca_data_input="pdata", size_by= "total_counts")
+plotPCA(sceset.red, pca_data_input="pdata", size_by= "total_counts")
 ```
 
 
-Plotting the 50 highest expressed genes. The profile should look relatively "flat".
+Plotting the 50 highest expressed genes. No ERCC spike-inn in the top 50. The profile should look relatively "flat".
 ```{r  highest expressed genes}
-plotQC(sceset.red, type = "highest-expression", n=50)
+p3 <- plotQC(sceset.red, type = "highest-expression", n=50)
 
 ```
 
+```{r mean freq expression}
+plotQC(sceset.red, type = "exprs-freq-vs-mean")
+```
+# Filtering the datasets based on the features. Here genes with low abundance are filtered out. We have to sets of features one is based on the mean expression and one on a expression in minium n cells.
+```{r  Filtering out low-abundance genes }
+ave.counts <- rowMeans(counts(sceset.red))
+keep <- ave.counts >= 1e-04
+sum(keep)
+ave.counts<- as.data.frame(log10(ave.counts))
+
+p4 <- ggplot(ave.counts, aes(ave.counts))+geom_histogram(binwidth = 0.5)+geom_vline(aes(xintercept=log10(1), color=1))+guides(color = "none")+labs( x = expression(Log[10]~"average count"), y = "frequency")
+
+sceset.red <- sceset.red[keep, ]
+
+```
 
 Normalize data according to Lun etal. 2016 using pooled counts to estimate size factors. The size factors in the non-filterd set contain non positive values what does this mean?
 The size factor is correlated with the library sizes. As we have a homogenous cell population there's no obvious grouping. The difference of library size between cells is possibly due the seqeuncing depth.
@@ -200,13 +223,21 @@ plot(sizeFactors(sceset.red), sceset.red$total_counts/1e6, log="xy",
     ylab="Library size (millions)", xlab="Size factor")
 ```
 
+
+
+Use size factors to normalize gene expression. No spike inn counts in datasets 
+```{r spike inn}
+
+```
 The counts are normalized using log2 transformation and applying the size factors for normalized gene expression. Are really the size factors from Lun et al. used or the ones from edgeR?
 ```{r normalization }
+
 sceset <- normaliseExprs(sceset)
 
 sceset.red <- normaliseExprs(sceset.red)
 
 ```
+
 
 # Save the normalized and cell filtered datasets
 ```{r save data }
@@ -222,7 +253,6 @@ save(res,file = "data/sceset_red_SRP073808.rda")
 # Identifying HVGs from the normalized log-expression
 
 ```{r High variable genes }
-
 var.fit <- trendVar(sceset.red, trend="loess", use.spikes=FALSE, span=0.2) 
 var.out <- decomposeVar(sceset.red, var.fit)
 
@@ -256,29 +286,22 @@ res <- sceset.hvg
 save(res,file = "data/sceset_hvg_SRP073808.rda")
 
 ```
-
-Plot a summary of the QC
-```{r create QC plots} 
-# some features have no zero counts, we remove them
-keep_features <- rowSums(counts(sceset.red) > 0) >= 1
-table(keep_features)
-sceset.red <- sceset.red[keep_features, ]
-
-
-
-p1 <- scater::plotPCA(sceset.red, exprs_values="exprs",pca_data_input="pdata")
-
-p2 <- scater::plotQC(sceset.red, type = "find-pcs", variable = "total_features")
-
+Plot the proportion of explained variances
+```{r explained variance} 
 expl_vars <- c( "phenoid","log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-p3 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
-p4 <- plotQC(sceset.red, type = "highest-expression", n=50)
-p5 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
-p7 <- plotQC(sceset.red, type = "exprs-freq-vs-mean")
+p5 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
+```
+plot tSNE represenatation
+```{r tSNE}
+p6 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+```
+Plot a summary of the QC
+```{r create QC plots} 
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p7, ncol = 2)
+
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
 
 save_plot("results/QC_data/qc_summary_koh.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns
@@ -301,6 +324,10 @@ ggsave("results/QC_data/tsnelibsize_koh2016.pdf")
 dev.off()
 ```
 
+
+
+
+# Appendix
 ```{r remove  batch effects}
 
 require(limma)
