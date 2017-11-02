@@ -1,4 +1,4 @@
-####################
+####################a
 # SC3
 ######################
 # change sc 3 prepare
@@ -60,7 +60,7 @@ for (i in names(data)){
  
     data[[i]]<- sc3_prepare(data[[i]], ks = par.k[i])  # uses the exprs slot of SCEset ; log2transformed, normalized data, filter data 
     #data[[i]]<- sc3_estimate_k(data[[i]]) # optional estimate the number of clusters
-    data[[i]]<- sc3(data[[i]], ks = par.k[[i]], n_cores=1, gene_filter=FALSE) # perform sc3 clustering
+    data[[i]]<- sc3(data[[i]], ks = par.k[[i]], gene_filter=FALSE) # perform sc3 clustering
 
   # store clusters
   p_data <- pData(data[[i]])
