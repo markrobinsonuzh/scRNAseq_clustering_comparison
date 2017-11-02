@@ -89,7 +89,7 @@ run_pcareduce <- function(input_matrix, par.nbt,par.q,n.cluster){
 for (i in names(input_matrix)){
     pca.red[[i]] <- PCAreduce(t(input_matrix[[i]]), nbt = par.nbt[[i]], q = par.q[[i]], method = 'S')[[1]]
     res.cluster[[i]]  <- pca.red[[i]][, (par.q[[i]]-9):par.q[[i]] ] # improve this!
-    colnames(res.cluster[[i]]) <-  c(paste0( rev(seq_len(length( (par.q[[i]]-9):par.q[[i]] ) ))) ) # this as well
+    colnames(res.cluster[[i]]) <-  c(paste0( 2:11) ) # this as well
 }
   return( res.cluster  )
 }
