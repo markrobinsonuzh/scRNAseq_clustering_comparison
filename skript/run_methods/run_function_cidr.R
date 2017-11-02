@@ -1,6 +1,8 @@
 ########################
 # CIDR
 ########################
+# works on TPMs, however UMI are also ok as there is no bias by gene lenght
+# currently not working for the Zheng data fix it....
 
 
 #load libraries
@@ -14,6 +16,7 @@ library(cidr)
 # file paths
 
 source("FILES.R")
+
 
 # load data sets
 
@@ -36,8 +39,9 @@ for(i in names(data)) {
 # extract transposed expression data
 
 for (i in 1:(length(tinput_matrix))){
-  tinput_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
+  tinput_matrix[[i]] <- t( get_exprs(data[[i]], exprs_values = "tpm") ) # use tpms, normalized and log2 transformed
 }
+
 
 ##### CIDR function
 
@@ -50,7 +54,8 @@ names(res.cluster) <- names(sData) <-  names(files)
 for  (i in names(sData)) {
     sData[[i]] <- scDataConstructor(t(tinput_matrix[[i]])) # creates a scData object with slots for the expression table, lib size, dropout candidates etc...
     sData[[i]] <- determineDropoutCandidates(sData[[i]]) # determines the dropout candidates
-    sData[[i]] <- wThreshold(sData[[i]], plotTornado = FALSE) # sets the imputation weighting threshold
+    sData[[i]] <- wThreshold(sData[[i]], plotTornado = TRUE) # sets the imputation weighting threshold
+    
     sData[[i]] <- scDissim(sData[[i]]) # computes the dissimilarity matrix for the slot dissim
     sData[[i]] <- scPCA(sData[[i]]) # performs PCA on the dissimilarity matrix
     sData[[i]] <- nPC(sData[[i]]) # deterimines the optimal number of PC to be used in clustering, populates nPC
@@ -70,17 +75,17 @@ return(res.cluster)
 
 ######### define the number of parameters
 # define number of clusters.
-
 par.k <-  list(
   kumar2015 = c(2:10),
   trapnell2014 = c(2:10),
-  zhengmix2016 = c(2:10),
   koh2016 = c(2:11)
 )
 
-#### run the function
 
+
+#### run the function
 res.cluster <- run_cidr(tinput_matrix, par.k )
+
 # save clusters
 
 dir_cluster <- paste0( "results/cidr/cidr_krange_clus_", names(res.cluster), ".txt" )
@@ -102,7 +107,7 @@ for (i in 1:length(labels)){
   write.table(sys_i, file=file_names[i], sep="\t")
 }
 
-
+ 
 ###### Save Session Info
 
 sink(file = "results/cidr/session_info_cidr_krange.txt")
@@ -110,12 +115,3 @@ sessionInfo()
 sink()
 
 ### Appendix
-
-#par(mfrow=c(2,2))
-
-#for (i in names(sData)){
-  
- # plot(sData[[i]]@PC[,c(1,2)], 
- #      pch=sData[[i]]@clusters, main=paste0(names(sData[i])), xlab="PC1", ylab="PC2")
-#}
-
