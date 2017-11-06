@@ -7,7 +7,7 @@
 # substantially rewritten,  added Hungarian alg. from 'clue' package by Mark Robinson
 # renamed calcF1Scores -> calc_f1_scores,
 # changed code to transpose matrix; cluster are rows, ground truth is column
-
+# adapted if number of cluster is not equal to the number of labels, add column with maximum values
 
 # # arguments:
 # - cluster: cluster labels from algorithm
@@ -21,9 +21,9 @@ calc_f1_score <- function(labels,cluster){
     stopifnot(is.integer(labels))
     stopifnot(is.integer(cluster))
     
-    # creat table with labels in rows and cluster in column
+    # create table with labels in rows and cluster in column
     tbl <- table(cluster=cluster, label=labels)
-    # add additional column with max if number of column <= number of rows
+    # add additional column with maximum values if number of column <= number of rows
     ifelse(ncol(tbl) >= nrow(tbl), tbl <- tbl, tbl <- cbind(tbl,"x"= array(max(tbl), dim=nrow(tbl))) )
     # compute hungarian assignement
     ha <- solve_LSAP(tbl, maximum=TRUE) # hungarian alg.

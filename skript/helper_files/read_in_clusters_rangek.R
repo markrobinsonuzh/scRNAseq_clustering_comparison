@@ -19,7 +19,7 @@ METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "cidr
 # file paths to the clustering results
 DATA_DIR <-  "results"
 
-DATASET <"koh2016"        # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
+DATASET <-"kumar2015"       # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
 
 files_labels <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_krange_labels_",DATASET,".txt"))%>%as.list()
 names(files_labels) <- METHOD
