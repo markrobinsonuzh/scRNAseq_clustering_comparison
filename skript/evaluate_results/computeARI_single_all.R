@@ -7,13 +7,16 @@
 library(dplyr)
 library(mclust)
 # load data files
-DATASET <- c("koh2016", "kumar2015", "trapnell2014", "zhengmix2016")
+DATASET <- c("koh2016", "kumar2015", "trapnell2014", "zhengmix2016", "simDataKumar")
+
 for (h in seq_len(length(DATASET)) ) {
   
   data_files <- as.list(paste0("results/run_results/cluster_single_",DATASET[h],".rda"))
   
   load(data_files[[1]])
+  
   # reformat labels as factors
+  
   clusters$labels <- clusters$labels%>%as.factor
   
   # create lookupfile
@@ -38,6 +41,6 @@ for (h in seq_len(length(DATASET)) ) {
   
 }
 
-clusters$linnorm
 
 #### Appendix
+
