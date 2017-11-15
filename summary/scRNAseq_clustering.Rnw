@@ -17,17 +17,19 @@
 
 % =======================================
 % bibliography
-\bibliographystyle{apalike}
+
 
 \begin{document}
+\section{Intro}
 
 \section{Datasets}
 
 \paragraph{Kumar et al. 2014} 
-Kumar et al. used $Dgcr8$-knockout and V6.5 variotypes from mouse embryonic stem cells (mESCs). Cells were cultured on serum plus leukaemia inhibitory factor (LIF) or under Erk and GSK3 signalling inhibition (2Li). The authors investigated the expression of pluripotency factors and their involvement in heterogeneity of pluripotent stem cells. Sequencing was done using a Fluidigm C1 system and following a SMARTer protocol.  The experimantel design is completely confounded, as the conditions and batches are identical.
+Kumar et al. used $Dgcr8$-knockout and V6.5 variotypes from mouse embryonic stem cells (mESCs). Cells were cultured on serum plus leukaemia inhibitory factor (LIF) or under Erk and GSK3 signalling inhibition (2Li). The authors investigated the expression of pluripotency factors and their involvement in heterogeneity of pluripotent stem cells. Sequencing was done using a Fluidigm C1 system and following a SMARTer protocol.  The experimental design is completely confounded, as the conditions and batches are identical.
 
 \paragraph{Trapnell et al. 2015} 
-Trapnell et al used human skeletal muscle myoblast cells to investigate temporal differentiation. Cells were expanded under high-mitogen conditions. Differentiation is induced by switching to low-serum medium. Cells were captured before switching to low-serum medium (T0) , 24 h (T24) and after 48h (T48). Cell lines were harvested on the start of the experiment and after one and two days. Between 49 and 77 cells were isolated at each time point and used for single mRNA-Seq library preparation. Libraries were sequenced with paired-end sequencing on a HiSeq 2500 (Illumina) platform. Sequencing depth was ˜4 million reads per library. Note: Authors excluded libraries that contained fewer than 1 million reads. As the three different timepoints are on different plates the experiment confounded and no difference between biolgical and batch effects can be made.
+Trapnell et al used human skeletal muscle myoblast cells to investigate temporal differentiation. Cells were expanded under high-mitogen conditions. Differentiation is induced by switching to low-serum medium. Cells were captured before switching to low-serum medium (T0) , 24 h (T24) and after 48h (T48). Cell lines were harvested on the start of the experiment and after one and two days. Between 49 and 77 cells were isolated at each time point and used for single mRNA-Seq library preparation. Libraries were sequenced with paired-end sequencing on a HiSeq 2500 (Illumina) platform. Sequencing depth was ˜4 million reads per library. 
+Note: Authors excluded libraries that contained fewer than 1 million reads. As the three different time points are on different plates the experiment confounded and no difference between biolgical and batch effects can be made.
 
 \paragraph{Koh et al. 2016} 
 H7 human embryonic stem cells (hESCs) were used to study human mesoderm developement. Starting from undifferentiated H7 hESCs several differentation stages, sorted by time point and further refined by fluorescence activated cell sorting (FACS) were isolated. Finally ten different cell lines were obtained namely  anterior primitive streak populations , mid primitive streak populations, lateral mesoderm , FACS-purified GARP+ cardiac mesoderm, FACS-purified DLL1+ paraxial mesoderm populations, early somite progenitor populations , dermomyotome populations and PDGFRα+ sclerotome populations.
@@ -38,7 +40,8 @@ Note that the authors discarded libraries with less than one million reads durin
 FACS-purified fresh periphelar blood mononuclear cells (PBMCS) sub-populations were sequenced using a droplet-based system. Gene filtering was done using only genes that showed at least one UMI count in at least one cell. FACS purity was 98 - 99 percent. Four of these purified filterd cell populations; namely CD19+ B, CD8+CD45RA+ naive cytotoxic, CD14+ monocytes and CD4+/CD25+ regulatory t cells were selected and used for the clustering analyses. CD19+ B and  CD14+ monocytes cells are distinct cell populations. Whereas CD8+CD45RA+ naive cytotoxic cells and  CD4+/CD25+ regulatory t cells are not distinguishable by tSNE dimension reduction and kmeans clustering. 
 To construct an artificial population 200 cells were sampled from these libraries and merged to obtain a single expression matrix.
 
-
+\paragraph{Simulated dataset }
+Using the Splatter package (Oshlack et al. 2017) expression data were simulated. Parameters for the simulation were estimated from the Kumar dataset and a expression matrix with n cells and j features were simulated. Three subpopulation with a propabilty of 0.25, 0.5 and 0.25 and a proportion of 0.1,0.2 and 0.4 differentially expressed genes were simulated.
 
 
 \section{Transformation}
@@ -91,6 +94,14 @@ Using log transformation and VST the mean-variance dependence is less extreme ( 
 \caption{Histogramm of Koh 2016. }
 \label{fig:three}
 \end{figure}
+
+\begin{figure}[!h]
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/comparison_panel.png}
+\caption{Comparison between the datasets. Based on compare function of Splatter.}
+\label{fig:compare}
+\end{figure}
+
+
 \section{Filtering and normalization}
 
 The quality control of the datasets follows Lun et al.
@@ -137,6 +148,12 @@ Another approach is the normalization by spike-inn. This approach is not feasibl
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/qc_summary_zheng2016.png}
 \caption{QC summary of Zheng 2016. }
 \label{fig:qczheng}
+\end{figure}
+
+\begin{figure}[!h]
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/qc_summary_simDataKumar.png}
+\caption{QC summary of simDataKumar. }
+\label{fig:simDataKumar}
 \end{figure}
 
 \section{Optimal number of clusters}
@@ -197,7 +214,7 @@ K-means clustering uses K centres for the K clusters. The data points are then a
 pcaReduce uses PCA and kmeans clustering to find the number of clusters in the reduced dimension given by PCA. The method expects that large classes of cells are contained in low dimension PC representation and more refined (subsets) of these cells types are contained in higher dimensional PC representations. Given an gene expression matrix, the clustering algorithm starts with a K-means clustering on the projections Ynxq with q+1 clusters. The number of initial clusters K is typically around 30,  guraenteering that most cell types are captured. For all pairs of clusters the joint probabilties are computed.  two cluster are merged togeter by selecting the pair with the highset probability or by sampling proportionally by the joint probabilities. The number of clusters is now decreased to K-1. Next, the PC with the lowest variance is deleted. And a k means clustering with K-2 centres is performed. This process is repeated until only one single cluster remains.
 
 \paragraph{SC3}
-Implement in the SC3 method is a filtering and log transformation step of the expression matrix. By PCA or Laplacian graphs  a lower dimensional representation of the data is obtained. The distance measures can be Euclidean, Pearson or Spearman. K means clustering is then performed on the d different dimensions. Next, a consensus matrix of the different clustering results is computed. The consensus matrix is a binary similarity matrix with 1 if two cells belong to the same cluster and 0 otherwise. The consensus matrix is obtained by averaging the individual clustering(how?). The last step is a hierarchical clustering step with complete linkage. The cluster is inferred by the k level of hierarchy, where k is supplied by the user.
+Implemented in the SC3 method is a gene and cell filtering and log transformation step of the expression matrix. The filtered expression matrix is then used to compute  Euclidean, Pearson and  Spearman dissimilarity measures. By PCA or Laplacian graphs  a lower dimensional representation of the data is obtained.  K means clustering is then performed on the d different dimensions. Next, a consensus matrix of the different clustering results is computed. The consensus matrix is a binary similarity matrix with 1 if two cells belong to the same cluster and 0 otherwise. The consensus matrix is obtained by averaging the individual clustering(how?). The last step is a hierarchical clustering step with complete linkage. The cluster is inferred by the k level of hierarchy, where k is supplied by the user.
 
 \paragraph{SNNcliq}
 In SNNcliq the high-dimensional data is modelled as a shared nearest neighbour graph. Nodes are the data points and weighted edges are the similarities between the data points. Cells are defined as a cluster if they have a defined number of edges between them, forming a "clique". 
@@ -208,18 +225,23 @@ Clusters are then identified by merging the quasi-cliques. For each pair an over
 
 \paragraph{SIMLR}
 Most clustering method rely on standart similarity metrics like euclidean distances. SIMLR uses a weighted function of multiple kernels to compute a distance matrix. Assumptions are that the matrix has a block-diagonal structure , where the blocks represents the clusters. the Kernels are Gaussian kernels with a range of hyper parameters defining the variance of each kernel.The similarities are then used for data visualization with tSNE  or clustering using k means and the latent space representations of the similarities.
+\paragraph{ZINB-WaVE}
+The method is based on a zero-inflated negative binomial (ZINB) model that accounts for the zero inflated, overdispersed nature of scRNAseq count data. 
+Based on the preprocessing steps given by the authors genes with less than 5 counts per feature were filtered out. Also it is recommended to use only high variable genes. ZINB-Wave is based on Factor analysis.
 
 \paragraph{dbscan}
 dbscan is a density based clustering method. A general assumption is that high density areas are well separated by low-density areas.  The methods work with euclidean distances, as well as other distant measures. Data points are defined as core points, border points and noise points. A core point is defined as point that lies in a neighbourhood of a neighbourhood with a predefined number of other points. Border points are in the neighbourhood of core points. Noise points are all other points. 
 Each of the points were labeled as core, noise or border points. Edges between all core points that lie inside a neighborhood $\epsilon$ were assigned. Connected core points belong to the same cluster. Border points are then assigned to the cluster of the respective core points. The border points can belong to different clusters so there's no unique solution. The number of cluster is not predefined and the cluster can have different forms (but not densities). A disadvantages is that the method performs badly with high dimensional data. So a dimensional reduction step is recommended.
 \paragraph{CIDR}
-Clustering through Imputation and Dimensionality Reduction (CIDR) takes the high dropout rate in scRNA seq data into account. CIDR uses TPMs as expression data. The method splits the squared euclidean distance in three terms. One in which both genes k for the pairs i an j are non-zero, one in which one gene is zero and both are zero. The authors state that only the cases were one gene is zero has an strong influence on the distances and the subsequent  dimension reduction and clustering. To reduce the dropout-induced zero inflation the method imputes the third term by its expected value given the distribution of the dropouts. CIDR works basicallz in five steps. (i) Find feature that are dropout candidates. That is genes that show a expression level below a threshold T. (ii) Find the empirical drop-out probability $\hat P(u)$ using the whole data set. (iii) Calculation of dissimilarity using euclidean distances together with pairwise imputation process. Features that fall below the threshold T are imputed using a weighting function. The weighting is based on the probability of beeing a drop-out. (iv) Dimension reduction using PCA on the imputed distance matrix. (v) Hierarchical clustering using the first few PC. the number of PC is determined by a variation of the scree method.
+Clustering through Imputation and Dimensionality Reduction (CIDR) takes the high dropout rate in scRNA seq data into account. CIDR uses TPMs as expression data. The method splits the squared euclidean distance in three terms. One in which both genes k for the pairs i an j are non-zero, one in which one gene is zero and both are zero. The authors state that only the cases were one gene is zero has an strong influence on the distances and the subsequent  dimension reduction and clustering. To reduce the dropout-induced zero inflation the method imputes the third term by its expected value given the distribution of the dropouts. CIDR works basicallz in five steps. (i) Find feature that are dropout candidates. That is genes that show a expression level below a threshold T. (ii) Find the empirical drop-out probability $\hat P(u)$ using the whole data set. (iii) Calculation of dissimilarity using euclidean distances together with pairwise imputation process. Features that fall below the threshold T are imputed using a weighting function. The weighting is based on the probability of beeing a drop-out. (iv) Dimension reduction using PCA on the imputed distance matrix. (v) Hierarchical clustering using the first few PC. The number of PC can be determined by several methods. Here we use a variation of the scree method. 
+\paragraph{Seurat}
+Seurat uses raw counts, filtering is done gene- and cellwise. A user specified threshold for the minium number of expressed features per cell and minimum number of genewise expression per cell. Scaling, log transformation and normalization of the counts is done with a scale factor of 10000, a log2 transformation.... In second gene filtering step low varaince genes are filter out. Clustering is finally done using PCA and a smart local moving algorithm (SLM). Here a resolution parameter defines the number of clusters.
+
 \paragraph{ZIFA}
 ZIFA is a dimensionality reduction technique for scRNA-seq data. To reduce the dimensionality a probabilistic Principal Components Analysis (PCA) that includes a 
 zero inflated model to account for dropout events. 
 
-\section{Results}
-\section{Clustering}
+\section{Parameters}
 \paragraph{tSNEkmeans}
 To reduce dimensionality the Barnes-Hut tSNE implemenation is used. Normalized and filtered counts were used as a input.  Perplexity was set to 20 for all datsets. tSNE is performed on the default 30 dimension in the initial PCA step. Kmeans clustering was done using 2 to 10 initial cluster centers.
 \paragraph{pcaReduce}
@@ -232,34 +254,46 @@ The connectivity of the quasi-cliques was set to the default value 0.7. Like wis
 The tuning parameter was set to the default value of 10. Clustering was done by estimating 2 to 10 clusters.
 \paragraph{Seurat}
 Implemented in the method are normalizations and a gene filtering step. For the clustering raw counts were used. Several parameters have to be defined. A cutoff value for the minimal expression and the number of total features per cell. Here we used the default value of zero for the anlysis. The expression threshold for a feature was as well set to the default value of zero. The default log normalization is used, currently the only option. scale factor for cell-level normalization was set to 10000. As a default no explanatory variables were choosen to be regressed out. 
-In the clustering paramters to be defined were a resolution parameter and the number PCA dimension to use for the clustering. The resolution parameter was set to the default value of 0.8 . The number of PC was determined by the methods recommended by the authors. Using scree plots and a jacknife permutation test (more exact)to determine the number of principial components. 9, 12, 10 and 15 principal compoments were used for the Kumar, Trapnell, Zheng and Koh dataset, respectively.
+In the clustering paramters to be defined were a resolution parameter and the number PCA dimension to use for the clustering. The resolution parameter was set to the default value of 0.8 . The number of PC was determined by the methods recommended by the authors. Using scree plots and a jacknife permutation test (more exact) to determine the number of principial components. 9, 12, 10 and 15 principal compoments were used for the Kumar, Trapnell, Zheng and Koh dataset, respectively.
 1, 5, 10 and 15 percent of cells were used for the number of neighbors in the k-nearest neighbor algorithm. 
 \paragraph{dbscan}
 To choose appriobiate parameters for the size of neighborhood epsilon and the minimun number of points in neighborhood the k-nearest neighbor distance is used. As a initial number of neighbors 10 percent of cells is used. then for each point the k-NN distance is computed and plot by increasing order. The chosen values for the distances are 280, 410, 35 and 380 for the Kumar, Trapnell, Zheng and Koh datasets, respectively.
 The default value for the minimum number of points is 5.
 For each of the dataset a range of epsilon around the theoretical optimum was chosen to optimize the clustering results.
 \paragraph{CIDR}
-Log transformed TPMs were used to analyse the datasets KOH,Kumar and Trapnell. The Zheng data were excluded from analysis as the method is not impemented for UMIs. Parameters to define are the number of    
+Log transformed TPMs were used to analyse the datasets KOH,Kumar and Trapnell. The Zheng data were excluded from analysis as the method is not impemented for UMIs. Parameters to define are the number of  
+
+\section{Evaluation}
+One evaluation criteria was the Hubert - Arabje Adjusted Rand Index (ARI) for comparing two partitions. The measure is adjusted for chance and 0 if there's no agreement between pairs and 1 if there is full agreement between pairs. The other criteria is the F1 score. It is the wieghted average mean between precision and recall. With weights defined by the inverse of the precision and recall. F1 scores can take on values between 0 and 1.The predicted clusters and the "ground truth" were match by the Hungarian algorithm. Some of the clustering methods are unsupervised and the partitions does not need to have the same sizes (non-bipartite). This causes problems with hungarian algorithm. As a solution the assignment matrix is augmented with dummy columns with the maximum as entries.
+
+
+
+\section{Results}
 
 \section{Clustering}
-Based on the cell annotation the optimal number of clusters are 3, 3, 4 and 10 for the Kumar, Trapnell, Zheng and Koh datasets, respecteviely. The Elbowplots showed similar results, with exception of the Koh data where within sum of squares was maximized with 8 clusters.
-The true cell populations are unknown, as a ground truth the annotation given by the authors were chosen.
-The datasets were clustered on a range of parameters. For methods where the number of clusters can be defined a range of number of clusters were used. 
-For the semi-supervised methods cidr, pcaReduce, tSNE and kmeans, SC3 and SIMLR a range of number of clusters were used. For Seurat a range in k-NN and for dbscan different neighborhood sizes were picked. 
+\paragraph{Clustering on a range of parameters}
+Based on the cell annotation the optimal number of clusters are 3, 3, 4 and 10 for the Kumar, Trapnell, Zheng and Koh data sets, respectively. The Elbow plots showed similar results, with exception of the Koh data where within sum of squares was maximized with 8 clusters.
+In datasets where true cell populations are unknown the annotation given by the authors were chosen as a ground truth.
+The data sets were clustered on a range of parameters. For methods where the number of clusters can be defined a range of number of clusters were used. 
+For the semi-supervised methods cidr, pcaReduce, tSNE and kmeans, SC3 and SIMLR a range of number of clusters were used. For Seurat a range in k-NN and for dbscan different neighborhood sizes were picked....
 
-To compare the results the Adjusted Rand Index (ARI) was computed, with the ground truth set by cell annotation. The scores were realtively stable. In the Kumar dataset all methods show a maximum with three clusters, set to be the ground truth. pcaReduce, RtSNEkmeans, SIMLR  and CIDR show similarly high scores with a clear maximum with three clusters. For these methods the clusterings are almost or exactely the same as in the annotated ground truth.
-Altough SC3 has a maximum with 3 clusters of 1 , also higher number of cluster gives relatively high scores (see Figure \ref{}). In SNNClique almost half of all the clustering labels are in disagreement with the annotaed cell labeling.
+To compare the results the Adjusted Rand Index (ARI) was computed, with the ground truth set by cell annotation. The scores were relatively stable. In the Kumar dataset all methods show a maximum with three clusters, set to be the ground truth. pcaReduce, RtSNEkmeans, SIMLR  and CIDR show similarly high scores with a clear maximum with three clusters. For these methods the clustering are almost or exactly the same as in the annotated ground truth.
+Although SC3 has a maximum with 3 clusters of 1 , also higher number of cluster gives relatively high scores (see Figure \ref{}). In SNNClique almost half of all the clustering labels are in disagreement with the annotated cell labeling.
 
-Similarly pcaReduce, RtSNEkmeans, SIMLR and cidr have a clear maximum with 3 clusters in the trapnell data. However more than half of the cells were clusterd differently. The best agreement is given by SC3.
-
-In the Koh data cidr, pcaReduce, tSNEkmeans, SC3 and SIMLR show similar results. Scores are increasing monotonely with a maximum value at 9 cluster. 
-
-
-
-
-
-
+Similarly pcaReduce, RtSNEkmeans, SIMLR and cidr have a clear maximum with 3 clusters in the Trapnell data. However more than half of the cells were clusters differently. The best agreement is given by SC3.
+In the Koh data cidr, pcaReduce, tSNEkmeans, SC3 and SIMLR show similar results. Scores are increasing monotonously with a maximum value at 9 cluster. 
 CIDR, pcaReduce, tSNE and kmeans show a maximum score with three clusters in the Trapnell dataset. Where as for SIMLR the optimal number of clusters is 4 and 2 for SC3. In the Koh dataset the highest score is with 9 clusters. 
+
+\paragraph{Clustering on single parameter}
+All methods were run with the number of cluster set to the annotation given by the authors or by the ground truth, if available. For graph based methods were the  neigbhorhood size had to be define 10 percent of the total cells were used as the respective neighboorhood. Others parameters like the number of PC's in seurat etc. were chosen according to the manual. 
+The partitioning of the clusters were then evaluated using the adjusted Rand Index and F1 scores. Figure \ref{fig:ariscore} shows the ARI scores for all datasets. RtSNE and kmeans, Seurat and  SC3 had some of the highest performances. This was also found in Freytag et al. 2017. Similar high results were also obtained with SIMLR and pcaReduce. In all the methods dbscan had the worst performance. Reason for that are the high dimensionality of the datasets (citation ) and the vialotion of the assumption that the dataset consist of seperated high denstiy regions. Which is only the case for the Kumar dataset where dbscan performs best. 
+Note that no results for the Zheng dataset where obtained with the method CIDR, where fitting  a logistic model to the mean variance relationsship failed.  The authors state that the method uses TPMs as expression values, whereas the Zheng data consist of UMI counts. Expect for  CIDR, dbscan, RACEID and SNNCliq all methods achieved a high score for simple Kumar dataset. Find out why not....
+
+F1 scores for the Kumar dataset are shown in Figure \ref{}. Generally the scores are for all methods in all three clusters. Low values for the method dbscan are due to a wrong assigning of the center and noise points. Only one cluster was obtained, where all the reaming cells where recognized as noise points in the dbscan algorithm.
+In the Trapnell data cell population 1 had the highest score (except in RaceId, check why). For population 2 and 3 the scores were similary low.
+Koh had the highest number cluster, here nine cluster were annotated by the authors. The majority of the methods failed to assign cells to subpopulation 6 (which is that and why).
+
+
 
 
 \begin{figure}[!h]
@@ -283,25 +317,31 @@ CIDR, pcaReduce, tSNE and kmeans show a maximum score with three clusters in the
 \begin{figure}[!h]
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_kumar2015.pdf}
 \caption{F1 scores for Kumar dataset }
-\label{fig:arirange}
+\label{fig:f1kumar}
 \end{figure}
 
 \begin{figure}[!h]
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_trapnell2014.pdf}
 \caption{F1 scores for Trapnell dataset }
-\label{fig:arirange}
+\label{fig:f1trapnell}
 \end{figure}
 
 \begin{figure}[!h]
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_koh2016.pdf}
 \caption{F1 scores for Koh dataset }
-\label{fig:arirange}
+\label{fig:f1koh}
 \end{figure}
 
 \begin{figure}[!h]
-\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_xue2013.pdf}
-\caption{F1 scores for Xue dataset }
-\label{fig:arirange}
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_zhengmix2016.pdf}
+\caption{F1 scores for Zheng mix dataset }
+\label{fig:f1zheng}
+\end{figure}
+
+\begin{figure}[!h]
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_f1_simDataKumar.pdf}
+\caption{F1 scores for simDataKumar. }
+\label{fig:f1sim}
 \end{figure}
 
 \begin{figure}[!h]
@@ -320,19 +360,22 @@ CIDR, pcaReduce, tSNE and kmeans show a maximum score with three clusters in the
 \begin{figure}[!h]
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_cluster_trapnell2014.pdf}
 \caption{Clusters Trapnell 2014 on PC representations. }
-\label{fig:clusterkumar}
+\label{fig:clustertrapnell}
 \end{figure}
 
 
+\begin{figure}[!h]
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/plots/plot_ari.pdf}
+\caption{ARI scores with optimal number of k. }
+\label{fig:ariscore}
+\end{figure}
 
 
 % =======================================
 % \section{References} \label{sec:ref}
 % =======================================
-\newpage
 
 
-\bibliographystyle{plain}
 
 
 \end{document}
