@@ -16,22 +16,14 @@ library(dplyr)
 
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
 
 # load data sets
 
 list<- vector("list", length(files))
 names(list) <- names(files)
 
-list->data->labels->tinput_matrix->sys.time->res.rtsne->res.cluster 
+list->data->tinput_matrix->sys.time->res.rtsne->res.cluster 
 
 for (i in names(data)){
   f <- files[[i]]
@@ -41,32 +33,36 @@ for (i in names(data)){
 }
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
+
 # extract transposed expression data
+lapply(data, assays)
 
 for (i in 1:(length(tinput_matrix))){
-  tinput_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
+  tinput_matrix[[i]] <-  t(assay(data[[i]], "normcounts"))# use count scaled length scaled tpms, normalized and log2 transformed
 }
+
 
 # RUN tSNE and kmeans
 # set random seed
 rand.seed <- 1234
-
+names(tinput_matrix)
 # define the perplexity parameter for tSNE
 par.perp <- list(
   kumar2015 = 20,
   trapnell2014 = 20,
-  xue2013 = 5,
-  koh2016 = 20
+  zhengmix2016 = 20,
+  koh2016 = 20,
+  simDataKumar=20
 )
 # define the number of cluster for kmeans clustering 
 par.k <- list(
   kumar2015 = 3,
   trapnell2014 = 3,
-  xue2013 = 8,
-  koh2016= 10
+  zhengmix2016 = 4,
+  koh2016= 10,
+  simDataKumar=3
+  
 )
 
 
@@ -100,8 +96,8 @@ save_systemtime(sys.time, dir_systime)
 
 file_names <-  paste0("results/RtSNEkmeans/RtSNEkmeans_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
-  sys_i <- as.data.frame(labels[[i]])
-  write.table(sys_i, file=file_names[i], sep="\t")
+  lab_i <- as.data.frame(labels[[i]])
+  write.table(lab_i, file=file_names[i], sep="\t")
 }
 
 

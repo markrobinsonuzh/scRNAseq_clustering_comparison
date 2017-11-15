@@ -14,19 +14,9 @@ source("skript/helper_files/Helper_functions.R")
 library("scater")
 library("DESeq2")
 library("SC3")
-
 # file paths
 
-
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
 
 # load data sets
 
@@ -42,16 +32,13 @@ for (i in names(data)){
 }
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
-
+labels <- load_labels(data) 
 
 # RUN SC3
 # list to store results
 list <- vector("list", length(data))
 names(list) <- names(data)
-res.cluster <- sys.time<- list
+res.cluster <- sys.time <- list
 
 
 
@@ -63,25 +50,24 @@ res.cluster <- sys.time<- list
 par.ks <- list(
   kumar2015=3,
   trapnell2014=3,
-  xue2013=8,
-  koh2016 = 10
+  zhengmix2016 =4,
+  koh2016 = 10,
+  simDataKumar=3
+  
   
 )
 
-
 for (i in names(data)){
   sys.time[[i]] <- system.time({
-    data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, normalized data, filter data 
+    data[[i]]<- sc3_prepare(data[[i]], ks=par.ks[i])        # uses the exprs slot of SCEset ; log2transformed, non normalized data, filter data 
     #data[[i]]<- sc3_estimate_k(data[[i]]) # optional estimate the number of clusters
-    data[[i]]<- sc3(data[[i]], ks = par.ks[[i]]) # perform sc3 clustering
+    data[[i]]<- sc3(data[[i]], ks = par.ks[[i]],gene_filter=FALSE, rand_seed=1234) # perform sc3 clustering
   })
   # store clusters
-  p_data <- pData(data[[i]])
+  p_data <- colData(data[[i]])
   res.cluster[[i]] <- p_data[ , grep("sc3_", colnames(p_data))]
   
 }
-
-
 
 
 # save clusters

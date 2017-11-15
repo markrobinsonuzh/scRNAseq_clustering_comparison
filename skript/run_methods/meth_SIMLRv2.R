@@ -18,23 +18,14 @@ set.seed(1234)
 
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
+
 
 # load data sets
 
-data <- labels<- vector("list", length(files))
+data <- vector("list", length(files))
 
-names(labels) <- names(data) <- names(files)
-
-
+names(data) <- names(files)
 
 for (i in names(data)){
   f <- files[[i]]
@@ -44,23 +35,22 @@ for (i in names(data)){
 }
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
+
 
 
 # RUN SIMLR
 list <- vector("list", length(data))
 names(list) <- names(data)
 res.SIMLR <- sys.time <- res.cluster <-  list
-# Set paramaeters, we define the tuning parameter k to ten as it is the standart parameter, the number of dimension are NA
+# Set paramaeters: c is the number of cluster expected. we define the tuning parameter k to 10 as it is the standart parameter, the number of dimension are NA
 par.c <-  list(
   kumar2015 = 3,
   trapnell2014 = 3,
-  xue2013 = 8,
-  koh2016 = 10
+  zhengmix2016 = 4,
+  koh2016 = 10,
+  simDataKumar = 3
 )
-
 # 
 for (i in names(data)){
   sys.time[[i]] <- system.time({
@@ -86,8 +76,8 @@ save_systemtime(sys.time, dir_systime)
 
 file_names <-  paste0("results/SIMLR/SIMLR_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
-  sys_i <- as.data.frame(labels[[i]])
-  write.table(sys_i, file=file_names[i], sep="\t")
+  lab_i <- as.data.frame(labels[[i]])
+  write.table(lab_i, file=file_names[i], sep="\t")
 }
 
 ###### Save Session Info
