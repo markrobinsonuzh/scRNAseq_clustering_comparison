@@ -22,15 +22,8 @@ library(pcaReduce)
 # import data as sceset
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
+
 
 # load data sets
 
@@ -47,9 +40,8 @@ for (i in names(data)){
 
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
+
 
 # create store files
 list <- vector("list", length(data))
@@ -63,28 +55,32 @@ res.cluster <- sys.time<- input_matrix<- pca.red <- list
 # extract expression data
 
 for (i in 1:(length(input_matrix))){
-  input_matrix[[i]] <- exprs(data[[i]]) # use count scaled length scaled tpms, normalized and log2 transformed
+  input_matrix[[i]] <- (assay(data[[i]], "normcounts")) # use count scaled length scaled tpms, normalized and log2 transformed
 }
 # set parameters, nbt is number of times to repeat pcareduce; q is number of starting dimensions, n cluster the number of clusters
 par.nbt <- list(
-  kumar2015 = 10,
-  trapnell2014 = 10,
-  xue2013 = 10,
-  koh2016 = 10
+  kumar2015 = 100,
+  trapnell2014 = 100,
+  zhengmix2016 = 100,
+  koh2016 = 100,
+  simDataKumar=100
+  
 
 )
 
 par.q <- list(
-  kumar2015 = 50,
-  trapnell2014 = 50,
-  xue2013 = 15,
-  koh2016 = 50
+  kumar2015 = 30,
+  trapnell2014 = 30,
+  zhengmix2016 = 30,
+  koh2016 = 30,
+  simDataKumar=30
 )
 n.cluster <- list(
   kumar2015=3,
   trapnell2014=3,
-  xue2013=8,
-  koh2016 = 10
+  zhengmix2016=4,
+  koh2016 = 10,
+  simDataKumar=3
   )
 
 # extract k dimension 
@@ -93,7 +89,6 @@ par.k <- function(i){
   (par.q[[i]]+2)-(n.cluster[[i]])
 }
 
-i <- 1
 # run pce Reduce, vary q
 for (i in names(input_matrix)){
   sys.time[[i]] <- system.time({
