@@ -41,17 +41,17 @@ for (i in names(input_matrix)){
 
 
 # RUN SNN-Cliq
-# set workin directory to save shared nearest neighbourhodd d matrix 
+# set workin directory to save shared nearest neighbourhood d matrix 
 setwd("skript/run_methods/snn-cliq")
 # Set parameters, k is number of nearest neighbours, r is cutoff for quasi-clique, m is threshold of overlapping quasicliques to be merged (standart threshold is half of the points)
 
 distan <- "euclidean"
-# set number of cluster , below 3 cluster doesent work
+# set number of neirest neighbors, below 3 neibghors doesnt work
 par.k <-  list(
-  kumar2015 = c(3:10),
-  trapnell2014 = c(3:10),
-  zhengmix2016 = c(3:10),
-  koh2016 = c(3:10)
+  kumar2015 =ncol(data[[i]])* c(0.01,0.05,0.1,0.15),
+  trapnell2014 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15),
+  zhengmix2016 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15),
+  koh2016 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15)
 )
 
 par.r <- list(
@@ -63,10 +63,9 @@ par.r <- list(
 par.m <-  list(
   kumar2015 = 0.5,
   trapnell2014 = 0.5,
-  xue2013 = 0.5,
+  zhengmix2016 = 0.5,
   koh2016 = 0.5
 )
-
 # SNN-clique function
 run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
   
@@ -113,7 +112,7 @@ run_snnclique <- function( input_matrix, par.k, par.m, par.r ) {
 # run method
 
 res.cluster <- run_snnclique(input_matrix,par.k,par.m,par.r)
-# save clusters
+1# save clusters
 
 setwd("~/Desktop/masterarbeit/scRNAseq_clustering_comparison")
 dir_cluster <- paste0("results/SNNCliq/SNNCliq_krange_clus_", names(res.cluster), ".txt")

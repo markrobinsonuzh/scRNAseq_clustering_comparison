@@ -89,7 +89,7 @@ run_pcareduce <- function(input_matrix, par.nbt,par.q,n.cluster){
 for (i in names(input_matrix)){
     pca.red[[i]] <- PCAreduce(t(input_matrix[[i]]), nbt = par.nbt[[i]], q = par.q[[i]], method = 'S')[[1]]
     res.cluster[[i]]  <- pca.red[[i]][, (par.q[[i]]-9):par.q[[i]] ] # improve this!
-    colnames(res.cluster[[i]]) <-  c(paste0( 2:11) ) # this as well
+    colnames(res.cluster[[i]]) <-  c(paste0( 11:2) ) # this as well
 }
   return( res.cluster  )
 }
@@ -111,7 +111,7 @@ save_systemtime(sys.time, dir_systime)
 # save experiment labels
 
 file_names <-  paste0("results/PCAreduce/PCAreduce_krange_labels_",names(labels), ".txt")
-for (i in 1:length(sys.time)){
+for (i in 1:length(file_names)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
   

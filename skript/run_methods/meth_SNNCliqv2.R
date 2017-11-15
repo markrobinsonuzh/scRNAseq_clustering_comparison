@@ -4,21 +4,11 @@
 # SNN-Cliq uses shared nearest neighbour graphs to model the high dimensional data given by the expression matrix. The identification of clusters is done by merging the quasi cliques obtained by the graph.
 # Paramteres supplied by the user are a threshold r which defines the connectivity of the quasi-cliques, a threshold m which defines the merging rate of the quasi-cliques. r and m is typically set to 0.7 and 0,5, respectively.
 # The number nearest neighbors k has to be defined by the user, higher number of neighbors gives lower number of clusters. Working distances are euclidean but diferent can be used, defined by the distan argument.
-
 source("skript/helper_files/Helper_functions.R")
-
-
+library(scater)
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  xue2013 = file.path(DATA_DIR, "sceset_red_GSE44183-GPL11154.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
 
 # load data sets
 
@@ -38,14 +28,12 @@ names(list) <- names(data)
 res.cluster <- sys.time<- input_matrix<- labels<- list
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
 
 
 # extract expression data
 for (i in names(input_matrix)){
-  input_matrix[[i]] <-exprs(data[[i]]) # use exprs slot of SCeset; log2, normalized count_lstpm
+  input_matrix[[i]] <-assay(data[[i]], "normcounts") # use exprs slot of SCeset; log2, normalized count_lstpm
 }
 
 
@@ -57,11 +45,13 @@ setwd("skript/run_methods/snn-cliq")
 distan <- "euclidean"
 
 par.k <-  list(
-  kumar2015 = 3,
-  trapnell2014 = 5,
-  xue2013 = 3,
-  koh2016 = 3
+  kumar2015 = ncol(data[[1]])*c(0.1),
+  trapnell2014 = ncol(data[[2]])*c(0.1),
+  zhengmix2016 = ncol(data[[3]])*c(0.1),
+  koh2016 = ncol(data[[4]])*c(0.1)
 )
+
+par.k <- lapply(par.k,round,0)
 
 par.r <- list(
   kumar2015 = 0.7,
@@ -105,7 +95,7 @@ snn.res <-
 cat(paste(snn.res, collapse = "\n"))
 snn.res <- read.table("res-snn-cliq.txt")
 
-pData(data[[i]])$SNNCliq <- as.character(snn.res[,1])
+colData(data[[i]])$SNNCliq <- as.character(snn.res[,1])
 # remove files that were created during the analysis
 system("rm snn-cliq.txt res-snn-cliq.txt")
 }
@@ -115,7 +105,7 @@ system("rm snn-cliq.txt res-snn-cliq.txt")
 
 setwd("~/Desktop/masterarbeit/scRNAseq_clustering_comparison")
 for (i in seq_len(length(res.cluster))){
-  res.cluster[[i]] <- pData(data[[i]])$SNNCliq
+  res.cluster[[i]] <- colData(data[[i]])$SNNCliq
 }
 dir_cluster <- paste0("results/SNNCliq/SNNCliq_clus_", names(res.cluster), ".txt")
 
@@ -133,8 +123,8 @@ save_systemtime(sys.time, dir_systime)
 
 file_names <-  paste0("results/SNNCliq/SNNCliq_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
-  sys_i <- as.data.frame(labels[[i]])
-  write.table(sys_i, file=file_names[i], sep="\t")
+  lab_i <- as.data.frame(labels[[i]])
+  write.table(lab_i, file=file_names[i], sep="\t")
 }
 
 ###### Save Session Info

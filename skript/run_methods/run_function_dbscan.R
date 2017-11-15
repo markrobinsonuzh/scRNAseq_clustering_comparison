@@ -71,18 +71,18 @@ for (i in names(input_matrix)){
 
 # parameter epsilon, size of the epsilon neighborhood. Bent in kNN dist plot. choose range for.
 par.eps <- list(
-  kumar2015 = c(10,20,50,150,250,500),
-  trapnell2014 = c(10,20,50,150,250,500),
-  zhengmix2016 = c(10,50,200,300,400,600),
-  koh2016 = c(5,10,20,50,100)
+  kumar2015 = c(150,200,230,240,250,280,300),
+  trapnell2014 = c(380,400,420,440,460),
+  zhengmix2016 = c(30,32,34,36,38,40),
+  koh2016 = c(380,400,420,440,460)
 )
 names(par.eps) <- names(files)
 # parameter Pts, number of minimum points in the eps region (for core points). Default is 5 points.
 
 par.Pts <- list(
-  kumar2015 = 5,
-  trapnell2014 = 5,
-  zhengmix2016 = 5,
+  kumar2015 = 3,
+  trapnell2014 = 3,
+  zhengmix2016 = 20,
   koh2016 = 5
   
 )

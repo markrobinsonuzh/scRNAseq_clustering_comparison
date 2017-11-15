@@ -35,9 +35,8 @@ for (i in names(data)){
 }
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
+
 
 
 # RUN SC3
@@ -63,7 +62,7 @@ for (i in names(data)){
     data[[i]]<- sc3(data[[i]], ks = par.k[[i]], gene_filter=FALSE) # perform sc3 clustering
 
   # store clusters
-  p_data <- pData(data[[i]])
+  p_data <- colData(data[[i]])
   res.cluster[[i]] <- p_data[ , grep("sc3_", colnames(p_data))]
   colnames(res.cluster[[i]]) <-  c( paste0(par.k[[i]]) )
 }

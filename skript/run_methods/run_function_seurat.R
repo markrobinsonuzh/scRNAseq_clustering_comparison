@@ -35,7 +35,7 @@ for(i in names(data)) {
 # Seurat
 # Resolution parameter resolution, higher number gives more cluster, lower less cluster. we define as the standart by 0.8
 # k.param is the number of neirest neighbors
-# th number of PC dim to use was deterimned by an elbow plot and by the jackstraW FUNCTION, ALTOUGH ITS DIFFICULT TO 
+# the number of PC dim to use was determined by an elbow plot and by the jackstraw function
 k.param <- list(
     kumar2015 =ncol(data[[i]])* c(0.01,0.05,0.1,0.15),
     trapnell2014 = ncol(data[[i]])*c(0.01,0.05,0.1,0.15),
@@ -128,7 +128,5 @@ sessionInfo()
 sink()
 
 ##### Apendix
-
-
 
 

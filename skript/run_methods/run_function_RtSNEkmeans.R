@@ -62,9 +62,9 @@ par.k <- list(
 )
 
 
-# Run tSNE and kmeans
+#tSNE and kmeans function
 
-run_RtSNEkmeans <- function(par.k, par.perp) {
+run_RtSNEkmeans <- function(tinput_matrix,par.k, par.perp) {
 for (i in names(data)){
   
  
@@ -82,7 +82,7 @@ for (i in names(data)){
 }
 
 ### run function
-res.cluster <- run_RtSNEkmeans(par.k, par.perp)
+res.cluster <- run_RtSNEkmeans(tinput_matrix,par.k, par.perp)
 
 
 # save clusters
