@@ -18,7 +18,7 @@ DATA_DIR <-  "results/run_results"
 files.ari <- list(
   kumar2015 = file.path(DATA_DIR, "ari_krange_kumar2015.rda"),
   trapnell2014 = file.path(DATA_DIR, "ari_krange_trapnell2014.rda"),
-  xue2013 = file.path(DATA_DIR, "ari_krange_xue2013.rda"),
+  zhengmix2106 = file.path(DATA_DIR, "ari_krange_zhengmix2016.rda"),
   koh2016 = file.path(DATA_DIR, "ari_krange_koh2016.rda")
 )
 # function to plot 
@@ -63,7 +63,7 @@ plot_ari <- function(x){
 }
 # plot all the data, store in list
 p.all <- lapply(files.ari, plot_ari)
-# save it to different files
+# save plot per datafile
 lapply(names(p.all), 
        function(x)ggsave(filename=paste0("results/plots/plot_ari_krange_",x,".pdf"), plot=p.all[[x]]))
 
