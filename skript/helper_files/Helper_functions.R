@@ -1,6 +1,45 @@
 ###########################
 # Helper Functions
 ###########################
+
+##########################
+# load cell labels from a SingleCellexpriment class
+#####################
+### Input: list of SingleCellexpriment class data
+### Output:  list of labels
+load_labels <- function(data) {
+  
+  labels <- vector("list", length(data))
+  names(labels) <- names(data)
+  
+for (i in names(data)) {
+  labels[[i]] <- as.character(colData(data[[i]])$phenoid)
+  }
+  return(labels)
+}
+
+
+
+############################################
+# load SingleCellexpriment class data sets 
+#################################################
+### Input: list of filepaths, vector with data directory path
+### Output:  list with SingleCellexpriment data sets
+
+load_data <- function( files, DATA_DIR ) { 
+  
+  data <- labels <- vector("list", length(files))
+  
+  names(data) <-names(labels) <-  names(files)
+  
+  for (i in 1:length(data)){
+    f <- files[[i]]
+    load(f)
+    data[[i]] <- res
+    
+  }
+  return(data)
+}
 #####################
 # for Data import
 ##################
