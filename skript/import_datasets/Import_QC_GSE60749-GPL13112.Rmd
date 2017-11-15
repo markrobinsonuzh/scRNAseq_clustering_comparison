@@ -21,8 +21,6 @@ suppressPackageStartupMessages( library(plyr) )
 suppressPackageStartupMessages( library(scran) )
 suppressPackageStartupMessages( library(cowplot) )
 suppressPackageStartupMessages( library(tibble) )
-
-
 ```
 
 ## load multiassay dataset from IMLS conquer
@@ -73,15 +71,15 @@ The expr slot is populated with the count data; obtained from the length-scalaed
 
 ```{r create SCEset, echo=TRUE }
 # Create an SCEobject 
-sceset <- newSCESet(countData = cts, 
-                    phenoData = new("AnnotatedDataFrame", data = as.data.frame(phn)))
-exprs(sceset)[1:3,1:3]
+sceset <- SingleCellExperiment(
+  assays = list(counts = cts), colData = phn)
 
-set_exprs(sceset, "tpm") <- tpms # tpm is populated with the gene level tpms
+logcounts(sceset) <- log2(calculateCPM(sceset, 
+                                            use.size.factors = FALSE) + 1)
 
-get_exprs(sceset, "tpm")[1:3,1:3] # untransformed tpm
-get_exprs(sceset, "counts")[1:3,1:3] # untransformed counts
-exprs(sceset)[1:3,1:3] # log2 transformed counts
+# save raw sceset
+
+save(sceset,file = "data/sceset_raw_GSE60749-GPL13112.rda")
 
 ```
 # Identify the ERCCC spike-ins.
@@ -98,9 +96,11 @@ print( table(is.mito) )
 # Compute some QC metrics and set ERCc as spike inn controls
 
 ```{r QC}
+isSpike(sceset) <- is.spike
 sceset <- calculateQCMetrics(sceset, feature_controls = list(ERCC = grepl("^ERCC", rownames(sceset))) )
-setSpike(sceset) <- "ERCC"
-colnames(pData(sceset))
+colnames(colData(sceset))
+
+
 
 
 ```
@@ -133,7 +133,7 @@ dev.off()
 # Quality control using PCA and highest expressed genes
 PCA plot based the quality metrics for each cell, e.g., the total number of reads, the total number of features and the proportion of mitochondrial or spike-in reads. 
 ```{r  Quality control using PCA }
-p1 <- scater::plotPCA(sceset, exprs_values="exprs",pca_data_input="pdata",colour_by="phenoid")
+p1 <- scater::plotPCA(sceset, exprs_values="logcounts", selected_variables="pdata",colour_by="phenoid")
 p2 <- scater::plotQC(sceset, type = "find-pcs", variable = "total_features")
 
 
@@ -155,11 +155,10 @@ table(libsize.drop,feature.drop)
 # Filter dataset by ERCCC spike inns
 The amount of endogenous should be constant. Cells with a high proportion are removed. Looking at the histogramm the ERCC should be removed regarding the batches.
 ```{r  filter by spike inn }
-hist( sceset$pct_counts_feature_controls_ERCC, xlab="ERCC proportion (%)", 
+hist( sceset$pct_counts_ERCC, xlab="ERCC proportion (%)", 
     ylab="Number of cells", breaks=20, main="", col="grey80" )
     
-spike.drop <- isOutlier(sceset$pct_counts_feature_controls_ERCC, nmads=3, type="higher")
-names(pData(sceset))
+spike.drop <- isOutlier(sceset$pct_counts_ERCC, nmads=3, type="higher")
 ```
 Total 24 cells were filtered out.  
 ```{r overview filtered cells }
@@ -188,14 +187,11 @@ plotQC(sceset.red, type = "exprs-freq-vs-mean")
 # Filtering the datasets based on the features. Here genes with low abundance are filtered out. We have to sets of features one is based on the mean expression and one on a expression in minium n cells.
 ```{r  Filtering out low-abundance genes }
 ave.counts <- rowMeans(counts(sceset.red))
-keep <- ave.counts >= 1e-04
+keep <- ave.counts >= 1
 sum(keep)
 ave.counts<- as.data.frame(log10(ave.counts))
 
 p4 <- ggplot(ave.counts, aes(ave.counts))+geom_histogram(binwidth = 0.5)+geom_vline(aes(xintercept=log10(1), color=1))+guides(color = "none")+labs( x = expression(Log[10]~"average count"), y = "frequency")
-
-
-
 sceset.red <- sceset.red[keep, ]
 
 ```
@@ -217,8 +213,8 @@ plot(sizeFactors(sceset.red), sceset.red$total_counts/1e6, log="xy",
 ```
 Use size factors to normalize gene expression
 ```{r spike inn}
-sceset <- computeSpikeFactors(sceset, type="ERCC", general.use=FALSE)
-sceset.red <- computeSpikeFactors(sceset.red, type="ERCC", general.use=FALSE)
+sceset <- computeSpikeFactors(sceset, general.use=FALSE)
+sceset.red <- computeSpikeFactors(sceset.red, general.use=FALSE)
 
 ```
 
@@ -228,7 +224,6 @@ sceset <- normaliseExprs(sceset)
 
 
 sceset.red <- normaliseExprs(sceset.red)
-
 
 
 ```
@@ -294,7 +289,9 @@ p5 <- plotQC(sceset.red, type = "explanatory-variables", variables = expl_vars)
 ```
 plot tSNE represenatation
 ```{r tSNE}
-p6 <- plotTSNE(sceset.red, exprs_values="exprs", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+p6 <- plotTSNE(sceset.red, exprs_values="logcounts", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+
+
 ```
 
 
