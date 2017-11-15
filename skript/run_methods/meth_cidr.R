@@ -8,29 +8,20 @@ source("skript/helper_files/Helper_functions.R")
 
 library(Rtsne)
 library(scater)
-
 library(dplyr)
-
 library(cidr)
 
 # file paths
 
-DATA_DIR <- "data"
-files <- list(
-  
-  kumar2015 = file.path(DATA_DIR, "sceset_red_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_red_GSE52529-GPL16791.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_red_zhengmix.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_red_SRP073808.rda")
-  
-)
+source("FILES.R")
+
 
 # load data sets
 
 list<- vector("list", length(files))
 names(list) <- names(files)
 
-list->data->labels->tinput_matrix->sys.time->res.rtsne->res.cluster 
+list->data->labels->tinput_matrix->sys.time->res.cluster 
 
 for (i in names(data)){
   f <- files[[i]]
@@ -40,15 +31,13 @@ for (i in names(data)){
 }
 
 # load cell labels
-for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
-}
+labels <- load_labels(data) 
+
 # extract transposed expression data
 
 for (i in 1:(length(tinput_matrix))){
-  tinput_matrix[[i]] <- t(exprs(data[[i]])) # use count scaled length scaled tpms, normalized and log2 transformed
+  tinput_matrix[[i]] <- t((assay(data[[i]], "normcounts"))) # use count scaled length scaled tpms, normalized and log2 transformed
 }
-
 
 # RUN cidr
 sData <- vector("list", length(files))
@@ -57,8 +46,8 @@ names(sData) <-  names(files)
 par.k <-  list(
   kumar2015 = 3,
   trapnell2014 = 3,
-  xue2013 = 8,
-  koh2016 = 10
+  koh2016 = 10,
+  simDataKumar=3
 )
 
 for  (i in names(sData)) {
