@@ -23,8 +23,15 @@ calc_f1_score <- function(labels,cluster){
     
     # create table with labels in rows and cluster in column
     tbl <- table(cluster=cluster, label=labels)
-    # add additional column with maximum values if number of column <= number of rows
-    ifelse(ncol(tbl) >= nrow(tbl), tbl <- tbl, tbl <- cbind(tbl,"x"= array(max(tbl), dim=nrow(tbl))) )
+    # add additional column with maximum values from tbl if number of column <= number of rows
+    add_column <- function(tbl){
+      ifelse(ncol(tbl) >= nrow(tbl), tbl <- tbl, tbl <- cbind(tbl,"x"= array(max(tbl), dim=nrow(tbl))) )
+      return(tbl)
+    }
+    
+    while( ncol(tbl) < nrow(tbl) ) {
+      tbl <- add_column(tbl)
+    }    
     # compute hungarian assignement
     ha <- solve_LSAP(tbl, maximum=TRUE) # hungarian alg.
     df <- data.frame(cluster=as.integer(rownames(tbl)),
