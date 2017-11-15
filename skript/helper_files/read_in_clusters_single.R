@@ -15,12 +15,12 @@ source("skript/helper_files/Helper_functions.R")
 
 
 
-# define method
-METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR", "SNNCliq", "cidr")
+# define method "pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR", "SNNCliq", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm"
+METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm")   
 
 # file paths to the clustering results
 DATA_DIR <-  "results"
-DATASET <- "trapnell2014"    # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
+DATASET <-"zhengmix2016"   # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar"
 
 
 
@@ -36,11 +36,10 @@ for (i in names(labels)) {
     
   }
 
-
 # read in cluster results
 
-files_cluster <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_clus_",DATASET,".txt"))%>%as.list()
-names(files_cluster) <- METHOD
+files_cluster <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_clus_",DATASET,".txt"))%>%as.list() # file path
+names(files_cluster) <- METHOD # gives names
 
 clusters <- vector("list", length(files_cluster))
 names(clusters) <- names(files_cluster) 
@@ -52,8 +51,8 @@ for (i in names(clusters)) {
 }
 
 #### generate object with cluster and files
-clusters$labels <- labels$RtSNEkmeans
+clusters$labels <- labels$pcaReduce
 ### Save object
-save(clusters,file = paste0("results/run_results/",DATASET,".rda"))
+save(clusters,file = paste0("results/run_results/cluster_single_",DATASET,".rda"))
 
 
