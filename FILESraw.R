@@ -10,10 +10,10 @@
 DATA_DIR <- "data"
 files <- list(
   
-  kumar2015 = file.path(DATA_DIR, "sceset_raw_GSE60749-GPL13112.rda"),
-  trapnell2014 = file.path(DATA_DIR, "sceset_raw_GSE52529-GPL16791.rda"),
-  koh2016 = file.path(DATA_DIR,"sceset_raw_SRP073808.rda"),
-  zhengmix2016 = file.path(DATA_DIR, "sceset_raw_zhengmix.rda"),
-  SimDataKumar = file.path(DATA_DIR,"sceset_raw_simDataKumar.rda")
+  raw.kumar2015 = file.path(DATA_DIR, "sceset_org_GSE60749-GPL13112.rda"),
+  raw.trapnell2014 = file.path(DATA_DIR, "sceset_org_GSE52529-GPL16791.rda"),
+  raw.koh2016 = file.path(DATA_DIR,"sceset_org_SRP073808.rda"),
+  raw.zhengmix2016 = file.path(DATA_DIR, "sceset_org_zhengmix.rda"),
+  raw.SimDataKumar = file.path(DATA_DIR,"sceset_org_simDataKumar.rda")
 )
 # 
