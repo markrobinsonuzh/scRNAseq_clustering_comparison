@@ -25,12 +25,14 @@ files_f1 <- list(
   zhengmix2016=file.path(DATA_DIR, "f1_single_zhengmix2016.rda"),
   simDataKumar =file.path(DATA_DIR, "f1_single_simDataKumar.rda")
 )
+
 for ( i in names(files_f1)){
 # load dataset
 tmp <- lapply(files_f1[[i]], function(x)get(load(x)))
+
 ## plot pheatmap
 # create table with data , remove the column with the "ground truth" (label)
-tmp <- ldply(tmp[[1]], data.frame) %>% select(.id, f1, labels) %>% subset(!(.id=="labels") )
+tmp <- ldply(tmp[[1]], data.frame) %>% select(.id, f1, labels, n.cluster) %>% subset(!(.id=="labels") )
 # tmp <- daply(tmp, .(labels, .id), function(x) x$f1) old way 
 tmp <- xtabs( f1~labels+.id, tmp, addNA=TRUE )
 
@@ -50,11 +52,6 @@ pheatmap(tmp , color = colorRampPalette(brewer.pal(3, "YlGnBu"))(10),
          number_format="%.2f", filename=paste0("results/plots/plot_f1_",names(files_f1[i]),".pdf")
 )
          
-
-
-
 }
 
 # Appendix
-
-
