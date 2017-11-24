@@ -81,6 +81,7 @@ filesclusters <- list(
 
 
 # load clusters
+
 clusters<- vector("list", length(filesclusters))
 
 names(clusters) <-  names(filesclusters)
@@ -113,7 +114,6 @@ for (i in 1:length(clusters)){
 
 plot2by3 <- plot_grid(plotlist=plot.method, labels = "auto", nrow = 3,ncol =3)
 save_plot("results/plots/plot_cluster_trapnell2014.pdf", plot2by3, base_height = 10, base_width = 15)
-
 
 ## appendix
 mid <- median(pData(data[[1]])$total_count)
