@@ -9,6 +9,8 @@
 ### Output:  list of labels
 load_labels <- function(data) {
   
+  require(scater)
+  
   labels <- vector("list", length(data))
   names(labels) <- names(data)
   
@@ -27,6 +29,7 @@ for (i in names(data)) {
 ### Output:  list with SingleCellexpriment data sets
 
 load_data <- function( files, DATA_DIR ) { 
+  require(scater)
   
   data <- labels <- vector("list", length(files))
   
@@ -40,6 +43,26 @@ load_data <- function( files, DATA_DIR ) {
   }
   return(data)
 }
+
+
+#####################################################################
+# load cluster results from single run clustering; 
+# for all data set only please
+#####################################################################
+
+### Input: list of filepaths, vector of data directory path
+### Output: list of cluster results 
+
+
+load_clusters <- function( files.cluster, DATA_DIR ) {
+  
+return( lapply(files.cluster,function(x) get(load(x))))
+  
+}
+
+
+
+
 #####################
 # for Data import
 ##################
@@ -166,7 +189,107 @@ save_systemtime <- function(sys.time, dir_systime){
   write.table(sys_i, file=dir_systime[i], sep="\t")
   }
 }
+######## save the labels ("ground truth") to txt file
 
-######## Determine number of cluster
+save_labels <- function(labels, dir_labels){
+  for (i in seq_len(length(labels)) ){
+    lab_i <- as.data.frame(labels[[i]])
+    write.table(lab_i, file=dir_labels[i], sep="\t")
+  }
+}
+######## save the clusters from the single run into a .rda file
+# input: METHOD = method names as chracter vector, DATA_DIR = data dir chracter vector, DATASET = data set as character vector, datatype = type of dataset/analysis
+# output: saved .rda file with the methods and dataset defined by input variables
 
+save_cluster_single <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
+  require(plyr)
+  require(dplyr)
+  ## load the labels
+  files_labels <- file.path(DATA_DIR,datatype, METHOD,paste0(METHOD,"_labels_",DATASET,".txt"))%>%as.list()
+  # assign names
+  names(files_labels) <- METHOD
+  # load the .csv files
+  labels <- vector("list", length(files_labels))
+  names(labels) <- names(files_labels) 
+  
+  labels <- lapply( files_labels,function(x){read.csv(x,  sep="") %>% unlist%>% as.vector} )
+  
+  ## read in cluster results
+  
+  files_cluster <- file.path(DATA_DIR,datatype , METHOD,paste0(METHOD,"_clus_",DATASET,".txt"))%>%as.list() # file path
+  names(files_cluster) <- METHOD # gives names
+  
+  clusters <- vector("list", length(files_cluster))
+  names(clusters) <- names(files_cluster) 
+  clusters <- lapply( files_cluster,function(x){read.csv(x,  sep="") %>% unlist%>% as.vector} )
+  
+  # save the clusters as a rda file 
+  save(clusters,file = paste0("results/run_results/cluster_single_",datatype,"_",DATASET,".rda"))
+  
+}
+######## save the clusters from the single run into a .rda file with exception handling
+# input: METHOD = method names as chracter vector, DATA_DIR = data dir chracter vector, DATASET = data set as character vector, datatype = type of dataset/analysis
+# output: saved .rda file with the methods and dataset defined by input variables
+
+save_cluster_single2 <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
+  require(plyr)
+  require(dplyr)
+  ## load the labels
+  files_labels <- file.path(DATA_DIR,datatype, METHOD,paste0(METHOD,"_labels_",DATASET,".txt"))%>%as.list()
+  # assign names
+  names(files_labels) <- METHOD
+  # load the .csv files
+  labels <- vector("list", length(files_labels))
+  names(labels) <- names(files_labels) 
+  
+  labels <- lapply( files_labels,function(x){read_file(x) %>% unlist%>% as.vector} )
+  ## read in cluster results
+  
+  files_cluster <- file.path(DATA_DIR,datatype , METHOD,paste0(METHOD,"_clus_",DATASET,".txt"))%>%as.list() # file path
+  names(files_cluster) <- METHOD # gives names
+  
+  clusters <- vector("list", length(files_cluster))
+  names(clusters) <- names(files_cluster) 
+  clusters <- lapply( files_cluster,function(x){read_file(x) %>% unlist%>% as.vector} )
+  
+  # save the clusters as a rda file 
+  save(clusters,file = paste0("results/run_results/cluster_single_",datatype,"_",DATASET,".rda"))
+  
+}
+# read .csv files with exception handling
+read_file <- function(file){
+  if ( file.exists(file)) {
+    tryCatch( read.csv(file,sep="") , error=function(e) NA)
+  } else {
+    return(NA)
+  }
+}
+
+# save single  runtimes to .rda file , per data set
+save_runtime_single <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
+  require(plyr)
+  require(dplyr)
+  ## files systime
+  files_systime <- file.path(DATA_DIR,datatype, METHOD,paste0(METHOD,"_systime_",DATASET,".txt"))%>%as.list()
+  # assign names
+  names(files_systime) <- METHOD
+  # load the .csv files
+  time <- vector("list", length(files_systime))
+  names(time) <- names(files_systime) 
+  # exception handling
+  read_file <- function(file){
+    if ( file.exists(file)) {
+      tryCatch( read.csv(file,sep="") , error=function(e) NA)
+    } else {
+      return(NA)
+    }
+  }
+  # load stuff
+  time <- lapply(files_systime, read_file)%>% unlist%>% as.vector
+  names(time) <- names(files_systime)
+  time 
+  # save the clusters as a rda file 
+  save(time,file = paste0("results/run_results/runtime_",datatype,"_",DATASET,".rda"))
+  
+}
 
