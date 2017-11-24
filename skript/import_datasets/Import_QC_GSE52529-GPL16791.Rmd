@@ -69,17 +69,24 @@ The expr slot is populated with the count data; obtained from the length-scalaed
 sceset <- SingleCellExperiment(
   assays = list(counts = cts), colData = phn)
 
-counts(sceset)[1:3,1:3]
-
 assay(sceset, "tpm") <- tpms # tpm is populated with the gene level tpms
+```
 
-assay(sceset, "tpm")[1:3,1:3] # untransformed tpm
-assay(sceset, "counts")[1:3,1:3] # untransformed counts
+throw away features which are not expressed
+```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset<- sceset[keep_features, ]
+dim(sceset)
+```
 
+
+```{r log transform}
 logcounts(sceset) <- log2(calculateCPM(sceset, 
                                             use.size.factors = FALSE) + 1)
+```
 
-exprs(sceset)[1:3,1:3] # log2 transformed counts
+```{r save raw file}
 # save raw sceset
 
 save(sceset,file = "data/sceset_raw_GSE52529-GPL16791.rda")
@@ -184,14 +191,6 @@ data.frame( ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop), ByCellnumb
     , Remaining=ncol(sceset.red) )
 
 
-```
-# Gene filter 
-Reduce expression matrix by filtering genes. Filtering is based on mean expression of genes. 
-
-```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
-keep_features <- rowSums(counts(sceset.red) > 0) >= 1
-table(keep_features)
-sceset.red <- sceset.red[keep_features, ]
 ```
 
 # Quality control using PCA and highest expressed genes

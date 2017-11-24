@@ -67,16 +67,31 @@ cd14.monocytes<- cd14.monocytes[,sample( colnames(cd14.monocytes) , 500, replace
 regulatory.t <- regulatory.t[,sample( colnames(regulatory.t ) , 500, replace = FALSE, prob = NULL) ]
 
 ```
-save the raw data
 
+# create an SCEset
+The expr slot is populated with the count data; obtained from the length-scalaed , count-scaled tpms. The values are automatically log2 transformed. gene-level tpms for the tpm slot.
 ```{r create singlecellexperiment set}
 # merge the stuff
 sceset <-cbind(b.cells, naive.cytotoxic, cd14.monocytes,regulatory.t)
 
 # change sparse matrix representation to expanded one 
 counts(sceset) <-  counts(sceset) %>% as.matrix 
+```
+throw away features which are not expressed
+```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset<- sceset[keep_features, ]
+dim(sceset)
+```
+log transform
+```{r log transform}
+logcounts(sceset) <- log2(calculateCPM(sceset, 
+                                            use.size.factors = FALSE) + 1)
+```
+save the raw data
+```{r save raw data}
 save( sceset,file = "data/sceset_raw_zhengmix.rda" )
-
 ```
 
 check the names of the potential spike inns. Based on webresearch these are not spike inns but mitochondrial genes....
@@ -88,21 +103,6 @@ rowData(cd14.monocytes)$symbol[grep("^ERCC", rowData(sceset)$symbol ) ]
 rowData(regulatory.t)$symbol[grep("^ERCC", rowData(sceset)$symbol ) ]
 
 ```
-# Reduce expression set
-Remove genes that are not expressed in any cell
-Keep only those features that are observed in at least 1 cell. 435 features are filtered out. The original counts are used.
-
-```{r reduce}
-
-keep_features <- rowSums(counts(sceset) > 0) >= 1
-table(keep_features)
-sceset <-sceset[keep_features, ]
-dim(sceset)
-
-```
-
-
-
 
 # Identify the ERCCC spike-ins and mitochondrial data
 There are no ERCCC spike-inn genes. 13 mitochondrial genes. ERCC are not really spike inns, UMI data contains no spike inns
@@ -118,9 +118,6 @@ rowData(sceset)$symbol[grep("^MT-", rowData(sceset)$symbol ) ]
 print( table(is.spike) )
 print( table(is.mito) )
 ```
-
-
-
 
 
 # Compute QC metrics, set mitochondrial features. 

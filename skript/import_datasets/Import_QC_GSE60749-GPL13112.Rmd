@@ -74,14 +74,34 @@ The expr slot is populated with the count data; obtained from the length-scalaed
 sceset <- SingleCellExperiment(
   assays = list(counts = cts), colData = phn)
 
+
+``` 
+
+throw away features which are not expressed
+```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset<- sceset[keep_features, ]
+dim(sceset)
+```
+
+Populate logcounts slot
+```{r log transform, echo=TRUE }
+
 logcounts(sceset) <- log2(calculateCPM(sceset, 
                                             use.size.factors = FALSE) + 1)
+```
 
-# save raw sceset
-
+save raw sceset
+```{r save raw data, echo=TRUE }
 save(sceset,file = "data/sceset_raw_GSE60749-GPL13112.rda")
 
 ```
+
+
+
+
+
 # Identify the ERCCC spike-ins.
 There are 92 ERCCC spike-inn genes. No mitochondrial genes , probably they are not annotaed yet.
 ```{r ERCC and mt genes }
@@ -99,9 +119,6 @@ print( table(is.mito) )
 isSpike(sceset) <- is.spike
 sceset <- calculateQCMetrics(sceset, feature_controls = list(ERCC = grepl("^ERCC", rownames(sceset))) )
 colnames(colData(sceset))
-
-
-
 
 ```
 
@@ -168,11 +185,6 @@ data.frame(ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop),
     BySpike=sum(spike.drop), Remaining=ncol(sceset.red))
 ```
 
-```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
-keep_features <- rowSums(counts(sceset.red) > 0) >= 1
-table(keep_features)
-sceset.red <- sceset.red[keep_features, ]
-```
 
 Plotting the 50 highest expressed genes. No ERCC spike-inn in the top 50. The profile should look relatively "flat".
 ```{r  highest expressed genes}
@@ -193,7 +205,7 @@ ave.counts<- as.data.frame(log10(ave.counts))
 
 p4 <- ggplot(ave.counts, aes(ave.counts))+geom_histogram(binwidth = 0.5)+geom_vline(aes(xintercept=log10(1), color=1))+guides(color = "none")+labs( x = expression(Log[10]~"average count"), y = "frequency")
 sceset.red <- sceset.red[keep, ]
-
+dim(sceset.red)
 ```
 
 

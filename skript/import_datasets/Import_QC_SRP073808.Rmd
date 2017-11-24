@@ -42,27 +42,17 @@ tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 There are three different subpopulations: knockout mouse and v6.5 mouse treated with serum or 2i.
 ```{r phentotypes, echo=TRUE}
 # extract the phenotype data
-
 phn <- colData(maex)
 
 # extract the cell annotation to phenoid column and rename it 
-
-
 phn[, "phenoid"] <- as.character(phn[,"LibraryName"])
-
-
 table(phn[, "phenoid"])
-
-
 ```
 
 
 ```{r have a closer look to pheno, echo=TRUE}
 phn.tbl <- as_data_frame(phn)
 glimpse(phn.tbl)
-# extract the plate information
-
-
 ```
 
 
@@ -72,13 +62,27 @@ The expr slot is populated with the count data; obtained from the length-scalaed
 ```{r create SCEset, echo=TRUE }
 # Create an SCEobject 
 sceset <- SingleCellExperiment(assays = list(counts = cts), colData = phn)
+```
 
+throw away features which are not expressed
+```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset<- sceset[keep_features, ]
+dim(sceset)
+```
+
+Populate logcounts slot
+```{r log transform, echo=TRUE  }
 logcounts(sceset) <- log2(calculateCPM(sceset,use.size.factors = FALSE) + 1)
-
+```
 # save raw sceset
+```{r save raw data}
 save(sceset,file = "data/sceset_raw_SRP073808.rda")
 
 ```
+
+
 # Identify the ERCCC spike-ins.
 There are 92 ERCCC spike-inn genes. No mitochondrial genes , probably they are not annotated yet.
 ```{r ERCC and mt genes }
@@ -202,7 +206,7 @@ ave.counts<- as.data.frame(log10(ave.counts))
 p4 <- ggplot(ave.counts, aes(ave.counts))+geom_histogram(binwidth = 0.5)+geom_vline(aes(xintercept=log10(1), color=1))+guides(color = "none")+labs( x = expression(Log[10]~"average count"), y = "frequency")
 
 sceset.red <- sceset.red[keep, ]
-
+dim(sceset.red)
 ```
 
 Normalize data according to Lun etal. 2016 using pooled counts to estimate size factors. The size factors in the non-filterd set contain non positive values what does this mean?
@@ -240,9 +244,11 @@ sceset.red <- normaliseExprs(sceset.red)
 # Save the normalized and cell filtered datasets
 ```{r save data }
 res <- sceset
+dim(res)
 save(res,file = "data/sceset_org_SRP073808.rda")
 
 res <- sceset.red
+dim(res)
 save(res,file = "data/sceset_red_SRP073808.rda")
 
 ```

@@ -1,5 +1,5 @@
 ---
-title: "SimData"
+title: "SimDatakumar"
 output: html_document
 ---
 
@@ -20,8 +20,6 @@ suppressPackageStartupMessages( library(scran) )
 suppressPackageStartupMessages( library(cowplot) )
 suppressPackageStartupMessages( library(tibble) )
 suppressPackageStartupMessages( library(splatter) )
-
-
 ```
 
 ## load multiassay dataset from IMLS conquer
@@ -30,15 +28,11 @@ suppressPackageStartupMessages( library(splatter) )
 # load multiassay dataset from IMLS conquer
 maex <- readRDS("data/GSE60749-GPL13112.rds")
 # summary of data set
-
 print(maex)
 dim(assay(maex)) # 45686 x 268
-
-
 # extract the gene-level TPM and the counts obtaines by scaling the TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
-
 ```
 # extract the Phenotype data
 There are three different subpopulations: knockout mouse and v6.5 mouse treated with serum or 2i.
@@ -50,24 +44,31 @@ phn <- colData(maex)
 phn[, "phenoid"] <- as.character(interaction(as.data.frame(phn[, c("source_name_ch1","characteristics_ch1.1")])))
 phn[, "phenoid"] <-  revalue(phn[, "phenoid"] , c("Dgcr8 knockout mouse embryonic stem cells.culture conditions: serum+LIF"="Dgcr8 knockout mouse serum+LIF", "v6.5 mouse embryonic stem cells.culture conditions: 2i+LIF"="v6.5 mouse 2i+LIF","v6.5 mouse embryonic stem cells.culture conditions: serum+LIF"="v6.5 mouse serum+LIF"))
 table(phn[, "phenoid"]) 
+colData(maex) <- phn
 
-cells.Dgcr8 <- phn[, "phenoid" == "Dgcr8 knockout mouse serum+LIF" ]
-nrow(cells.Dgcr8)
-cells.v6.52iLIF <- phn[, "phenoid" == "v6.5 mouse 2i+LIF" ]
-cells.v6.5serumLIF <-  phn[, "phenoid" == "v6.5 mouse serum+LIF" ]
+
 ```
 
-# subset the dataset by the populations
+# subset the dataset by the v6.5 mouse 2i+LIF cell population.
 ```{r subsetting cells, echo=TRUE }
-names( cells.Dgcr8 )
-cts[  , cells.Dgcr8 ]
+# extract subpopulation names
+maex.sub <- maex[,maex$phenoid == "v6.5 mouse 2i+LIF",]
+cell.names <- assay(maex.sub) %>%colnames(sub.cts)
+# subsetting
+sub.cts <- cts[,cell.names]
+dim(sub.cts)
+```
+# remove the ERCC spike inns
+```{r remove spike inns, echo=TRUE }
+is.spike <- grepl("^ERCC", rownames(sub.cts))
+sub.cts <- sub.cts[ !is.spike,]
 
 ```
-
 ## Estimate parameters for simulation
 The splatter package for  scRNA data simulation is used 
 ```{r estimate parameters, echo=TRUE}
-params <- splatEstimate(cts)
+params <- splatEstimate(sub.cts)
+
 # have a look at the parameters
 params
 ```
@@ -76,19 +77,45 @@ params
 Simulate SCEset dataset with 3 groups. Groups conatning of 100,200 and 500 cells. The probabilities for differential expression per group are 0.1,0.2 and 0.4.
 ```{r simulate counts, echo=TRUE}
 # use splatSimulate to simulate counts
-sceset <- splatSimulate(params, group.prob = c(0.25, 0.5, 0.25), method = "groups",de.prob=c(0.1,0.2,0.4),
-                            verbose = FALSE)
+
+sceset <- splatSimulate(params=params,   batchCells = 500,
+                        group.prob = c(0.1, 0.15, 0.5, 0.25), 
+                        method = "groups",de.prob=c(0.05,0.1,0.2,0.4),
+                        verbose = FALSE)
+```
+
+throw away features which are not expressed
+```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
+keep_features <- rowSums(counts(sceset) > 0) >= 1
+table(keep_features)
+sceset<- sceset[keep_features, ]
+dim(sceset)
+```
+
+log transform counts
+```{r log transform}
+
 logcounts(sceset) <- log2(calculateCPM(sceset, 
                                             use.size.factors = FALSE) + 1)
+```
 
+
+#  add cellgroup labels
+```{r populate phenoid}
 #  store group under phenoid
 sceset$phenoid <- colData(sceset)$Group
+```
+# tSNE and PCA plots by cellgroup
 
-plotTSNE(sceset, exprs_values = "counts", colour_by="phenoid")
+```{r plots}
+plotTSNE(sceset, exprs_values = "counts", colour_by="phenoid", perplexity=10)
 plotPCA(sceset, exprs_values = "counts", colour_by="phenoid")
 
+```
+
 # save counts
- res <- sceset
+```{r save raw counts}
+res <- sceset
 save(res,file = "data/sceset_raw_simDataKumar.rda")
 ```
 
@@ -155,14 +182,6 @@ data.frame(ByLibSize=sum(libsize.drop), ByFeature=sum(feature.drop), Remaining=n
 
 ```
 
-
-NUmber of non expressed features is smaller than in original data
-```{r reduce expression matrix, throwing away features that are not expressed. noninformative features}
-keep_features <- rowSums(counts(sceset.red) > 0) >= 1
-table(keep_features)
-sceset.red <- sceset.red[keep_features, ]
-```
-
 Plotting the 50 highest expressed genes. The profile should look relatively "flat".
 ```{r  highest expressed genes}
 p3 <- plotQC(sceset.red, type = "highest-expression", n=50 )
@@ -181,9 +200,6 @@ sum(keep)
 ave.counts<- as.data.frame(log10(ave.counts))
 
 p4 <- ggplot(ave.counts, aes(ave.counts))+geom_histogram(binwidth = 0.5)+geom_vline(aes(xintercept=log10(1), color=1))+guides(color = "none")+labs( x = expression(Log[10]~"average count"), y = "frequency")
-
-
-
 sceset.red <- sceset.red[keep, ]
 
 ```
@@ -208,12 +224,7 @@ plot(sizeFactors(sceset.red), sceset.red$total_counts/1e6, log="xy",
 The counts are normalized using log2 transformation using the edgeR::calcNormFactors function.
 ```{r normalization }
 sceset <- normaliseExprs(sceset)
-
-
 sceset.red <- normaliseExprs(sceset.red)
-
-
-
 ```
 
 # Save the normalized and cell filtered datasets
@@ -266,8 +277,7 @@ save(res,file = "data/sceset_hvg_simDataKumar.rda")
 
 
 ```
-
-
+## Generate different plots for the summary
 Plot the proportion of explained variances
 ```{r explained variance} 
 expl_vars <- c( "Group","log10_total_counts", "log10_total_features", 
