@@ -41,11 +41,7 @@ for (j in seq_len(length(res.f1))) {
 }
 print(res.f1)
 
-
-
 save(res.f1, file = paste0("results/run_results/f1_single_",DATASET[h],".rda"))
 }
 
-
 #### Appendix
-
