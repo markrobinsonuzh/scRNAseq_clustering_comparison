@@ -12,14 +12,14 @@ library(dplyr)
 
 source("skript/helper_files/Helper_functions.R")
 
-# define method
+# define method : "pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR","SNNCliq"
 METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR","SNNCliq")
 
 
 # file paths to the clustering results
 DATA_DIR <-  "results"
 
-DATASET <-"koh2016"     # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
+DATASET <- "koh2016"     #  "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" 
 
 files_labels <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_krange_labels_",DATASET,".txt"))%>%as.list()
 names(files_labels) <- METHOD
@@ -41,13 +41,11 @@ names(files_cluster) <- METHOD
 clusters <- vector("list", length(files_cluster))
 names(clusters) <- names(files_cluster) 
 
-
 for (i in names(clusters)) {
   lab_i <-  read.csv(files_cluster[[i]], sep="", check.names = FALSE)
   clusters[[i]] <- as.data.frame(lab_i)
   
 }
-
 
 #### generate object with cluster and files
 clusters$labels <- labels$RtSNEkmeans
