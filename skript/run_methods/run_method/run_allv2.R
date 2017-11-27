@@ -20,11 +20,12 @@ datatype <- "default"
 analyze_cidr(datatype)
 analyze_linnorm(datatype)
 analyze_pcareduce(datatype)
-analyze_raceid(datatype)
 analyze_rtsnekmeans(datatype) #error
-analyze_seurat(datatype)
 analyze_simlrlargescale(datatype)
 analyze_tscan(datatype)
+analyze_raceid(datatype)
+analyze_seurat(datatype)
+
 analyze_sc3(datatype)
 
 
@@ -35,9 +36,10 @@ analyze_linnorm(datatype)
 analyze_pcareduce(datatype)
 analyze_raceid(datatype)
 analyze_rtsnekmeans(datatype) #error
-analyze_seurat(datatype)
 analyze_simlrlargescale(datatype)
 analyze_tscan(datatype)
+analyze_seurat(datatype)
+
 analyze_sc3(datatype)
 
 # on unfiltered
@@ -47,9 +49,10 @@ analyze_linnorm(datatype)
 analyze_pcareduce(datatype)
 analyze_raceid(datatype)
 analyze_rtsnekmeans(datatype) #error
-analyze_seurat(datatype)
 analyze_simlrlargescale(datatype)
 analyze_tscan(datatype)
+analyze_seurat(datatype)
+
 analyze_sc3(datatype)
 
 
