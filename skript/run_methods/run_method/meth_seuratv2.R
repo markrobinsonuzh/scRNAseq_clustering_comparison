@@ -33,9 +33,8 @@ k.param1 <- list(
   simDataKumar=30
 )
 
-k.param1 <- lapply(k.param,round,0)
 
-par.dims.use <-  list(
+par.dims.use1 <-  list(
   kumar2015 = NULL,
   trapnell2014 = NULL,
   zhengmix2016 = NULL,
@@ -45,14 +44,14 @@ par.dims.use <-  list(
 
 #filtered, unfilterd;
 k.param2 <- list(
-  kumar2015 =ncol(data[[1]])* c(0.1),
-  trapnell2014 = ncol(data[[2]])*c(0.1),
-  zhengmix2016 = ncol(data[[3]])*c(0.1),
-  koh2016 = ncol(data[[4]])*c(0.1),
-  simDataKumar=ncol(data[[5]])*c(0.1)
+  kumar2015 =ncol(data[["kumar2015"]])* c(0.1),
+  trapnell2014 = ncol(data[["trapnell2014"]])*c(0.1),
+  zhengmix2016 = ncol(data[["zhengmix2016"]])*c(0.1),
+  koh2016 = ncol(data[["koh2016" ]])*c(0.1),
+  simDataKumar=ncol(data[["simDataKumar"]])*c(0.1)
 )
 
-k.param2<- lapply(k.param,round,0)
+k.param2<- lapply(k.param2,round,0)
 
 par.dims.use2 <-  list(
   kumar2015 = 1:9,
@@ -67,6 +66,7 @@ if ((datatype == "unfiltered" ) | (datatype=="filtered")) {k.param <- k.param2; 
   if ((datatype == "default")) { k.param <- k.param1;  par.dims.use <- par.dims.use1 }
   else {print("datatype not defined") }
 }
+print(k.param)
 # run Seurat
 run_function_seurat(  data, labels, k.param , par.dims.use,  datatype )
 
