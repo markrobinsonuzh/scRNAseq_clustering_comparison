@@ -10,13 +10,15 @@
 source("skript/helper_files/Helper_functions.R")
 # define which method to load
 # methods: "pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "SNNCliq", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm"
-METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLRlargescale",  "cidr" , "Seurat", "tscan","raceid", "linnorm")   
+METHOD <- c("pcaReduce", "RtSNEkmeans", "SIMLRlargescale",  "cidr" ,  "tscan","raceid", "linnorm")   
 
 # file paths to the clustering results, change the path according to the processed datasets
 DATA_DIR <-  "results"
-DATASET <-"simDataKumar" # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar"
-datatype <- "default"
+datatype <- "unfiltered"
+DATASET <-c("kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar")   # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar"
 
 # store .rda objects , per dataset
+for (i in seq_len(length(DATASET)) ) {
+save_cluster_single(  METHOD,DATA_DIR, DATASET[i], datatype )
+}
 
-save_cluster_single(  METHOD,DATA_DIR, DATASET, datatype )
