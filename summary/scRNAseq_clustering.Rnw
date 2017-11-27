@@ -71,9 +71,14 @@ Using log transformation and VST the mean-variance dependence is less extreme ( 
 \begin{figure}[!h]
 \includegraphics[width=7 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/meanvarplots_zhengmix2016.pdf}
 \caption{transformations Zheng 2016.}
-\label{fig:transkoh}
+\label{fig:transzheng}
 \end{figure}
 
+\begin{figure}[!h]
+\includegraphics[width=7 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/meanvarplots_simDataKumar.pdf}
+\caption{transformations simDataKumar.}
+\label{fig:transsim}
+\end{figure}
 
 \section{Filtering and Normalization}
 
@@ -94,6 +99,15 @@ Using log transformation and VST the mean-variance dependence is less extreme ( 
 \caption{Histogramm of Koh 2016. }
 \label{fig:three}
 \end{figure}
+
+
+\begin{figure}[!h]
+\includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/hist_simDataKumar.pdf}
+\caption{Histogramm of simDataKumar. }
+\label{fig:three}
+\end{figure}
+
+
 
 \begin{figure}[!h]
 \includegraphics[width=5 in]{/Users/angeloduo/Desktop/masterarbeit/scRNAseq_clustering_comparison/results/QC_data/comparison_panel.png}
