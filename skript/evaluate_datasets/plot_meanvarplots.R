@@ -1,4 +1,3 @@
-
 #######################################
 # Mean variance plots for all data sets
 #######################################
@@ -9,12 +8,16 @@ source("skript/helper_files/Helper_functions.R")
 library(vsn)
 library(cowplot)
 library(DESeq2)
+library(gridExtra)
+library(DESeq)
+library(cowplot)
+library(scater)
+
 
 
 # file paths, defined in FILES.R
 
-source("FILES.R")
-
+source("FILESraw.R")
 
 # load data sets
 
@@ -29,60 +32,45 @@ for (i in 1:length(data)){
   
 }
 
-########## which dataset?
-#data <- data[[3]]
+# rlog
 
-#name <- "xue2013"
-# vst function adapted from https://seqqc.wordpress.com/2015/02/16/should-you-transform-rna-seq-data-log-vst-voom/
-vst <- function(countdata){
-  require(DESeq)
-  countdata <- newCountDataSet((round(count_lstpm,0)), conditions = array(1,dim = ncol(count_lstpm)))
-  countdata <- estimateSizeFactors( countdata)
-  cdsBlind <- DESeq::estimateDispersions( countdata, method="blind")
-  vstdata <- varianceStabilizingTransformation( cdsBlind )
-  return(exprs(vstdata))
-}
+#rld <- rlog((round(count_lstpm,0)), blind=TRUE) # takes too much time
 
-######## define function to transform and plot
-meansd_plot <- function(data, name, rank ){
-########### try different transformations
-data <- data[[1]]
-
-count_lstpm <- ( as.matrix(get_exprs(data, "counts")) ) # no trnasformation
+###### define funcion  meansd_plot for transformation and plotting of count data
+meansd_plot <- function(data, ranks,cofactor ){
+# compute transformations
+count_lstpm <- ( as.matrix(assay(data, "counts")) ) # extract count data
+# log and asin transformaations
 count_lstpm.log <- log2(count_lstpm +1)  # log2
-count_lstpm.asinh <- asinh(count_lstpm)
-count.integer <- (round(count_lstpm,0))
+cofactor <- cofactor
+count_lstpm.asinh <- asinh(sqrt(count_lstpm/cofactor) )# arc sin
+# vst transform
+countdata <- newCountDataSet((round(count_lstpm,0)), conditions = array(1,dim = ncol(count_lstpm)))
+countdata <- estimateSizeFactors( countdata)
+cdsBlind <- DESeq::estimateDispersions( countdata, method="blind")
+vstdata <- varianceStabilizingTransformation( cdsBlind )
+count_lstpm.vst <- exprs(vstdata)
 
-count_lstpm.vst <- vst( count_lstpm) ## for counts, as it is tpm on count scale necessary to change to integer
-#count_lstpm.norm <- as.matrix(exprs(data)) # standart from scater, is log2
+# plot it
+msd.non <- meanSdPlot(count_lstpm, plot = FALSE, ranks = ranks)
+msd.log <- meanSdPlot(count_lstpm.log, plot = FALSE, ranks = ranks)
+msd.asin <- meanSdPlot(count_lstpm.asinh, plot = FALSE, ranks = ranks)
+msd.vst <- meanSdPlot(count_lstpm.vst , plot = FALSE, ranks = ranks)
+# in grid
 
-#### have a look on the data
-count_lstpm[1:3,1:3]
-count_lstpm.log[1:3,1:3]
-count_lstpm.asinh[1:3,1:3]
-count_lstpm.vst[1:3,1:3]
-########## mean var plots
-########### plot
-FILE_NAME<- paste0("results/QC_data/meanvarplots_", name,".pdf")
-pdf(FILE_NAME)
-
-par(mfrow=c(2,4))
-meansdplot(data=count_lstpm, title = "count_lstpm" ,ylim=c(0,2000), rank=TRUE)
-meansdplot(count_lstpm.log, title="count_lstpm.log2", rank=TRUE )
-meansdplot(data=count_lstpm.asinh, title = "count_lstpm.asinh" ,ylim=c(0,5), rank=TRUE)
-meansdplot(data=count_lstpm.vst, title = "count_lstpm.vst" ,ylim=c(0,5), rank=TRUE)
-
-dev.off()
+grid.arrange( msd.non$gg+ggtitle("untransformed"), msd.log$gg+ggtitle("log transformed"), msd.asin$gg+ggtitle(paste0("arcussin cofactor=", cofactor)), msd.vst$gg+ggtitle("vst"),ncol=2)
 
 }
 
-#### use the function, plot with and without rank
-for (i in names(data)){
-meansd_plot(data=data[[i]],rank = TRUE,name= paste0("rank",names(data)[i]))
-}
-## try http:// if https:// URLs are not suppo
-for (i in names(data)){
-meansd_plot(data=data[[i]],rank = FALSE,name= paste0("mean",names(data)[i]))
+## plot all data sets
+for (i in seq_len(length(data))){
+  
+  FILE_NAME<- paste0("results/QC_data/meanvarplots_", names(data)[i],".pdf")
+  pdf(FILE_NAME)
+  meansd_plot(data=data[[i]],ranks= FALSE,cofactor=1)
+  dev.off()
 }
 
-## varaince stabilizing transformation
+# Appendix
+###### define vst function,adapted from DEseq2, from DEseq vignette, vignette("DESeq2")
+
