@@ -19,13 +19,15 @@ DATA_DIR <-  "results/run_results"
 
 
 ## read in cluster results from Rdata files
+# which dataset
+datatype <- "unfiltered"
 # files directories per dataset
 files_ari <- list(
-  kumar2015 = file.path(DATA_DIR, "ari_single_unfiltered_kumar2015.rda"),
-  trapnell2014 = file.path(DATA_DIR, "ari_single_unfiltered_trapnell2014.rda"),
-  koh2016 = file.path(DATA_DIR, "ari_single_unfiltered_koh2016.rda"),
-  zhengmix = file.path(DATA_DIR, "ari_single_unfiltered_zhengmix2016.rda"),
-  simDataKumar = file.path(DATA_DIR, "ari_single_unfiltered_simDataKumar.rda")
+  kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_kumar2015.rda") ),
+  trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_trapnell2014.rda") ),
+  koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_koh2016.rda")),
+  zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype,"_zhengmix2016.rda")),
+  simDataKumar = file.path(DATA_DIR,paste0("ari_single_",datatype,"_simDataKumar.rda"))
 )
 tmp<- list(
   kumar2015 = NULL,
@@ -56,7 +58,7 @@ tmp<- list(
          display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
          cluster_rows = FALSE, cluster_cols = FALSE, cellwidth=30, cellheight = 30,
          main = "ARI scores", 
-         number_format="%.2f", filename=paste0("results/plots/plot_ari_unfiltered.pdf"))
+         number_format="%.2f", filename=paste0("results/plots/plot_ari_",datatype,".pdf"))
   
 
 # Appendix
