@@ -16,23 +16,24 @@ library(RColorBrewer)
 
 ## define the data directories
 DATA_DIR <-  "results/run_results"
-
+datatype1 <- "filtered"
+datatype2 <- "default"
 
 ## read in cluster results from Rdata files
 # files directories per dataset
-files_ari_filtered <- list(
-  kumar2015 = file.path(DATA_DIR, "ari_single_kumar2015.rda"),
-  trapnell2014 = file.path(DATA_DIR, "ari_single_trapnell2014.rda"),
-  koh2016 = file.path(DATA_DIR, "ari_single_koh2016.rda"),
-  zhengmix = file.path(DATA_DIR, "ari_single_zhengmix2016.rda"),
-  simDataKumar = file.path(DATA_DIR, "ari_single_simDataKumar.rda")
+files_ari_datatype1 <- list(
+  kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_kumar2015.rda") ),
+  trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_trapnell2014.rda") ),
+  koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_koh2016.rda") ),
+  zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_zhengmix2016.rda") ),
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_simDataKumar.rda"))
 )
-files_ari_unfiltered <- list(
-  kumar2015 = file.path(DATA_DIR, "ari_single_unfiltered_kumar2015.rda"),
-  trapnell2014 = file.path(DATA_DIR, "ari_single_unfiltered_trapnell2014.rda"),
-  koh2016 = file.path(DATA_DIR, "ari_single_unfiltered_koh2016.rda"),
-  zhengmix = file.path(DATA_DIR, "ari_single_unfiltered_zhengmix2016.rda"),
-  simDataKumar = file.path(DATA_DIR, "ari_single_unfiltered_simDataKumar.rda")
+files_ari_datatype2 <- list(
+  kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_kumar2015.rda") ),
+  trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_trapnell2014.rda") ),
+  koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_koh2016.rda") ),
+  zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_zhengmix2016.rda") ),
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_simDataKumar.rda"))
 )
 
 #_______________________________________________________________________
@@ -69,23 +70,23 @@ ari2matrix <- function(files.ari) {
 #_______________________________________________________________________
 
 # convert results
-ari.filtered <- ari2matrix(files_ari_filtered )
-ari.unfiltered <- ari2matrix(files_ari_unfiltered )
+ari.datatype1 <- ari2matrix(files_ari_datatype1 )
+ari.datatype2 <- ari2matrix(files_ari_datatype2 )
 # subset methods
-match <- intersect( colnames(ari.filtered), colnames(ari.unfiltered) )
+match <- intersect( colnames(ari.datatype2), colnames(ari.datatype2 ) )
 
-ari.filter.sub <- ari.filtered[, match ] 
-ari.unfilter.sub <- ari.unfiltered[, match]
+ari.datatype1.sub <- ari.datatype1[, match ] 
+ari.datatype2.sub <- ari.datatype2 [, match]
 # differences
-ari.diff <- ari.filter.sub - ari.unfilter.sub
+ari.diff <- ari.datatype1.sub  - ari.datatype2.sub
 
 
 ## plot pheatmap
 pheatmap( ari.diff , color = colorRampPalette(brewer.pal(3, "RdYlGn"))(10),
           display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
           cluster_rows = FALSE, cluster_cols = FALSE, cellwidth=30, cellheight = 30,
-          main = "difference ARI by filtered vs. unfiltered", 
-          number_format="%.2f", filename=paste0("results/plots/plot_ari_diff_filterd_unfilterd.pdf"))
+          main = paste0("difference ARI: ",datatype1," vs. ",datatype2 ), 
+          number_format="%.2f", filename=paste0("results/plots/plot_ari_diff_",datatype1,"_",datatype2,".pdf") )
 
 
 # Appendix
