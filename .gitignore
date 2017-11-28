@@ -13,3 +13,6 @@ dendrosplit
 method_resources/
 plot_ari_krange.pdf
 summary/
+countsim_report_ggplots.rds
+countsim_report.html
+res.full.tsne
