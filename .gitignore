@@ -16,3 +16,4 @@ summary/
 countsim_report_ggplots.rds
 countsim_report.html
 res.full.tsne
+method_resources/
