@@ -26,17 +26,18 @@ labels <- load_labels(data)
 # the number of PC dim to use was determined by an elbow plot and by the jackstraw function
 
 k.param <- list(
-    kumar2015 =ncol(data[["kumar2015"]])* c(0.01,0.05,0.1,0.15,0.2),
-    trapnell2014 = ncol(data[["trapnell2014"]])*c(0.01,0.05,0.1,0.15,0.2),
-    zhengmix2016 = ncol(data[["zhengmix2016"]])*c(0.01,0.05,0.1,0.15,0.2),
-    koh2016 = ncol(data[["koh2016"]])*c(0.01,0.05,0.1,0.15,0.2)
+    kumar2015 =ncol(data[["kumar2015"]])* c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+    trapnell2014 = ncol(data[["trapnell2014"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+    zhengmix2016 = ncol(data[["zhengmix2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+    koh2016 = ncol(data[["koh2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+    simDataKumar =ncol(data[["simDataKumar"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4)
   )
 par.dims.use <-  list(
   kumar2015 = 1:5,
   trapnell2014 = 1:12,
-  zhengmix2016 = 1:10,
-  koh2016 = 1:15
-  simDataKumar =
+  zhengmix2016 = 1:15,
+  koh2016 = 1:15,
+  simDataKumar =1:15
 )
 #Seurat function
 run_seurat <- function( data, par.resolution, par.dims.use ) {
@@ -90,20 +91,20 @@ res.cluster <-  run_seurat( data,  k.param, par.dims.use )
 
 # save clusters
 
-dir_cluster <- paste0("results/Seurat/seurat_krange_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/filtered/Seurat/seurat_krange_clus_", names(res.cluster), ".txt")
 save_clusters(res.cluster,dir_cluster)
 
 # save systemtime
 
-dir_systime <-  paste0("results/Seurat/seurat_krange_systime_",names(sys.time),".txt")
+dir_systime <-  paste0("results/filtered/Seurat/seurat_krange_systime_",names(res.cluster),".txt")
 
 save_systemtime(sys.time, dir_systime)
 
 
 # save experiment labels
 
-file_names <-  paste0("results/Seurat/seurat_krange_labels_",names(sys.time), ".txt")
-for (i in 1:length(sys.time)){
+file_names <-  paste0("results/filtered/Seurat/seurat_krange_labels_",names(res.cluster), ".txt")
+for (i in 1:length(res.cluster)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
   
@@ -111,7 +112,7 @@ for (i in 1:length(sys.time)){
 
 
 ###### Save Session Info
-sink(file = "results/Seurat/session_info_Seurat_krange.txt")
+sink(file = "results/filtered/Seurat/session_info_Seurat_krange.txt")
 sessionInfo()
 sink()
 

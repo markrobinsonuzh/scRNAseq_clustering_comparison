@@ -43,7 +43,7 @@ for (i in names(data)){
 
 # load cell labels
 for(i in names(data)) {
-  labels[[i]] <- as.character(phenoData(data[[i]])@data$phenoid)
+  labels[[i]] <- as.character(colData(data[[i]])$phenoid)
 }
 
 # create store files
@@ -60,7 +60,8 @@ par.nbt <- list(
   kumar2015 = 50,
   trapnell2014 = 50,
   zhengmix2016 = 50,
-  koh2016 = 50
+  koh2016 = 50,
+  simDataKumar =50
   
 )
 
@@ -68,13 +69,17 @@ par.q <- list(
   kumar2015 = 30,
   trapnell2014 = 30,
   zhengmix2016 = 30,
-  koh2016 = 30
+  koh2016 = 30,
+  simDataKumar =30
+  
 )
 n.cluster <- list(
   kumar2015=3,
   trapnell2014=3,
   zhengmix2016=4,
-  koh2016 = 10
+  koh2016 = 10,
+  simDataKumar =4
+  
 )
 # extract k dimension,  
 # run pce Reduce, vary q
@@ -101,11 +106,6 @@ res.cluster <- run_pcareduce(input_matrix,par.nbt, par.q, n.cluster)
 
 dir_cluster <- paste0("results/filtered/PCAreduce/PCAreduce_krange_clus_", names(res.cluster), ".txt")
 save_clusters(res.cluster,dir_cluster)
-
-# save systemtime
-
-dir_systime <-  paste0("results/filtered/PCAreduce/PCAreduce_krange_systime_",names(sys.time),".txt")
-save_systemtime(sys.time, dir_systime)
 
 
 # save experiment labels

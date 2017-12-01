@@ -92,15 +92,8 @@ res.cluster <- run_cidr(tinput_matrix, par.k )
 # save clusters
 
 dir_cluster <- paste0( "results/filtered/cidr/cidr_krange_clus_", names(res.cluster), ".txt" )
-
-
 save_clusters(res.cluster,dir_cluster)
 
-# save systemtime
-
-dir_systime <-  paste0( "results/filtered/cidr/cidr_krange_systime_",names(sys.time),".txt" )
-
-save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 

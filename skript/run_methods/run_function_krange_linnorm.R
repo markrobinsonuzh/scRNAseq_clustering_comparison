@@ -58,7 +58,7 @@ run_lindworm <- function(data, par.num_center, par.minNonZeroPortion){
   list->sys.time->transformedExp->res.cluster 
   # run function
   for (i in names(data)){
-    
+    print(i)
     transformedExp[[i]] <- Linnorm(counts(data[[i]]), spikein=NULL, minNonZeroPortion = par.minNonZeroPortion[[i]])
     df.clus <- matrix( nrow = ncol( transformedExp[[i]] ), ncol=length(par.num_center[[i]]) ) 
     for ( j in seq_len(length(par.num_center[[i]])) ){
@@ -76,20 +76,14 @@ res.cluster <- run_lindworm( data, par.num_center, par.minNonZeroPortion )
 
 
 # save clusters
-dir_cluster <- paste0("results/filtered/linnorm_krange_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/filtered/linnorm/linnorm_krange_clus_", names(res.cluster), ".txt")
 
 
 save_clusters(res.cluster,dir_cluster)
 
-# save systemtime
-
-dir_systime <-  paste0("results/filtered/linnorm_krange_systime_",names(sys.time),".txt")
-
-save_systemtime(sys.time, dir_systime)
-
 # save experiment labels
 
-file_names <-  paste0("results/filtered/linnorm_krange_labels_",names(labels), ".txt")
+file_names <-  paste0("results/filtered/linnorm/linnorm_krange_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
@@ -97,7 +91,7 @@ for (i in 1:length(labels)){
 
 
 ###### Save Session Info
-sink(file = "results/filtered/session_info_krange_linnorm.txt")
+sink(file = "results/filtered/linnorm/session_info_krange_linnorm.txt")
 sessionInfo()
 sink()
 
