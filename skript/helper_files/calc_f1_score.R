@@ -15,7 +15,7 @@
 # (for both arguments: length = number of cells; names = cluster labels (integers))
 
 calc_f1_score <- function(labels,cluster){
-  {
+  
     require(clue)
     #act and prd must be integers
     stopifnot(is.integer(labels))
@@ -23,6 +23,8 @@ calc_f1_score <- function(labels,cluster){
     
     # create table with labels in rows and cluster in column
     tbl <- table(cluster=cluster, label=labels)
+    print(names(labels))
+    n.cluster <- rowSums(tbl, na.rm = TRUE)
     # add additional column with maximum values from tbl if number of column <= number of rows
     add_column <- function(tbl){
       ifelse(ncol(tbl) >= nrow(tbl), tbl <- tbl, tbl <- cbind(tbl,"x"= array(max(tbl), dim=nrow(tbl))) )
@@ -43,7 +45,9 @@ calc_f1_score <- function(labels,cluster){
       df$tp[i] <- sum( labels==df$labels[i] & cluster==df$cluster[i] )
       df$fp[i] <- sum( labels==df$labels[i] & cluster!=df$cluster[i] )
       df$fn[i] <- sum( labels!=df$labels[i] & cluster==df$cluster[i] )
-      df$f1[i] <- with(df, (2*tp[i])/(2*tp[i]+fp[i]+fn[i]))  }
-  }
+      df$f1[i] <- with(df, (2*tp[i])/(2*tp[i]+fp[i]+fn[i]))  
+      df$n.cluster <- n.cluster
+    }
+   
   return(df)
 }
