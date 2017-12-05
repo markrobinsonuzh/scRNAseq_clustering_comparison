@@ -5,7 +5,7 @@
 # These similiraties are then used for a RtSNE step to represent the data in lower dimension space and clustering using kmeans. 
 # Parameterrs given by the user are the number of cluster c to be estimated over the expression matrix. 
 
-analyze_simlrlargescale <- function( datatype ){ 
+analyze_simlrlargescale <- function( datatype, dataset ){ 
   
   set.seed(1234)
   
@@ -33,7 +33,7 @@ analyze_simlrlargescale <- function( datatype ){
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
-    koh2016 = 10,
+    koh2016 = 9,
     simDataKumar = 4
   )
  
@@ -45,7 +45,7 @@ analyze_simlrlargescale <- function( datatype ){
   stopifnot( names(par.c) == names(data) )
   # RUN SIMLR
   
-  run_function_simlr(data,labels, par.c, datatype )
+  run_function_simlr(data[paste0(dataset)],labels[paste0(dataset)], par.c[paste0(dataset)], datatype )
   
 
 }

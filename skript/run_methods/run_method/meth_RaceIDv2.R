@@ -3,7 +3,7 @@
 #####################
 # RaceID is an algorithm for the identification of rare and abundant cell types from single cell transcriptome data. 
 # The method is based on transcript counts obtained with unique molecular identifies.
-analyze_raceid <- function(dataype) {
+analyze_raceid <- function(dataype, dataset) {
   
   source("skript/helper_files/Helper_functions.R")
   # source method raceid
@@ -65,7 +65,7 @@ analyze_raceid <- function(dataype) {
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016=4,
-    koh2016 = 10,
+    koh2016 = 9,
     simDataKumar=4
   )
   # which parameter set
@@ -80,9 +80,7 @@ analyze_raceid <- function(dataype) {
   stopifnot( names(do.gap ) == names(data) )
   
   # run RACEID
-  run_function_raceid( data=data, labels=labels, datatype=datatype ,par.mintotal=par.mintotal, par.maxexpr=par.maxexpr,do.gap=do.gap,cln=par.cln) 
-  
-  
+  run_function_raceid( data=data[paste0(dataset)], labels=labels[paste0(dataset)], datatype=datatype ,par.mintotal=par.mintotal[paste0(dataset)], par.maxexpr=par.maxexpr[paste0(dataset)],do.gap=do.gap[paste0(dataset)],cln=par.cln[paste0(dataset)]) 
 }
 
 ### Appendix

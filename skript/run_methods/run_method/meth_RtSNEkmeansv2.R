@@ -10,9 +10,9 @@
 # Variables:  datatype: which analysis; default , filtered, unfiltered
 
 
-analyze_rtsnekmeans <- function( datatype, rand.seed = 1234){ 
+analyze_rtsnekmeans <- function( datatype, dataype){ 
   # set random seed
-  rand.seed = rand.seed
+  rand.seed = 1234
   
   # source method rtsnekmeans and helpers
   source("skript/run_methods/run_functions/run_function_rtsnekmeans.R") 
@@ -34,7 +34,7 @@ analyze_rtsnekmeans <- function( datatype, rand.seed = 1234){
   kumar2015 = 3,
   trapnell2014 = 3,
   zhengmix2016 = 4,
-  koh2016= 10,
+  koh2016= 9,
   simDataKumar=4
   )
   # define the perplexity parameter  and the number of dimension from PCA for tSNE, 
@@ -56,11 +56,11 @@ analyze_rtsnekmeans <- function( datatype, rand.seed = 1234){
   )
   # filtered , unfiltered
   par.perp.2<- list(
-    kumar2015 = 20,
-    trapnell2014 = 20,
-    zhengmix2016 = 20,
-    koh2016 = 20,
-    simDataKumar=20
+    kumar2015 = 30,
+    trapnell2014 = 30,
+    zhengmix2016 = 30,
+    koh2016 = 30,
+    simDataKumar=30
   )
   par.initial_dims.2 <- list(
     kumar2015 = 20,
@@ -86,6 +86,6 @@ if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.perp <- par.perp
 
   
   # Run tSNE and kmeans
-  run_function_rtsnekmeans(  data, labels, par.k, par.perp, par.initial_dims,datatype )
+  run_function_rtsnekmeans(  data[paste0(dataset)], labels[paste0(dataset)], par.k[paste0(dataset)], par.perp[paste0(dataset)], par.initial_dims[paste0(dataset)],datatype )
   
 }
