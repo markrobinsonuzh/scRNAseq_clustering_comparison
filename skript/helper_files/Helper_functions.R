@@ -251,9 +251,43 @@ save_cluster_single2 <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
   clusters <- vector("list", length(files_cluster))
   names(clusters) <- names(files_cluster) 
   clusters <- lapply( files_cluster,function(x){read_file(x) %>% unlist%>% as.vector} )
+  # add labels
+  clusters$labels <-  labels$RtSNEkmeans
   
   # save the clusters as a rda file 
   save(clusters,file = paste0("results/run_results/cluster_single_",datatype,"_",DATASET,".rda"))
+  
+}
+
+######## save the clusters from the krange run into a .rda file with exception handling
+# input: METHOD = method names as chracter vector, DATA_DIR = data dir chracter vector, DATASET = data set as character vector, datatype = type of dataset/analysis
+# output: saved .rda file with the methods and dataset defined by input variables
+
+save_cluster_krange <-  function( METHOD, DATA_DIR, DATASET, datatype  ){
+  require(plyr)
+  require(dplyr)
+  ## load the labels
+  files_labels <- file.path(DATA_DIR,datatype, METHOD,paste0(METHOD,"_krange_labels_",DATASET,".txt"))%>%as.list()
+  # assign names
+  names(files_labels) <- METHOD
+  # load the .csv files
+  labels <- vector("list", length(files_labels))
+  names(labels) <- names(files_labels) 
+  
+  labels <- lapply( files_labels,function(x){read_file(x) %>% unlist%>% as.vector} )
+  ## read in cluster results
+  
+  files_cluster <- file.path(DATA_DIR,datatype , METHOD,paste0(METHOD,"_krange_clus_",DATASET,".txt"))%>%as.list() # file path
+  names(files_cluster) <- METHOD # gives names
+  
+  clusters <- vector("list", length(files_cluster))
+  names(clusters) <- names(files_cluster) 
+  clusters <- lapply( files_cluster,function(x){read_file(x) %>% unlist%>% as.vector} )
+  # add labels
+  clusters$labels <-  labels$RtSNEkmeans
+  
+  # save the clusters as a rda file 
+  save(clusters,file = paste0("results/run_results/cluster_krange_",datatype,"_",DATASET,".rda"))
   
 }
 # read .csv files with exception handling
