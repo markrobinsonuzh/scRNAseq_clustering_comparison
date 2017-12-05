@@ -14,7 +14,7 @@ source("skript/helper_files/Helper_functions.R")
 # load data files, define which dataset to work with
 DATASET <-   c("koh2016", "kumar2015", "trapnell2014", "zhengmix2016", "simDataKumar")
 # which datatype
-datatype <-  "default"
+datatype <-  "filtered"
 
 # 
 ########

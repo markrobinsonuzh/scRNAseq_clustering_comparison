@@ -8,7 +8,7 @@ library(dplyr)
 library(mclust)
 # load data files
 DATASET <- c("koh2016", "kumar2015",  "trapnell2014","zhengmix2016", "simDataKumar")
-datatype<-  "default"
+datatype<-  "unfiltered"
 
 for (h in seq_len(length(DATASET)) ) {
   
@@ -21,7 +21,6 @@ for (h in seq_len(length(DATASET)) ) {
   clusters$labels <- clusters$labels%>%as.factor
   
   # create lookupfile
-  #look <- lapply(clusters$labels, function(x) levels(x) <- c(1:length(levels(x))) )
   levels(clusters$labels) <- c(1:length(levels(clusters$labels)))
   clusters$labels <- as.integer(clusters$labels)%>%as.data.frame
   ### calculate ARI scores
