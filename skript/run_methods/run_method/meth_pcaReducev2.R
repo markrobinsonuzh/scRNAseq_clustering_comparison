@@ -15,7 +15,7 @@
 
 
 
-analyze_pcareduce <- function( datatype){ 
+analyze_pcareduce <- function( datatype, dataset){ 
   
   source("skript/helper_files/Helper_functions.R")
   # source method pcaReduce
@@ -53,7 +53,7 @@ analyze_pcareduce <- function( datatype){
     kumar2015=3,
     trapnell2014=3,
     zhengmix2016=4,
-    koh2016 = 10,
+    koh2016 = 9,
     simDataKumar=4
   )
   
@@ -63,11 +63,9 @@ analyze_pcareduce <- function( datatype){
   # check data files and parameters
   stopifnot( names(files) == names(data) )
   stopifnot( names(par.nbt) == names(data) )
-  
-  
-  
+
   # RUN pcaReduce
-  run_function_pcareduce( data, labels, par.nbt, par.q , n.cluster , datatype )
+  run_function_pcareduce( data[paste0(dataset)], labels[paste0(dataset)], par.nbt[paste0(dataset)], par.q[paste0(dataset)] , n.cluster[paste0(dataset)] , datatype )
 
 }
 

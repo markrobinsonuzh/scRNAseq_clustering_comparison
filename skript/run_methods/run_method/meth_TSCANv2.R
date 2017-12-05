@@ -11,7 +11,7 @@
 
 
 
-analyze_tscan <- function( datatype){ 
+analyze_tscan <- function( datatype, dataset){ 
   
 source("skript/helper_files/Helper_functions.R")
 
@@ -38,8 +38,8 @@ par.minexpr_percent1 <- list(
   kumar2015 = 0.5,
   trapnell2014 = 0.5,
   zhengmix2016 = 0.1,
-  koh2016 = 0.1,
-  simDataKumar = 0.1
+  koh2016 = 0.5,
+  simDataKumar = 0.5
 )
 
 par.clusternum1 <- list(
@@ -54,8 +54,8 @@ par.minexpr_percent2 <- list(
   kumar2015 = 0.5,
   trapnell2014 = 0.5,
   zhengmix2016 = 0.1,
-  koh2016 = 0.1,
-  simDataKumar = 0.1
+  koh2016 = 0.5,
+  simDataKumar = 0.5
 )
 
 par.clusternum2 <- list(
@@ -82,5 +82,5 @@ stopifnot( names(files) == names(data) )
 stopifnot( names(par.clusternum) == names(data) )
 
 # RUN TSCAN
-run_function_tscan( data, labels,  par.minexpr_percent  , par.clusternum = par.clusternum  , datatype )
+run_function_tscan( data[paste0(dataset)], labels[paste0(dataset)],  par.minexpr_percent[paste0(dataset)]  , par.clusternum = par.clusternum[paste0(dataset)]  , datatype )
 }

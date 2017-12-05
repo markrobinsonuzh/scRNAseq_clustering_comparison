@@ -6,7 +6,7 @@
 
 
 
-analyze_linnorm <- function(dataype) {
+analyze_linnorm <- function(dataype, dataset) {
   # source method linnomr
   source("skript/run_methods/run_functions/run_function_linnorm.R")
   # source helper
@@ -31,40 +31,55 @@ analyze_linnorm <- function(dataype) {
   par.minNonZeroPortion <- list(
     kumar2015 = 0.75,
     trapnell2014 =  0.75,
-    zhengmix2016 =  0.25,
+    zhengmix2016 =  0.1,
     koh2016 =  0.75,
     simDataKumar=0.75
   )
+
   # default:
   par.num_center1 <- list(
-    kumar2015 = 1:5,
-    trapnell2014 =  1:5,
-    zhengmix2016 = 1:5,
-    koh2016 = 1:12,
-    simDataKumar=1:5
+    kumar2015 = c(1:20),
+    trapnell2014 =  c(1:20),
+    zhengmix2016 = c(1:20),
+    koh2016 = c(1:20),
+    simDataKumar=c(1:20)
   )
+  par.BE_strength1 <- list(
+    kumar2015 = 0.5,
+    trapnell2014 =  0.5,
+    zhengmix2016 = 0.5,
+    koh2016 = 0.5,
+    simDataKumar=0.5
+  )
+
   # filtered , unfiltered:
   par.num_center2 <- list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016=4,
-    koh2016 = 10,
+    koh2016 =9,
     simDataKumar=4
   )
+  par.BE_strength2 <- list(
+    kumar2015 = 0.75,
+    trapnell2014 =  0.75,
+    zhengmix2016 = 0.75,
+    koh2016 = 0.75,
+    simDataKumar=0.1
+  )
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.num_center <- par.num_center2
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.num_center <- par.num_center2; par.BE_strength <- par.BE_strength2
   } else {
-    if ((datatype == "default")) { par.num_center <- par.num_center1 }
+    if ((datatype == "default")) { par.num_center <- par.num_center1 ; par.BE_strength <- par.BE_strength1}
     else {print("datatype not defined") }
   }
   print(par.num_center)
   # check data files and parameters
   stopifnot( names(files) == names(data) )
   stopifnot( names(par.num_center) == names(data) )
-  
+
   
   # RUN cidr
-  run_function_linnorm(data, labels, datatype , par.minNonZeroPortion, par.num_center)
-  
+  run_function_linnorm(data[paste0(dataset)], labels[paste0(dataset)],  par.minNonZeroPortion[paste0(dataset)], par.num_center[paste0(dataset)],par.BE_strength[paste0(dataset)], datatype)
   
 }

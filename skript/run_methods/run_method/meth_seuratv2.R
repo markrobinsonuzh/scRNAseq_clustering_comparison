@@ -2,7 +2,7 @@
 # Seurat
 #####################
 
-analyze_seurat <- function(dataype){
+analyze_seurat <- function(dataype, dataset){
   
 source("skript/helper_files/Helper_functions.R")
 # source method CIDR
@@ -68,6 +68,6 @@ if ((datatype == "unfiltered" ) | (datatype=="filtered")) {k.param <- k.param2; 
 }
 print(k.param)
 # run Seurat
-run_function_seurat(  data, labels, k.param , par.dims.use,  datatype )
+run_function_seurat(  data[paste0(dataset)], labels[paste0(dataset)], k.param[paste0(dataset)] , par.dims.use[paste0(dataset)],  datatype )
 
 }
