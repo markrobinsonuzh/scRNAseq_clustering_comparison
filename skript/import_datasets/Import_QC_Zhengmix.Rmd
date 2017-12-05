@@ -285,7 +285,7 @@ p6 <- plotTSNE(scset.red, exprs_values="normcounts", perplexity=5, colour_by="to
 ```{r create QC plots} 
 
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2, labels="auto")
 
 save_plot("results/QC_data/qc_summary_zheng.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns

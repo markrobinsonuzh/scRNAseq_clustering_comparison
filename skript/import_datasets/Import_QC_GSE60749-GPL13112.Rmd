@@ -253,7 +253,7 @@ save(res,file = "data/sceset_red_GSE60749-GPL13112.rda")
 
 # Identifying HVGs from the normalized log-expression
 
-```{r High variable genes }
+```{r High variable genes, eval=FALSE }
 
 var.fit <- trendVar(sceset.red, trend="loess", use.spikes=FALSE, span=0.2) 
 var.out <- decomposeVar(sceset.red, var.fit)
@@ -262,7 +262,7 @@ var.out <- decomposeVar(sceset.red, var.fit)
 ```
 
 
-```{r High variable genes using the variance of the log-expression }
+```{r High variable genes using the variance of the log-expression, eval=FALSE }
 
 plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression",
     ylab="Variance of log-expression")
@@ -280,7 +280,7 @@ plotExpression(sceset.red, rownames(hvg.out)[1:10])
 
 ```
 # select only high variable genes and save sceset
-```{r}
+```{r, eval=FALSE}
 
 sceset.hvg <-sceset.red[ rownames(hvg.out), ]
 dim(sceset.hvg)
@@ -311,7 +311,7 @@ Plot a summary of the QC
 ```{r create QC plots} 
 
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2)
+plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2, labels="auto")
 
 save_plot("results/QC_data/qc_summary_kumar.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns
@@ -321,7 +321,15 @@ save_plot("results/QC_data/qc_summary_kumar.png", plot.qc,
 
 ```
 
+```{r some more QC plots} 
+p1 <- plotQC(sceset, type = "expl")
+p2 <- plotQC(sceset, type = "expl", method = "pairs", theme_size = 6)
+p3 <- plotQC(sceset, type = "find-pcs", variable = "total_features",
+        plot_type = "pcs-vs-vars")
+p4 <- plotQC(sceset, type = "find-pcs", variable = "total_features",
+       plot_type = "pairs-pcs")
 
+```
 
 ```{r plot tSNE} 
 set.seed(1234)
@@ -338,7 +346,7 @@ dev.off()
 
 
 
-```{r remove  batch effects}
+```{r remove  batch effects, eval=FALSE}
 
 require(limma)
 
