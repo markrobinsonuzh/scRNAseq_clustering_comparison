@@ -4,7 +4,7 @@
 #####################
 # RaceID is an algorithm for the identification of rare and abundant cell types from single cell transcriptome data. 
 # The method is based on transcript counts obtained with unique molecular identifies.
-
+# load libraries
 require(tsne)
 require(pheatmap)
 require(MASS)
@@ -41,60 +41,70 @@ labels <- load_labels(data)
 
 
 # RUN RaceID
-# set the maxexpr parameter for UMI count data. discarding genes with at least maxexpr transcripts in at least a single cell after normalization or downsampling.
+par.mintotal <- list(
+  kumar2015 = 3000,
+  trapnell2014 = 3000,
+  zhengmix2016 = 200,
+  koh2016 = 3000,
+  simDataKumar=3000
+)
 par.maxexpr <-  list(
   kumar2015 = Inf,
   trapnell2014 = Inf,
-  zhengmix2016 = 500,
-  koh2016 = Inf
+  zhengmix2016 = Inf,
+  koh2016 = Inf,
+  simDataKumar=Inf
 )
 
-# define the minimum percentage of highly expressed cells (expression value bigger than minexpr_value) for the genes/features to be retained.
-# Set a lower cutoff for the zhengmix data
-par.minexpr_percent <- list(
-  kumar2015 = 0.75,
-  trapnell2014 = 0.75,
-  zhengmix2016 = 0.1,
-  koh2016 = 0.75
+
+# define the number of cluster for kmeans clustering 
+par.k <- list(
+  kumar2015 = c(2:10),
+  trapnell2014 = c(2:10),
+  zhengmix2016=c(2:10),
+  koh2016 = c(2:15),
+  simDataKumar=c(2:10)
 )
 
-run_raceid <-  function(data,par.maxexpr,par.minexpr_percent){
+
+run_raceid <-  function(data,par.k,par.maxexpr,par.minexpr_percent){
 # create store vectors
 list<- vector("list", length(files))
 names(list) <- names(files)
-list->sys.time->sc->res.cluster 
+list->sc->res.cluster 
 for (i in names(data)){
   
     sc[[i]] <- SCseq(as.data.frame(counts(data[[i]]))) # extract the expression data
-    sc[[i]] <- filterdata(sc[[i]], mintotal = 3000, minexpr = 5, 
+    sc[[i]] <- filterdata(sc[[i]], mintotal = par.mintotal[[i]], minexpr = 5, 
                           minnumber = 1, maxexpr = par.maxexpr[[i]] , downsample = FALSE, dsn = 1, rseed = 1234)
+    df.clus <- matrix( nrow = ncol(data[[i]]), ncol = length(par.k[[i]]) ) 
     
-    res.cluster[[i]]<- clustexp(sc[[i]], metric="pearson", cln=0, do.gap=TRUE, clustnr=20, B.gap=50, SE.method="Tibs2001SEmax", 
+    for ( j in seq_len(length(par.k[[i]])) ) {
+      df.clus[,j]<- clustexp(sc[[i]], metric="pearson", cln=par.k[[i]][j], do.gap=FALSE, clustnr=20, B.gap=50, SE.method="Tibs2001SEmax", 
                                 SE.factor=.25, bootnr=50, rseed=1234)@kmeans$kpart
-
-  
+    }
+    colnames(df.clus) <-  c( paste0(par.k[[i]]) )
+    res.cluster[[i]] <- df.clus
 }
+return(res.cluster)
+
 }
 
 # run fuction
 
-res.cluster <-  run_raceid(data, par.maxexpr, par.minexpr_percent)
+res.cluster <-  run_raceid(data,par.k, par.maxexpr, par.minexpr_percent)
+
 # save clusters
 
-dir_cluster <- paste0("results/raceid/raceid_krange_clus_", names(res.cluster), ".txt")
+dir_cluster <- paste0("results/filtered/raceid/raceid_krange_clus_", names(res.cluster), ".txt")
 
 
 save_clusters(res.cluster,dir_cluster)
 
-# save systemtime
-
-dir_systime <-  paste0("results/raceid/raceid_krange_systime_",names(sys.time),".txt")
-
-save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 
-file_names <-  paste0("results/raceid/raceid_krange_labels_",names(labels), ".txt")
+file_names <-  paste0("results/filtered/raceid/raceid_krange_labels_",names(labels), ".txt")
 for (i in 1:length(labels)){
   sys_i <- as.data.frame(labels[[i]])
   write.table(sys_i, file=file_names[i], sep="\t")
@@ -102,7 +112,7 @@ for (i in 1:length(labels)){
 
 
 ###### Save Session Info
-sink(file = "results/raceid/session_info_raceid_krange.txt")
+sink(file = "results/filtered/raceid/session_info_raceid_krange.txt")
 sessionInfo()
 sink()
 
