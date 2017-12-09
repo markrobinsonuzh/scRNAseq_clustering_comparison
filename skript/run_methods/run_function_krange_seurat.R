@@ -26,12 +26,13 @@ labels <- load_labels(data)
 # the number of PC dim to use was determined by an elbow plot and by the jackstraw function
 
 k.param <- list(
-    kumar2015 =ncol(data[["kumar2015"]])* c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
-    trapnell2014 = ncol(data[["trapnell2014"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
-    zhengmix2016 = ncol(data[["zhengmix2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
-    koh2016 = ncol(data[["koh2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
-    simDataKumar =ncol(data[["simDataKumar"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4)
+  kumar2015 =ncol(data[["kumar2015"]])* c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+  trapnell2014 = ncol(data[["trapnell2014"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+  zhengmix2016 = ncol(data[["zhengmix2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+  koh2016 = ncol(data[["koh2016"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4),
+  simDataKumar =ncol(data[["simDataKumar"]])*c(0.005,0.01,0.025,0.05,0.075, 0.1,0.15,0.2,0.4)
   )
+
 par.dims.use <-  list(
   kumar2015 = 1:5,
   trapnell2014 = 1:12,
@@ -39,6 +40,7 @@ par.dims.use <-  list(
   koh2016 = 1:15,
   simDataKumar =1:15
 )
+
 #Seurat function
 run_seurat <- function( data, par.resolution, par.dims.use ) {
   
