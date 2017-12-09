@@ -12,7 +12,7 @@ analyze_linnorm <- function(dataype, dataset) {
   # source helper
   source("skript/helper_files/Helper_functions.R")
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -67,10 +67,20 @@ analyze_linnorm <- function(dataype, dataset) {
     koh2016 = 0.75,
     simDataKumar=0.1
   )
+  # optimalk
+  par.num_center3 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 2,
+    zhengmix2016=5,
+    koh2016 = 11,
+    simDataKumar=3
+  )
+  
   # which parameter set
   if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.num_center <- par.num_center2; par.BE_strength <- par.BE_strength2
   } else {
     if ((datatype == "default")) { par.num_center <- par.num_center1 ; par.BE_strength <- par.BE_strength1}
+    if ((datatype == "optimalk")) { par.num_center <- par.num_center3 ; par.BE_strength <- par.BE_strength2 }
     else {print("datatype not defined") }
   }
   print(par.num_center)

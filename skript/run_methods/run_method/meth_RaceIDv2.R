@@ -9,7 +9,7 @@ analyze_raceid <- function(dataype, dataset) {
   # source method raceid
   source("skript/run_methods/run_functions/run_function_raceid.R")
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -68,10 +68,20 @@ analyze_raceid <- function(dataype, dataset) {
     koh2016 = 9,
     simDataKumar=4
   )
+  # optimalk
+  par.cln3 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016=5,
+    koh2016 = 13,
+    simDataKumar=4
+  )
+  
   # which parameter set
   if ((datatype == "unfiltered" ) | (datatype=="filtered")) {do.gap <- do.gap2;  par.cln <- par.cln2
   } else {
-    if ((datatype == "default")) { do.gap <- do.gap1;  par.cln <- par.cln1}
+    if ((datatype == "default")) { do.gap <- do.gap1;  par.cln <- par.cln1 }
+    if ((datatype == "optimalk")) { do.gap <- do.gap2;  par.cln <- par.cln3 }
     else {print("datatype not defined") }
   }
   print(do.gap )

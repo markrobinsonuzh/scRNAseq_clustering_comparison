@@ -8,7 +8,7 @@ analyze_sc3 <- function( datatype , dataset){
   
   source("skript/helper_files/Helper_functions.R")
 # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -80,10 +80,21 @@ pct_dropout_max2<- list(
   koh2016 = 99,
   simDataKumar=90
 )
+# optimalk
+par.k3 <-  list(
+  kumar2015 = 3,
+  trapnell2014 = 2,
+  zhengmix2016=4,
+  koh2016 = 11,
+  simDataKumar=4
+)
+
 # which parameter set
 if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k2; pct_dropout_max <- pct_dropout_max2
 } else {
   if ((datatype == "default")) { par.ks  <- par.ks1 ;par.k_estimator <- par.k_estimator1 ; par.k <- par.k1 ; pct_dropout_max <- pct_dropout_max1 }
+  if ((datatype == "optimalk")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k3; pct_dropout_max <- pct_dropout_max2 }
+  
   else {print("datatype not defined") }
 }
 print(par.ks )

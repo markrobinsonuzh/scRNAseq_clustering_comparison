@@ -9,7 +9,7 @@ analyze_cidr <- function(dataype, dataset) {
   source("skript/run_methods/run_functions/run_function_cidr.R")
   
   # source file paths: fileterd , unfiltered or default
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered") | (datatype=="optimalk")){ source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -39,7 +39,7 @@ analyze_cidr <- function(dataype, dataset) {
     simDataKumar=4
   )
   
-  # filtered 
+  # filtered , unfiltered
   par.k2 <-  list(
     kumar2015 = 3,
     trapnell2014 = 3,
@@ -54,12 +54,20 @@ analyze_cidr <- function(dataype, dataset) {
     koh2016 = 8,
     simDataKumar=3
   )
-
+  # optimalk
+  par.k3 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016=5,
+    koh2016 = 13,
+    simDataKumar=4
+  )
 
   # which parameter set
   if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.k <- par.k2 ; par.nPC <- par.nPC2
   } else {
     if ((datatype == "default")) { par.k <- par.k1 ; par.nPC <- par.nPC1 }
+    if ((datatype == "optimalk")) { par.k <- par.k3 ; par.nPC <- par.nPC2 }
     else {print("datatype not defined") }
   }
   print(par.k)

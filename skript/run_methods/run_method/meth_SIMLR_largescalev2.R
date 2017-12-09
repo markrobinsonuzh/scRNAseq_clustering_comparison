@@ -15,7 +15,7 @@ analyze_simlrlargescale <- function( datatype, dataset ){
   
   
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -28,8 +28,8 @@ analyze_simlrlargescale <- function( datatype, dataset ){
   # load cell labels
   labels <- load_labels(data) 
   
-  # parameters
-  par.c <-  list(
+  # parameters default, filtered, unfiltered
+  par.c1 <-  list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
@@ -37,9 +37,22 @@ analyze_simlrlargescale <- function( datatype, dataset ){
     simDataKumar = 4
   )
  
-  print(par.c)
-  
-  
+  # optimalk
+  par.c2 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 2,
+    zhengmix2016=4,
+    koh2016 =10,
+    simDataKumar=3
+  )
+  # which parameter set
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.c <- par.c1
+  } else {
+    if ((datatype == "default")) { par.c <- par.c1 }
+    if ((datatype == "optimalk")) { par.c <- par.c2 }
+    else {print("datatype not defined") }
+  }
+
   # check data files and parameters
   stopifnot( names(files) == names(data) )
   stopifnot( names(par.c) == names(data) )

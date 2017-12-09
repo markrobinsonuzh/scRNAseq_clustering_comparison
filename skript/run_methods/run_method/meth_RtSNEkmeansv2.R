@@ -19,11 +19,11 @@ analyze_rtsnekmeans <- function( datatype, dataype){
   source("skript/helper_files/Helper_functions.R")
 
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
-    } else {
-  if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
-  else {print("datatype not defined") }
-    }
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
+  } else {
+    if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    else {print("datatype not defined") }
+  }
       
   # load data sets
   data <- load_data(files, DATA_DIR)
@@ -70,10 +70,20 @@ analyze_rtsnekmeans <- function( datatype, dataype){
     simDataKumar=20
     
   )
+  # optimalk
+  par.k3 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016=4,
+    koh2016 = 12,
+    simDataKumar=3
+  )
+  
   # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.k <- par.k; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2
 } else {
-  if ((datatype == "default")) { par.perp <- par.perp.1 ; par.initial_dims <-  par.initial_dims.1 }
+  if ((datatype == "default")) { par.k <- par.k; par.perp <- par.perp.1 ; par.initial_dims <-  par.initial_dims.1 }
+  if ((datatype == "optimalk")) { par.k <- par.k3; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 }
   else {print("datatype not defined") }
 }
  print(par.perp)

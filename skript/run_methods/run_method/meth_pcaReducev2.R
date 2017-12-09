@@ -21,7 +21,7 @@ analyze_pcareduce <- function( datatype, dataset){
   # source method pcaReduce
   source("skript/run_methods/run_functions/run_function_pcareduce.R")
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
@@ -49,13 +49,27 @@ analyze_pcareduce <- function( datatype, dataset){
     koh2016 = 30,
     simDataKumar=30
   )
-  n.cluster <- list(
+  n.cluster1 <- list(
     kumar2015=3,
     trapnell2014=3,
     zhengmix2016=4,
     koh2016 = 9,
     simDataKumar=4
   )
+  # optimalk
+  n.cluster2  <-  list(
+    kumar2015 = 4,
+    trapnell2014 = 3,
+    zhengmix2016=5,
+    koh2016 = 11,
+    simDataKumar=4
+  )
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster1 } 
+  else {
+    if ((datatype == "default")) { par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster1 }
+    if ((datatype == "optimalk")) {  par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster2 }
+    else {print("datatype not defined") }
+  }
   
   print(par.nbt)
   print(par.q)

@@ -36,8 +36,7 @@ analyze_tscan(datatype, dataset)
 analyze_raceid(datatype, dataset)
 analyze_seurat(datatype, dataset)
 analyze_zinbwave(datatype, dataset)
-
- analyze_sc3(datatype, dataset)
+analyze_sc3(datatype, dataset)
 
 
 # on filtered
@@ -47,6 +46,8 @@ analyze_linnorm(datatype, dataset)
 analyze_pcareduce(datatype,dataset)  
 analyze_rtsnekmeans(datatype, dataset) 
 analyze_simlrlargescale(datatype, dataset)
+analyze_simlr(datatype, dataset)
+
 analyze_tscan(datatype, dataset)
 analyze_raceid(datatype, dataset)
 analyze_seurat(datatype, dataset)
@@ -58,7 +59,7 @@ datatype <- "unfiltered"
 analyze_cidr(datatype, dataset)
 analyze_linnorm(datatype, dataset)
 analyze_pcareduce(datatype,dataset)
-analyze_rtsnekmeans(datatype, dataset) #error
+analyze_rtsnekmeans(datatype, dataset) 
 analyze_simlrlargescale(datatype, dataset)
 analyze_simlr(datatype, dataset)
 
@@ -69,6 +70,20 @@ analyze_zinbwave(datatype, dataset)
 
 analyze_sc3(datatype, dataset)
 
+# on unfiltered
+datatype <- "optimalk"
+analyze_cidr(datatype, dataset)
+analyze_linnorm(datatype, dataset)
+analyze_pcareduce(datatype,dataset)
+analyze_rtsnekmeans(datatype, dataset) 
+analyze_simlrlargescale(datatype, dataset)
+analyze_simlr(datatype, dataset)
+
+analyze_tscan(datatype, dataset)
+analyze_raceid(datatype, dataset)
+analyze_seurat(datatype, dataset)
+analyze_zinbwave(datatype, dataset)
+analyze_sc3(datatype, dataset)
 
 
 

@@ -8,12 +8,11 @@ source("skript/helper_files/Helper_functions.R")
 # source method CIDR
 source("skript/run_methods/run_functions/run_function_seurat.R")
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")) { source("FILES.R"); print("filtered files")
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
     else {print("datatype not defined") }
   }
-  
 # load data sets
 data <- load_data(files, DATA_DIR)
 
@@ -60,14 +59,26 @@ par.dims.use2 <-  list(
   koh2016 = 1:15,
   simDataKumar=1:10
 )
+# optimalk
+# optimalresolution
+par.resolution3 <-  list(
+  kumar2015 = 0.6,
+  trapnell2014 = 0.6,
+  zhengmix2016=0.6,
+  koh2016 = 0.7,
+  simDataKumar=0.6
+)
+
 # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) {k.param <- k.param2;  par.dims.use <- par.dims.use2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.resolution <- par.resolution3; k.param <- k.param2;  par.dims.use <- par.dims.use2
 } else {
-  if ((datatype == "default")) { k.param <- k.param1;  par.dims.use <- par.dims.use1 }
+  if ((datatype == "default")) { par.resolution <- par.resolution3; k.param <- k.param1;  par.dims.use <- par.dims.use1 }
+  if ((datatype == "optimalk")) { par.resolution <- par.resolution3 ; k.param <- k.param2;  par.dims.use <- par.dims.use2 }
+  
   else {print("datatype not defined") }
 }
 print(k.param)
 # run Seurat
-run_function_seurat(  data[paste0(dataset)], labels[paste0(dataset)], k.param[paste0(dataset)] , par.dims.use[paste0(dataset)],  datatype )
+run_function_seurat(  data[paste0(dataset)], labels[paste0(dataset)],par.resolution[paste0(dataset)], k.param[paste0(dataset)] , par.dims.use[paste0(dataset)],  datatype )
 
 }
