@@ -53,4 +53,3 @@ cf1 <- clusterboot(face,B=3,bootmethod=
                      c("boot","noise","jitter"),clustermethod=kmeansCBI,
                    krange=5,seed=15555)
 
-
