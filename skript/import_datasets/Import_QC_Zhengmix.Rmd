@@ -61,10 +61,10 @@ colData(cd14.monocytes)$phenoid <- array("cd14.monocytes", dim = ncol(cd14.monoc
 colData(regulatory.t)$phenoid <- array("regulatory.t", dim = ncol(regulatory.t) )
 
 ## sample
-b.cells <- b.cells[,sample( colnames(b.cells) , 500, replace = FALSE, prob = NULL) ]
-naive.cytotoxic<- naive.cytotoxic[,sample( colnames(naive.cytotoxic) , 500, replace = FALSE, prob = NULL) ]
-cd14.monocytes<- cd14.monocytes[,sample( colnames(cd14.monocytes) , 500, replace = FALSE, prob = NULL) ]
-regulatory.t <- regulatory.t[,sample( colnames(regulatory.t ) , 500, replace = FALSE, prob = NULL) ]
+b.cells <- b.cells[,sample( colnames(b.cells) , 200, replace = FALSE, prob = NULL) ]
+naive.cytotoxic<- naive.cytotoxic[,sample( colnames(naive.cytotoxic) , 200, replace = FALSE, prob = NULL) ]
+cd14.monocytes<- cd14.monocytes[,sample( colnames(cd14.monocytes) , 200, replace = FALSE, prob = NULL) ]
+regulatory.t <- regulatory.t[,sample( colnames(regulatory.t ) , 200, replace = FALSE, prob = NULL) ]
 
 ```
 
