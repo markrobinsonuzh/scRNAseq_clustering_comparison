@@ -9,6 +9,7 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library("gridExtra")
+library(ggpubr)
 
 ## define the data directories
 DATA_DIR <-  "results/run_results"
@@ -22,7 +23,8 @@ files.ari.krange <- list(
   koh2016 = file.path(DATA_DIR, "ari_krange_koh2016.rda"),
   simDataKumar = file.path(DATA_DIR, "ari_krange_simDataKumar.rda")
 )
-# function to plot 
+#________________________________________________________________________________________________________________________
+# function to plot each method seperately
 plot_ari_krange <- function(files.ari.krange){
   # load files
   tmp <- lapply(files.ari.krange[[1]], function(x) get(load(x)))
@@ -30,23 +32,21 @@ plot_ari_krange <- function(files.ari.krange){
   tmp <- ldply(tmp[[1]], as.data.frame)  
   tmp$par <- as.character(tmp$par)
   tmp$par <- as.numeric(tmp$par)
-  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm"))  
+  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid"))  
   # plot the ARIs per dataset
   
-  p1 <- ggplot(data = tmp.k, aes(x = ncluster, y = ARI, colour = .id))+       
+  p <- ggplot(data = tmp.k, aes(x = ncluster, y = ARI, colour = .id))+       
     geom_line(aes(group=.id))+
     geom_point()+
+    theme_bw()+
     facet_grid(.id~.)+
     guides(colour = "none")+
     labs(x="k")
-
-  
-
-  #pgrid <- plot_grid(p1,p2, p3, ncol=2)
-  p <- grid.arrange(p1)                       # Number of rows
+                       
   return(p)
   
 }
+#________________________________________________________________________________________________________________________
 
 # plot all the data, store in list
 p.all <- lapply(files.ari.krange, plot_ari_krange)
@@ -58,5 +58,35 @@ lapply(names(p.all),
 
 p.grid <- plot_grid(plotlist = p.all ,labels="auto" )
 save_plot("results/plots/plot_ari_krange_ncluster_all.pdf", p.grid, base_height=10)
+#________________________________________________________________________________________________________________________
 
-### Appendix
+### plot methods in one plot , per data set
+plot_ari_krangemerged <- function(files.ari.krange){
+  # load files
+  tmp <- lapply(files.ari.krange[[1]], function(x) get(load(x)))
+  #remove the label column, sort to long format
+  tmp <- ldply(tmp[[1]], as.data.frame)  
+  tmp$par <- as.character(tmp$par)
+  tmp$par <- as.numeric(tmp$par)
+  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid"))  
+  # plot the ARIs per dataset
+  p <- ggplot(data = tmp.k, aes(x = ncluster, y = ARI, colour = .id))+       
+    geom_line(aes(group=.id))+
+    geom_point()+
+    theme_bw()+
+    guides(colour = "legend")+
+    labs(x="k")
+          
+  return(p)
+  
+}
+# plot list
+p.allmerged <- lapply(files.ari.krange, plot_ari_krangemerged)
+# extract the legend from one of the plots
+# (clearly the whole thing only makes sense if all plots
+# have the same legend, so we can arbitrarily pick one.)
+
+p.allmerged <- ggarrange(plotlist=p.allmerged , common.legend = TRUE, labels="auto")
+# in single plot
+
+save_plot("results/plots/plot_ari_krange_ncluster_allmerged.pdf",p.allmerged, base_height = 8)
