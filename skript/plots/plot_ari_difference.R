@@ -20,6 +20,7 @@ DATA_DIR <-  "results/run_results"
 datatype1<- "filtered"
 datatype2 <- "default"
 datatype3 <- "unfiltered"
+datatype4 <- "optimalk"
 
 
 ## read in cluster results from Rdata files
@@ -44,6 +45,13 @@ files_ari_unfiltered <- list(
   koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_koh2016.rda") ),
   zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_zhengmix2016.rda") ),
   simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_simDataKumar.rda"))
+)
+files_ari_optimalk <- list(
+  kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_kumar2015.rda") ),
+  trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_trapnell2014.rda") ),
+  koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_koh2016.rda") ),
+  zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_zhengmix2016.rda") ),
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_simDataKumar.rda"))
 )
 
 #_______________________________________________________________________
@@ -93,7 +101,7 @@ ari.diff <- ari.datatype1.sub  - ari.datatype2.sub
 
 
 ## plot pheatmap
-pheatmap( ari.diff , color = colorRampPalette(brewer.pal(3, "RdYlGn"))(10),
+pheatmap( ari.diff , color = colorRampPalette(brewer.pal(3, "PiYG"))(10),
           display_numbers = TRUE, number_color = "black", fontsize_number = 8, 
           cluster_rows = FALSE, cluster_cols = FALSE, cellwidth=25, cellheight = 25,
           main = main, 
@@ -103,7 +111,7 @@ pheatmap( ari.diff , color = colorRampPalette(brewer.pal(3, "RdYlGn"))(10),
 p1 <- plot_ari_differences(files_ari_filtered , files_ari_unfiltered , main="difference ARI: filtered vs. unfiltered")
 p2 <- plot_ari_differences(files_ari_filtered, files_ari_default , main="difference ARI: filtered vs.default")
 p3 <- plot_ari_differences(files_ari_default, files_ari_unfiltered, main="difference ARI: default vs. unfiltered" )
+p4 <- plot_ari_differences(files_ari_optimalk,files_ari_filtered , main="difference ARI: optimalk vs. filtered" )
 
-p.all <- plot_grid(p1$gtable, p2$gtable, p3$gtable, ncol = 1, labels="auto")
-save_plot("results/plots/plot_ari_diff_all.pdf", p.all, base_width=7, base_height = 10)
-?save_plot
+p.all <- plot_grid(p1$gtable, p2$gtable, p3$gtable, p4$gtable,ncol = 1, labels="auto")
+save_plot("results/plots/plot_ari_diff_all.pdf", p.all, base_width=7, base_height = 13)
