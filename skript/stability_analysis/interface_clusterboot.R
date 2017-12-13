@@ -113,7 +113,8 @@ sc3CBI <- function ( data, par.ks, par.k_estimator ,par.k, pct_dropout_max ) {
   list <- vector("list", length(data))
   names(list) <- names(data)
   res.cluster <- list
-  
+  data <- SingleCellExperiment(data)
+  rownames(data) <- array(data= c(1:ncol(data)), dim=(ncol(data)) ) 
   data<- sc3_prepare(data, ks=par.ks)# uses the exprs slot of SCEset ; log2transformed, non normalized data, filter data 
   data<- sc3_estimate_k(data) # optional estimate the number of clusters
   # estimated k (default ) or user supplied k (filtered, unfiltered)
@@ -224,7 +225,7 @@ tbscanCBI <- function ( data, par.minexpr_percent  ,par.clusternum) {
   list<- vector("list", length(data))
   names(list) <- names(data)
   list->res.tscan->res.cluster 
-  res.tscan <- preprocess(counts(data), minexpr_percent = par.minexpr_percent, logbase = 2) # preprocessing
+  res.tscan <- preprocess(data, minexpr_percent = par.minexpr_percent, logbase = 2) # preprocessing
   res.cluster <- exprmclust(res.tscan, clusternum = 
                                    par.clusternum )$clusterid # clustering
   # out
