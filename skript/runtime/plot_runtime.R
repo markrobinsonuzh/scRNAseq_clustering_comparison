@@ -64,12 +64,12 @@ tbl <- cbind( kumar.time, trapnell.time, zhengmix.time, koh.time , simDataKumar.
 tbl <- cbind( method= rownames(tbl), tbl) %>% as.data.frame
 
 tbl<- melt(tbl, id.vars = c("method"), variable.name = "dataset", value.name = ".time")
-tbl$.time <- as.integer(tbl$.time)
+tbl$.time <- log10(as.integer(tbl$.time))
 #-------------------------------------------------------------------------------------------------------------------
 p1 <- ggplot(tbl)+
   geom_bar(aes(x=dataset,y=.time,fill=method),
            stat='identity',position='dodge')+
-  labs(x="data set", y="runtime (s)")
+  labs(x="data set", y="log10(runtime (s))")
 
 
 save_plot(plot=p1,filename= "results/plots/runtimes.pdf", base_width = 10)
