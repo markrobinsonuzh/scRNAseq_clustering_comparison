@@ -22,6 +22,8 @@ analyze_rtsnekmeans <- function( datatype, dataype){
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
       
@@ -80,7 +82,7 @@ analyze_rtsnekmeans <- function( datatype, dataype){
   )
   
   # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.k <- par.k; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) {par.k <- par.k; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2
 } else {
   if ((datatype == "default")) { par.k <- par.k; par.perp <- par.perp.1 ; par.initial_dims <-  par.initial_dims.1 }
   if ((datatype == "optimalk")) { par.k <- par.k3; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 }

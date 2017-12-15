@@ -18,6 +18,8 @@ analyze_simlrlargescale <- function( datatype, dataset ){
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
 
@@ -46,7 +48,7 @@ analyze_simlrlargescale <- function( datatype, dataset ){
     simDataKumar=3
   )
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.c <- par.c1
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.c <- par.c1
   } else {
     if ((datatype == "default")) { par.c <- par.c1 }
     if ((datatype == "optimalk")) { par.c <- par.c2 }

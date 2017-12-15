@@ -12,6 +12,8 @@ analyze_raceid <- function(dataype, dataset) {
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   # load data sets
@@ -78,7 +80,7 @@ analyze_raceid <- function(dataype, dataset) {
   )
   
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) {do.gap <- do.gap2;  par.cln <- par.cln2
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) {do.gap <- do.gap2;  par.cln <- par.cln2
   } else {
     if ((datatype == "default")) { do.gap <- do.gap1;  par.cln <- par.cln1 }
     if ((datatype == "optimalk")) { do.gap <- do.gap2;  par.cln <- par.cln3 }

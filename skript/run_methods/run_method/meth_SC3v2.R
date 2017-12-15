@@ -11,6 +11,8 @@ analyze_sc3 <- function( datatype , dataset){
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   # source method SC3
@@ -90,7 +92,7 @@ par.k3 <-  list(
 )
 
 # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k2; pct_dropout_max <- pct_dropout_max2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k2; pct_dropout_max <- pct_dropout_max2
 } else {
   if ((datatype == "default")) { par.ks  <- par.ks1 ;par.k_estimator <- par.k_estimator1 ; par.k <- par.k1 ; pct_dropout_max <- pct_dropout_max1 }
   if ((datatype == "optimalk")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k3; pct_dropout_max <- pct_dropout_max2 }

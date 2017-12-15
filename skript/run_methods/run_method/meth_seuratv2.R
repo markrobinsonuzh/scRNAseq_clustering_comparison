@@ -11,6 +11,8 @@ source("skript/run_methods/run_functions/run_function_seurat.R")
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
 # load data sets
@@ -70,7 +72,7 @@ par.resolution3 <-  list(
 )
 
 # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.resolution <- par.resolution3; k.param <- k.param2;  par.dims.use <- par.dims.use2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) {par.resolution <- par.resolution3; k.param <- k.param2;  par.dims.use <- par.dims.use2
 } else {
   if ((datatype == "default")) { par.resolution <- par.resolution3; k.param <- k.param1;  par.dims.use <- par.dims.use1 }
   if ((datatype == "optimalk")) { par.resolution <- par.resolution3 ; k.param <- k.param2;  par.dims.use <- par.dims.use2 }

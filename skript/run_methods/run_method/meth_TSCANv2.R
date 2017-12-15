@@ -19,6 +19,8 @@ source("skript/helper_files/Helper_functions.R")
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   
@@ -71,7 +73,7 @@ par.minexpr_percent3 <- list(
   trapnell2014 = 0.5,
   zhengmix2016 = 0.1,
   koh2016 = 0.5,
-  simDataKumar = 0.5
+  simDataKumar = 0.1
 )
 
 par.clusternum3 <- list(
@@ -79,11 +81,11 @@ par.clusternum3 <- list(
   trapnell2014 = 2,
   zhengmix2016 = 3,
   koh2016= 10,
-  simDataKumar=3
+  simDataKumar=4
 )
 
 # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.minexpr_percent  <- par.minexpr_percent2  ; par.clusternum <-  par.clusternum2
+if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.minexpr_percent  <- par.minexpr_percent2  ; par.clusternum <-  par.clusternum2
 } else {
   if ((datatype == "default")) { par.minexpr_percent  <- par.minexpr_percent1  ; par.clusternum <-  par.clusternum1 }
   if ((datatype == "optimalk")) { par.minexpr_percent  <- par.minexpr_percent3  ; par.clusternum <-  par.clusternum3 }

@@ -12,6 +12,8 @@ analyze_cidr <- function(dataype, dataset) {
   if ((datatype == "default") | (datatype=="filtered") | (datatype=="optimalk")){ source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   
@@ -64,7 +66,7 @@ analyze_cidr <- function(dataype, dataset) {
   )
 
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.k <- par.k2 ; par.nPC <- par.nPC2
+  if ((datatype == "unfiltered" ) | (datatype=="filtered") | (datatype=="smooth")) { par.k <- par.k2 ; par.nPC <- par.nPC2
   } else {
     if ((datatype == "default")) { par.k <- par.k1 ; par.nPC <- par.nPC1 }
     if ((datatype == "optimalk")) { par.k <- par.k3 ; par.nPC <- par.nPC2 }

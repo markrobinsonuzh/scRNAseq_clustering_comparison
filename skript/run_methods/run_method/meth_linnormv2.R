@@ -15,6 +15,8 @@ analyze_linnorm <- function(dataype, dataset) {
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   
@@ -77,7 +79,7 @@ analyze_linnorm <- function(dataype, dataset) {
   )
   
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) {par.num_center <- par.num_center2; par.BE_strength <- par.BE_strength2
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) {par.num_center <- par.num_center2; par.BE_strength <- par.BE_strength2
   } else {
     if ((datatype == "default")) { par.num_center <- par.num_center1 ; par.BE_strength <- par.BE_strength1}
     if ((datatype == "optimalk")) { par.num_center <- par.num_center3 ; par.BE_strength <- par.BE_strength2 }

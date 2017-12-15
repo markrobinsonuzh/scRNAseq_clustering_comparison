@@ -24,6 +24,8 @@ analyze_pcareduce <- function( datatype, dataset){
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
   } else {
     if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+    
     else {print("datatype not defined") }
   }
   # load data sets
@@ -64,7 +66,7 @@ analyze_pcareduce <- function( datatype, dataset){
     koh2016 = 11,
     simDataKumar=4
   )
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster1 } 
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster1 } 
   else {
     if ((datatype == "default")) { par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster1 }
     if ((datatype == "optimalk")) {  par.nbt <- par.nbt; par.q <- par.q; n.cluster <- n.cluster2 }
