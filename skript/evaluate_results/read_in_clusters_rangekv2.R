@@ -13,12 +13,12 @@ library(dplyr)
 source("skript/helper_files/Helper_functions.R")
 
 # define method : "pcaReduce","dbscan", "RtSNEkmeans", "SC3", "Seurat", "SIMLR","SNNCliq"
-METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "SNNCliq", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm")
+METHOD <- c("pcaReduce", "RtSNEkmeans", "SIMLR", "cidr" , "Seurat", "zinbwave","raceid", "linnorm", "tscan", "SC3")
 
 # file paths to the clustering results
 DATA_DIR <-  "results/filtered"
 
-DATASET <- "zhengmix2016" #  "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar"
+DATASET <"simDataKumar2" #  "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar", "simDataKumar2"
 
 files_labels <- file.path(DATA_DIR, METHOD,paste0(METHOD,"_krange_labels_",DATASET,".txt"))%>%as.list()
 names(files_labels) <- METHOD
