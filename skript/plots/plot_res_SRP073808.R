@@ -25,7 +25,6 @@ METHOD_NAME <- as.character(c("tSNEkmeans",
                               "Seurat",
                               "SC3",
                               "pcaReduce",
-                              "dbscan",
                               "cidr"))
 
 
