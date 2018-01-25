@@ -24,12 +24,12 @@ names(data) <- names(files)
 for (i in names(data)){
   f <- files[[i]]
   load(f)
-  data[[i]] <- sceset
+  data[[i]] <- res
   
 }
 
 # compare datasets
-comparison <- compareSCESets(data)
+comparison <-splatter::compareSCEs(data)
 # 
 # available plots
 names(comparison$Plots)
