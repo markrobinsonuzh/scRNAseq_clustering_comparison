@@ -30,28 +30,36 @@ files_ari_filtered <- list(
   trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_trapnell2014.rda") ),
   koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_koh2016.rda") ),
   zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_zhengmix2016.rda") ),
-  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_simDataKumar.rda"))
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_simDataKumar.rda")),
+  simDataKumar2 = file.path(DATA_DIR, paste0("ari_single_",datatype1,"_simDataKumar2.rda"))
+  
 )
 files_ari_default <- list(
   kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_kumar2015.rda") ),
   trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_trapnell2014.rda") ),
   koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_koh2016.rda") ),
   zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_zhengmix2016.rda") ),
-  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_simDataKumar.rda"))
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_simDataKumar.rda")),
+  simDataKumar2 = file.path(DATA_DIR, paste0("ari_single_",datatype2,"_simDataKumar2.rda"))
+  
 )
 files_ari_unfiltered <- list(
   kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_kumar2015.rda") ),
   trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_trapnell2014.rda") ),
   koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_koh2016.rda") ),
   zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_zhengmix2016.rda") ),
-  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_simDataKumar.rda"))
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_simDataKumar.rda")),
+  simDataKumar2 = file.path(DATA_DIR, paste0("ari_single_",datatype3,"_simDataKumar2.rda"))
+  
 )
 files_ari_optimalk <- list(
   kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_kumar2015.rda") ),
   trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_trapnell2014.rda") ),
   koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_koh2016.rda") ),
   zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_zhengmix2016.rda") ),
-  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_simDataKumar.rda"))
+  simDataKumar = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_simDataKumar.rda")),
+  simDataKumar2 = file.path(DATA_DIR, paste0("ari_single_",datatype4,"_simDataKumar2.rda"))
+  
 )
 
 #_______________________________________________________________________
@@ -62,7 +70,9 @@ ari2matrix <- function(files.ari) {
     trapnell2014 =NULL,
     koh2016 = NULL,
     zhengmix2016 =NULL,
-    simDataKumar = NULL
+    simDataKumar = NULL,
+    simDataKumar2 = NULL
+    
   )
   tmp <- lapply(files.ari, function(x) get(load(x)))
   # create name vector
@@ -78,9 +88,10 @@ ari2matrix <- function(files.ari) {
   # table
   #xtabs <-  xtabs(X..i..~ data+ method, data=tmp)
   tbl <- acast(tmp, data~method, value.var="X..i..")
-  # order
-  tbl[, order(colnames(tbl))]
-  
+  # rename
+  rownames(tbl) <- c("Koh", "Kumar", "simDataKumar", "simDataKumar2", "Trapnell", "Zheng")
+  colnames(tbl) <-c("CIDR", "Linnorm", "pcaReduce", "RaceID", "tSNEkmeans", "SC3", "Seurat", "SIMLR", "SIMLR (large)", "TSCAN", "ZINBWaVE")
+
   return(tbl)
   
   
@@ -112,6 +123,8 @@ p1 <- plot_ari_differences(files_ari_filtered , files_ari_unfiltered , main="dif
 p2 <- plot_ari_differences(files_ari_filtered, files_ari_default , main="difference ARI: filtered vs.default")
 p3 <- plot_ari_differences(files_ari_default, files_ari_unfiltered, main="difference ARI: default vs. unfiltered" )
 p4 <- plot_ari_differences(files_ari_optimalk,files_ari_filtered , main="difference ARI: optimalk vs. filtered" )
+p.filtdef <- plot_grid(p1$gtable, p2$gtable,ncol = 2, labels="auto")
+save_plot("results/plots/plot_ari_diff_filtdef.pdf", p.filtdef , base_width=12, base_height = 5)
 
 p.all <- plot_grid(p1$gtable, p2$gtable, p3$gtable, p4$gtable,ncol = 1, labels="auto")
-save_plot("results/plots/plot_ari_diff_all.pdf", p.all, base_width=7, base_height = 13)
+save_plot("results/plots/plot_ari_diff_all.pdf", p.all, base_width=7, base_height = 14)
