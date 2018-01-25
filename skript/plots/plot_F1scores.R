@@ -16,7 +16,7 @@ library(RColorBrewer)
 DATA_DIR <-  "results/run_results"
 
 # which dataset
-datatype <- "default"
+datatype <- "unfiltered"
 ## read in cluster results from Rdata files
 # files directories per dataset
 files_f1 <- list(
@@ -24,7 +24,9 @@ files_f1 <- list(
   trapnell2014 = file.path(DATA_DIR, paste0("f1_single_",datatype,"_trapnell2014.rda") ),
   koh2016 = file.path(DATA_DIR, paste0("f1_single_",datatype,"_koh2016.rda") ),
   zhengmix2016=file.path(DATA_DIR, paste0("f1_single_",datatype,"_zhengmix2016.rda") ),
-  simDataKumar =file.path(DATA_DIR, paste0( "f1_single_",datatype,"_simDataKumar.rda"))
+  simDataKumar =file.path(DATA_DIR, paste0( "f1_single_",datatype,"_simDataKumar.rda")),
+  simDataKumar2 =file.path(DATA_DIR, paste0( "f1_single_",datatype,"_simDataKumar2.rda"))
+  
 )
 
 for ( i in names(files_f1)){
@@ -48,9 +50,10 @@ pheatmap(tmp , color = colorRampPalette(brewer.pal(3, "YlGnBu"))(10),
          display_numbers = TRUE, number_color = "black", fontsize_number = 9, 
          cluster_rows = FALSE, cluster_cols = FALSE, cellwidth=30, cellheight = 30,
          main = paste0(names(files_f1[i])), 
+         
          width = 6, 
          height = 6,
-         number_format="%.2f", filename= paste0("results/plots/plot_f1_",datatype,"_",names(files_f1[i]),".pdf")
+         number_format="%.2f", filename = paste0("results/plots/plot_f1_",datatype,"_",names(files_f1[i]),".pdf")
 )
          
 }
