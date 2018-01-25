@@ -4,7 +4,8 @@
 # Given a gene expression matrix ( normalized , log transformed ) SIMLR learns a distance metric through multiple kernels (Gaussian) that best fits the data. 
 # These similiraties are then used for a RtSNE step to represent the data in lower dimension space and clustering using kmeans. 
 # Parameterrs given by the user are the number of cluster c to be estimated over the expression matrix. 
-# 
+
+
 set.seed(1234)
 
 source("skript/helper_files/Helper_functions.R")
@@ -14,7 +15,7 @@ source("skript/helper_files/Helper_functions.R")
 
 source("FILES.R")
 # source method SIMLR large scale
-source("skript/run_methods/run_functions/run_SIMLR_largescale.R")
+source("skript/run_methods/run_functions/run_function_SIMLR_largescale.R")
 # load data sets
 
 data <- load_data(files, DATA_DIR)
@@ -32,9 +33,9 @@ par.c <-  list(
 )
 # define datatype
 
-datatype <- "filtered"
+datatype <- "default"
 # check if files, parameters and data are the same:
-names(files)==names(data) 
+names(par.c)==names(data) 
 
 # RUN SIMLR
 

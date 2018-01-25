@@ -2,95 +2,45 @@
 # ZINB-WaVE
 #####################
 # uses reduced raw count  matrix. 
-
-require("zinbwave")
-require(scater)
-require(dplyr)
-require(Rtsne)
-
 source("skript/helper_files/Helper_functions.R")
-
-
-# file paths
+# source file paths: fileterd , raw etc.
 
 source("FILES.R")
-
+# source method zinbwave
+source("skript/run_methods/run_functions/run_function_zinbwave.R")
 # load data sets
 
-data <- res.cluster <- vector("list", length(files))
+data <- load_data(files, DATA_DIR)
 
-names(data) <- names(res.cluster) <- names(files)
-
-for (i in names(data)){
-  f <- files[[i]]
-  load(f)
-  data[[i]] <- res
-  
-}
 # load cell labels
 labels <- load_labels(data) 
 
-
-# RUN ZINB-WaVE
+# parameters: number of clusters k in kmeans, number of genes n.genes for ZINBWaVE
 par.k <- list(
   kumar2015 = 3,
   trapnell2014 = 3,
   zhengmix2016 = 4,
   koh2016 = 10,
   simDataKumar = 3
-  
+   
 )
 
-list<- vector("list", length(files))
-names(list) <- names(files)
-list->sys.time->transformedExp-> res.zinb ->d -> tsne_data -> res.cluster
-i <- 5
-for (i in names(data)) {
+n.genes <- list(
+  kumar2015 = 1000,
+  trapnell2014 = 1000,
+  zhengmix2016 = 200,
+  koh2016 = 1000,
+  simDataKumar = 1000
   
-    filter <- rowSums( ( assay(data[[i]], "normcounts")  )>5)>5 
-    data[[i]] <- data[[i]][filter,]# filter out genes with at least five counts
-    counts( data[[i]] ) %>% log1p %>% rowVars -> vars
-    names(vars) <- rownames( data[[i]] )
-    vars <- sort(vars, decreasing = TRUE)
-    data[[i]] <- data[[i]][names(vars)[1:1000],]
-    
-    res.zinb[[i]] <- zinbFit( round(counts(data[[i]]),0) , K=2, epsilon=1000, verbose=TRUE)  # round data as it assumes whole counts
-    d[[i]]<- dist(getW( res.zinb[[i]] ))
-    tsne_data[[i]] <- Rtsne(d[[i]], is_distance = TRUE, pca = FALSE, 
-                       perplexity=10, max_iter=5000)
-    res.cluster[[i]] <- kmeans(d[[i]], centers=par.k[[i]] )$cluster
+)
+# define datatype
 
-    }
+datatype <- "default"
+# check if files, parameters and data are the same:
+names(files)==names(data) 
 
 
+# RUN ZINB-WaVE
+run_function_zinbwave( data, labels, par.k, n.genes,datatype ) 
 
-# save clusters
-
-dir_cluster <- paste0("results/zinbwave/zinbwave_clus_", names(res.cluster), ".txt")
-
-
-save_clusters(res.cluster,dir_cluster)
-
-# save systemtime
-
-dir_systime <-  paste0("results/zinbwave/zinbwave_systime_",names(sys.time),".txt")
-
-save_systemtime(sys.time, dir_systime)
-
-# save experiment labels
-
-file_names <-  paste0("results/zinbwave/zinbwave_labels_",names(labels), ".txt")
-for (i in 1:length(labels)){
-  sys_i <- as.data.frame(labels[[i]])
-  write.table(sys_i, file=file_names[i], sep="\t")
-}
-
-
-###### Save Session Info
-sink(file = "results/tscan/session_info_zinbwave.txt")
-sessionInfo()
-sink()
-
-### Appendix
-plotmclust()
 

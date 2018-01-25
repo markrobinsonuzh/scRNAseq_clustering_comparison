@@ -8,34 +8,19 @@
 # Next pseudotime analysis is done, using dim reduction with PCA and model based clustering. A  pseudo temporal ordering score (POS) and travelling sales- man problem algorithm (TSP) algorithm combined with 
 # Due to included preprocessing we use raw counts. Here the default transformation with log base2 , a pseudocount of one and cutoff for min expr of 2 
 # is chosen. The method has an addiotionally criteria for the covariances for features, default is 1. We keep only high expressed genes, here we keep at least 5 pwercent of all genes for highly expressed cells.
-
-require(TSCAN)
-require(dplyr)
-
 source("skript/helper_files/Helper_functions.R")
 
-
-# file paths
+# source file paths: fileterd , raw etc.
 
 source("FILES.R")
+# source method CIDR
+source("skript/run_methods/run_functions/run_function_tscan.R")
 
 # load data sets
+data <- load_data(files, DATA_DIR)
 
-data <- res.cluster <- vector("list", length(files))
-
-names(data) <- names(res.cluster) <- names(files)
-
-for (i in names(data)){
-  f <- files[[i]]
-  load(f)
-  data[[i]] <- res
-  
-}
 # load cell labels
 labels <- load_labels(data) 
-
-names(data)
-# RUN TSCAN
 
 # define the minimum percentage of highly expressed cells (expression value bigger than minexpr_value) for the genes/features to be retained.
 # Set a lower cutoff for the zhengmix data
@@ -46,48 +31,24 @@ par.minexpr_percent <- list(
   koh2016 = 0.1,
   simDataKumar = 0.1
 )
-# create store vectors
-list<- vector("list", length(files))
-names(list) <- names(files)
-list->sys.time->res.tscan->res.cluster 
-i <- 5
-for (i in names(data)){
+
+par.clusternum <- list(
+  kumar2015 = 2:10,
+  trapnell2014 = 2:10,
+  zhengmix2016 =2:10,
+  koh2016 =2:10,
+  simDataKumar = 2:10
+)
+
+
+
+# define datatype
+
+datatype <- "default"
+# check if files, parameters and data are the same:
+names(files)==names(data) 
+
+
+# RUN TSCAN
+run_function_tscan( data, labels,  par.minexpr_percent  ,par.clusternum= par.clusternum  , datatype )
   
-  sys.time [[i]] <- system.time({
-    res.tscan[[i]] <- preprocess(counts(data[[i]]), minexpr_percent = par.minexpr_percent[[i]], logbase = 2) # preprocessing
-    res.cluster[[i]] <- exprmclust(res.tscan[[i]], clusternum = 2:13 )$clusterid # clustering
-  })
-
-  
-}
-
-# save clusters
-
-dir_cluster <- paste0("results/tscan/tscan_clus_", names(res.cluster), ".txt")
-
-
-save_clusters(res.cluster,dir_cluster)
-
-# save systemtime
-
-dir_systime <-  paste0("results/tscan/tscan_systime_",names(sys.time),".txt")
-
-save_systemtime(sys.time, dir_systime)
-
-# save experiment labels
-
-file_names <-  paste0("results/tscan/tscan_labels_",names(labels), ".txt")
-for (i in 1:length(labels)){
-  lab_i <- as.data.frame(labels[[i]])
-  write.table(lab_i, file=file_names[i], sep="\t")
-}
-
-
-###### Save Session Info
-sink(file = "results/tscan/session_info_tscan.txt")
-sessionInfo()
-sink()
-
-### Appendix
-plotmclust()
-
