@@ -13,11 +13,11 @@ require(cowplot)
 source("skript/helper_files/Helper_functions.R")
 # define which method to load
 # methods: "pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "SNNCliq", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm"
-METHOD <- c("pcaReduce","dbscan", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "SNNCliq", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm")   
+METHOD <- c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "cidr" , "Seurat", "zinbwave", "tscan","raceid", "linnorm")   
 
 # file paths to the clustering results, change the path according to the processed datasets
 DATA_DIR <-  "results"
-DATASET <-"simDataKumar"   # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar"
+DATASET <-"simDataKumar2"  # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar","simDataKumar2"
 datatype <- "filtered"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -59,19 +59,34 @@ trapnell.time <-  return_runtime_single(  METHOD,DATA_DIR, DATASET="trapnell2014
 zhengmix.time <-  return_runtime_single(  METHOD,DATA_DIR, DATASET="zhengmix2016", datatype )
 koh.time <-  return_runtime_single(  METHOD,DATA_DIR, DATASET="koh2016", datatype )
 simDataKumar.time <-  return_runtime_single(  METHOD,DATA_DIR, DATASET="simDataKumar", datatype )
+simDataKumar2.time <-  return_runtime_single(  METHOD,DATA_DIR, DATASET="simDataKumar2", datatype )
+
 #tidy up
-tbl <- cbind( kumar.time, trapnell.time, zhengmix.time, koh.time , simDataKumar.time )
+tbl <- cbind( kumar.time, trapnell.time, zhengmix.time, koh.time , simDataKumar.time,simDataKumar2.time )
 tbl <- cbind( method= rownames(tbl), tbl) %>% as.data.frame
 
 tbl<- melt(tbl, id.vars = c("method"), variable.name = "dataset", value.name = ".time")
-tbl$.time <- log10(as.integer(tbl$.time))
+
+tbl$.timelog <- log10(as.integer(tbl$.time))
+tbl$.time <- as.integer(tbl$.time)
+# rename levels of datasets
+levels(tbl$dataset) <- c("Kumar", "Trapnell", "Zheng", "Koh", "simDataKumar", "simDatakumar2")
 #-------------------------------------------------------------------------------------------------------------------
 p1 <- ggplot(tbl)+
+  geom_bar(aes(x=dataset,y=.timelog,fill=method),
+           stat='identity',position='dodge')+
+  labs(x="dataset", y="log10( runtime (s))")+
+  scale_fill_brewer(palette = "Set3")
+
+p2 <- ggplot(tbl)+
   geom_bar(aes(x=dataset,y=.time,fill=method),
            stat='identity',position='dodge')+
-  labs(x="data set", y="log10(runtime (s))")
+  labs(x="data set", y="runtime (s)")+
+  scale_fill_brewer(palette = "Set3")  
 
 
-save_plot(plot=p1,filename= "results/plots/runtimes.pdf", base_width = 10)
+save_plot(plot=p1,filename= "results/plots/runtimeslog.pdf", base_width = 10)
+save_plot(plot=p2,filename= "results/plots/runtimes.pdf", base_width = 10)
+
 
 
