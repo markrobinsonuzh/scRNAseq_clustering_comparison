@@ -34,7 +34,6 @@ run_function_zinbwave <-  function( data, labels, par.k,n.genes,datatype ){
                               stop.epsilon.optimize = 1e-04)  # round data as it assumes whole counts
 
     d[[i]]<- dist(getW( res.zinb[[i]] ))
-    tsne_data[[i]] <- Rtsne(d[[i]], is_distance = TRUE, pca = FALSE, perplexity=10, max_iter=5000)
     res.cluster[[i]] <- kmeans(d[[i]], centers=par.k[[i]] )$cluster
     })
   }
