@@ -6,10 +6,10 @@
 # load libraries
 library(gridExtra)
 library(ggfortify)
-
 library(scater)
 library(plyr)
 library(cowplot)
+
 # load the data
 ##############################
 DATA_DIR <- "data"
