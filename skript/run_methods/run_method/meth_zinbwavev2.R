@@ -7,11 +7,11 @@ analyze_zinbwave <- function( datatype, dataset ) {
   # source method zinbwave
   source("skript/run_methods/run_functions/run_function_zinbwave.R")
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered") | (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
-  } else {
-    if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
-    else {print("datatype not defined") }
-  }
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")}
+  else if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+  else if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+  else {print("datatype not defined") }
+  
   
   # load data sets
   
@@ -21,71 +21,76 @@ analyze_zinbwave <- function( datatype, dataset ) {
   labels <- load_labels(data) 
   
   # parameters: number of clusters k in kmeans, number of genes n.genes for ZINBWaVE
-  # default:
-
- n.genes1 <- list(
+  #for all runmodes
+  n.genes <- list(
     kumar2015 = 1000,
     trapnell2014 = 1000,
     zhengmix2016 = 200,
     koh2016 = 1000,
-    simDataKumar = 1000
+    simDataKumar = 1000,
+    simDataKumar2 = 1000
+    
     
   )
+  # default:
+
   
   par.k1 <- list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
-    koh2016 = 10,
-    simDataKumar = 4
+    koh2016 = 9,
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
     
   )
-  # filtered, unfiltered
+  # filtered
 
-  n.genes2 <- list(
-    kumar2015 = 1000,
-    trapnell2014 = 1000,
-    zhengmix2016 = 200,
-    koh2016 = 1000,
-    simDataKumar = 1000
-    
-  )
+
   
   par.k2 <- list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
     koh2016 = 9,
-    simDataKumar = 4
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
     
   )
-  # filtered, unfiltered
-  
-  n.genes3 <- list(
-    kumar2015 = 1000,
-    trapnell2014 = 1000,
-    zhengmix2016 = 200,
-    koh2016 = 1000,
-    simDataKumar = 1000
-    
-  )
+  #unfiltered
+
   
   par.k3 <- list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
+    koh2016 = 10,
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
+    
+  )
+  # opt k
+  
+  par.k4 <- list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016 = 4,
     koh2016 = 9,
-    simDataKumar = 4
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
     
   )
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")) { n.genes  <-n.genes2  ; par.k <-  par.k2
-  } else {
-    if ((datatype == "default")) { n.genes  <- n.genes1  ; par.k <-  par.k1 }
-    if ((datatype == "optimalk")) { n.genes  <- n.genes3  ; par.k <-  par.k3 }
-    
-    else {print("datatype not defined") }
-  }
+  if ( (datatype=="filtered") | (datatype=="smooth")) { n.genes  <-n.genes  ; par.k <-  par.k2}
+  else if ((datatype == "unfiltered")) { n.genes  <- n.genes  ; par.k <-  par.k3 }
+  else if ((datatype == "default")) { n.genes  <- n.genes ; par.k <-  par.k1 }
+  else if ((datatype == "optimalk")) { n.genes  <- n.genes ; par.k <-  par.k4 }
+  else {print("datatype not defined") }
+  
   print( n.genes  )
   print( par.k )
   
