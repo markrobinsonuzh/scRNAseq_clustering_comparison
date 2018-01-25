@@ -10,7 +10,7 @@
 library(dplyr)
 library(mclust)
 # load data files
-DATASET <- c( "kumar2015", "trapnell2014","koh2016" , "simDataKumar", "zhengmix2016")
+DATASET <- c( "kumar2015", "trapnell2014","koh2016" , "simDataKumar", "zhengmix2016", "simDataKumar2" )
 for (h in seq_len(length(DATASET) )) {
   print(DATASET[h])
   data_files <- as.list(paste0("results/run_results/cluster_krange_",DATASET[h],".rda"))
