@@ -22,13 +22,13 @@ run_function_rtsnekmeans <- function(data, labels, par.k, par.perp, par.initial_
   list->tinput_matrix->sys.time->res.rtsne->res.cluster 
 # extract transposed expression data
 for (i in names(data) ){
-  tinput_matrix[[i]] <-  t(assay(data[[i]], "normcounts"))# use count scaled length scaled tpms, normalized and log2 transformed
+  tinput_matrix[[i]] <-  t(exprs(data[[i]]))# use count scaled length scaled tpms, normalized and log2 transformed
 }
 # Run tSNE and kmeans
 for (i in names(data)){
   print(i)
   sys.time[[i]] <- system.time({
-    res.rtsne[[i]] <- Rtsne(X= tinput_matrix[[i]] ,perplexity=par.perp[[i]] , pca = TRUE, initial_dims=par.initial_dims[[i]]  )
+    res.rtsne[[i]] <- Rtsne(X= tinput_matrix[[i]] ,perplexity=par.perp[[i]] , pca = TRUE, initial_dims=par.initial_dims[[i]] , check_duplicates = FALSE )
     res.cluster[[i]] <- as.character(kmeans(res.rtsne[[i]]$Y, centers = par.k[[i]])$cluster)
   })
 
