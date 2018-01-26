@@ -258,7 +258,36 @@ save_cluster_single2 <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
   save(clusters,file = paste0("results/run_results/cluster_single_",datatype,"_",DATASET,".rda"))
   
 }
+######## save the clusters from the single run into a .rda file with exception handling
+# input: METHOD = method names as chracter vector, DATA_DIR = data dir chracter vector, DATASET = data set as character vector, datatype = type of dataset/analysis
+# output: saved .rda file with the methods and dataset defined by input variables
 
+save_cluster_single3 <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
+  require(plyr)
+  require(dplyr)
+  ## load the labels
+  files_labels <- file.path(DATA_DIR,datatype, METHOD,paste0(METHOD,"_labels_",DATASET,".txt"))%>%as.list()
+  # assign names
+  names(files_labels) <- METHOD
+  # load the .csv files
+  labels <- vector("list", length(files_labels))
+  names(labels) <- names(files_labels) 
+  
+  labels <- lapply( files_labels,function(x){read_file(x) %>% unlist%>% as.vector} )
+  ## read in cluster results
+  files_cluster <- file.path(DATA_DIR,datatype , METHOD,paste0(METHOD,"_clus_",DATASET,".txt"))%>%as.list() # file path
+  names(files_cluster) <- METHOD # gives names
+  
+  clusters <- vector("list", length(files_cluster))
+  names(clusters) <- names(files_cluster) 
+  clusters <- lapply( files_cluster,function(x){read_file(x) %>% unlist%>% as.vector} )
+  # add labels
+  clusters$labels <-  labels
+  
+  # save the clusters as a rda file 
+  save(clusters,file = paste0("results/run_results/cluster_single_",datatype,"_",DATASET,".rda"))
+  
+}
 ######## save the clusters from the krange run into a .rda file with exception handling
 # input: METHOD = method names as chracter vector, DATA_DIR = data dir chracter vector, DATASET = data set as character vector, datatype = type of dataset/analysis
 # output: saved .rda file with the methods and dataset defined by input variables
@@ -326,4 +355,15 @@ save_runtime_single <-  function( METHOD,DATA_DIR, DATASET, datatype  ){
   save(time,file = paste0("results/run_results/runtime_",datatype,"_",DATASET,".rda"))
   
 }
-
+# deetach all packages
+detachAllPackages <- function() {
+  
+  basic.packages <- c("package:stats","package:graphics","package:grDevices","package:utils","package:datasets","package:methods","package:base")
+  
+  package.list <- search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
+  
+  package.list <- setdiff(package.list,basic.packages)
+  
+  if (length(package.list)>0)  for (package in package.list) detach(package, character.only=TRUE)
+  
+}
