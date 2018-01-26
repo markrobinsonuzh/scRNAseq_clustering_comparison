@@ -21,7 +21,6 @@ suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(plyr))
 suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(cowplot))
-suppressPackageStartupMessages(library(Seurat))
 
 
 ```
@@ -127,12 +126,6 @@ print( table(is.mito) )
 sceset <- calculateQCMetrics(sceset )
 colnames(colData(sceset))
 
-#sceset <- calculateQCMetrics(sceset, feature_controls = list(Mt=grepl("^MT-",  sceset@featureData$symbol) ))
-
-
-#hist(sceset$pct_counts_feature_controls  , xlab="Mitochondrial proportion (%)", 
- #   ylab="Number of cells", main="", col="grey80")
-
 
 ```
 
@@ -158,9 +151,6 @@ feature.med <- median(log10(sceset$total_features), na.rm = TRUE)
 feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
 
-#mito.med <- median((sceset$pct_counts_feature_controls_Mt), na.rm = TRUE)
-#mito.mad <- mad((sceset$pct_counts_feature_controls_Mt), center = size.med, na.rm = TRUE)
-#upper.limit.mito <- (mito.med + 3 * mito.mad  )
 
 
 
