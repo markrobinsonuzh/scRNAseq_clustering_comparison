@@ -1,5 +1,5 @@
 ##########################
-# FILES Data directory
+# FILES reduced Data directory
 #########################
 
 #### This script defines the files and their respective file paths directories which will be ued in the cluster analysis and evaluations
