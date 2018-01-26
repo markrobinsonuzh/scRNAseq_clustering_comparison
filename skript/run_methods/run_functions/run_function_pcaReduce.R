@@ -24,7 +24,7 @@ res.cluster <- sys.time<- input_matrix<- pca.red <- list
 # extract expression data
 
 for (i in 1:(length(input_matrix))){
-  input_matrix[[i]] <- (assay(data[[i]], "normcounts")) # use count scaled length scaled tpms, normalized and log2 transformed
+  input_matrix[[i]] <- exprs(data[[i]]) # use count scaled length scaled tpms, normalized and log2 transformed
 }
 
 

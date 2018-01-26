@@ -7,21 +7,19 @@
 
 analyze_simlr <- function( datatype, dataset ){ 
   
-  set.seed(1234)
-  
+
   source("skript/helper_files/Helper_functions.R")
   # source method SIMLR large scale
   source("skript/run_methods/run_functions/run_function_SIMLR.R")
   
   
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
-  } else {
-    if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
-    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
-    
-    else {print("datatype not defined") }
-  }
+  # source file paths: fileterd , raw etc.
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")}
+  else if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+  else if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+  else {print("datatype not defined") }
+  
   
   # load data sets
   
@@ -37,30 +35,39 @@ analyze_simlr <- function( datatype, dataset ){
     trapnell2014 = 3,
     zhengmix2016 = 4,
     koh2016 = 9,
-    simDataKumar = 4
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
   )
   normalize1 <-  list(
     kumar2015 = FALSE,
     trapnell2014 = FALSE,
     zhengmix2016 =FALSE,
     koh2016 = FALSE,
-    simDataKumar = FALSE
+    simDataKumar = FALSE,
+    simDataKumar2 = FALSE
+    
   )
   # parameters
-  #filtered unfiltered
+  #filtered 
+  normalize2 <-  list(
+    kumar2015 = TRUE,
+    trapnell2014 = TRUE,
+    zhengmix2016 = TRUE,
+    koh2016 = TRUE,
+    simDataKumar = TRUE,
+    simDataKumar2 = TRUE
+    
+  )
+  #unfiltered
   par.c2 <-  list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
-    koh2016 = 9,
-    simDataKumar = 4
-  )
-  normalize2 <-  list(
-    kumar2015 = FALSE,
-    trapnell2014 = FALSE,
-    zhengmix2016 = FALSE,
-    koh2016 = FALSE,
-    simDataKumar = FALSE
+    koh2016 = 10,
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
   )
   # optimalk
   par.c3 <-  list(
@@ -68,23 +75,21 @@ analyze_simlr <- function( datatype, dataset ){
     trapnell2014 = 2,
     zhengmix2016=4,
     koh2016 =10,
-    simDataKumar=3
+    simDataKumar=3,
+    simDataKumar2=3
+    
   )
-  normalize3 <-  list(
-    kumar2015 = TRUE,
-    trapnell2014 = TRUE,
-    zhengmix2016 =TRUE,
-    koh2016 = TRUE,
-    simDataKumar = TRUE
-  )
+
+  
   
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.c <- par.c2 ; normalize <-  normalize2
-  } else {
-    if ((datatype == "default")) {  par.c <- par.c1 ; normalize <-  normalize1 }
-    if ((datatype == "optimalk")) { par.c <- par.c3 ; normalize <-  normalize3 }
-    else {print("datatype not defined") }
-  }
+  if ( (datatype=="filtered")) { par.c <- par.c1; normalize <-  normalize2}
+  else if((datatype == "default")) { par.c <- par.c1 ; normalize <-  normalize1 }
+  else if ((datatype == "unfiltered" )) { par.c <- par.c2 ; normalize <-  normalize2}
+  else if((datatype == "optimalk")) { par.c <- par.c3 ; normalize <-  normalize2 }
+  else if((datatype == "smooth")) { par.c <- par.c1 ; normalize <-  normalize2 }
+  else {print("datatype not defined") }
+  
   print(par.c)
   print(normalize)
   

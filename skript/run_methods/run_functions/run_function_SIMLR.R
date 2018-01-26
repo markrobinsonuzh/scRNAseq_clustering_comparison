@@ -19,7 +19,7 @@ res.SIMLR <- sys.time <- res.cluster <-  list
 for (i in names(data)){
   print(i)
   sys.time[[i]] <- system.time({
-  res.SIMLR[[i]] = SIMLR(X = assay(data[[i]], "normcounts"), c = par.c[[i]], no.dim = NA,k=10, if.impute=FALSE, normalize = normalize[[i]] ) # use exprs slot of SCeset; log2, normalized count_lstpm
+  res.SIMLR[[i]] = SIMLR(X = exprs(data[[i]]), c = par.c[[i]], no.dim = NA,k=10, if.impute=FALSE, normalize = normalize[[i]] ) # use exprs slot of SCeset; log2, normalized count_lstpm
   })
   res.cluster[[i]] <- res.SIMLR[[i]]$y$cluster  
 

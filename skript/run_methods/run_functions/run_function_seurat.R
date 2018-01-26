@@ -3,7 +3,7 @@
 #####################
 
 
-run_function_seurat <-  function(  data, labels, par.resolution, k.param , par.dims.use,  datatype ){
+run_function_seurat <-  function(  data, labels, par.mincells ,par.mingenes ,par.resolution , k.param , par.dims.use,  datatype ){
   
   require(Seurat)
   
@@ -15,7 +15,7 @@ run_function_seurat <-  function(  data, labels, par.resolution, k.param , par.d
 for (i in names(data)) {
   print(i)
   # create Seurat object
-  data[[i]] <- CreateSeuratObject(raw.data = counts(data[[i]]), min.cells = 0, min.genes = 0, project = "whatever") # use raw count_lstpm
+  data[[i]] <- CreateSeuratObject(raw.data = counts( data[[i]] ), min.cells = par.mincells[[i]], min.genes = par.mingenes[[i]], project = "scRNAseq") # use raw count_lstpm
   ## Normalizing the data. After removing unwanted cells from the dataset, 
   # the next step is to normalize the data. By default, we employ a global-scaling normalization method "LogNormalize" 
   #that normalizes the gene expression measurements for each cell by the total expression, 
@@ -60,7 +60,7 @@ save_systemtime(sys.time, dir_systime)
 
 # save experiment labels
 
-dir_labels <-  paste0("results/",datatype,"/Seurat/seurat_labels_",names(res.cluster), ".txt")
+dir_labels <-  paste0("results/",datatype,"/Seurat/seurat_labels_", names(res.cluster), ".txt")
 save_labels(labels, dir_labels )
 
 

@@ -1,7 +1,7 @@
 ########################
 # CIDR
 ########################
-
+# Notes ; could assign nPCs in function directly
 
 run_function_cidr <- function( data, labels, par.k, par.nPC,datatype  ) {
   
@@ -17,7 +17,7 @@ run_function_cidr <- function( data, labels, par.k, par.nPC,datatype  ) {
 # extract transposed expression data
 
 for (i in names(data) ){
-  tinput_matrix[[i]] <- t((assay(data[[i]], "normcounts"))) # use count scaled length scaled tpms, normalized and log2 transformed
+  tinput_matrix[[i]] <- t(assay( data[[i]], "normcounts")) # use  length scaled tpms, normalized and log2+1 transformed
 }
 
 # RUN cidr
@@ -37,7 +37,8 @@ sData[[i]] <- scPCA(sData[[i]]) # performs PCA on the dissimilarity matrix
 sData[[i]] <- nPC(sData[[i]]) # deterimines the optimal number of PC to be used in clustering, populates nPC
 
 # nCluster(sData) # different methods todefine the number of clusters, optional
-sData[[i]] <- scCluster(object=sData[[i]], nCluster = par.k[[i]], cMethod = "ward.D2", nPC = par.nPC[[i]])# hierarchical clustering on PC , nCluster if user defines cluster number, nPC is the number of PC used for clustering (default is 4), cMethod is hierarchical clustering method default is ward.D2
+sData[[i]] <- scCluster( object=sData[[i]], nCluster = par.k[[i]], cMethod = "ward.D2", nPC = par.nPC[[i]] )# hierarchical clustering on PC , nCluster if user defines cluster number, nPC is the number of PC used for clustering (default is 4), cMethod is hierarchical clustering method default is ward.D2
+# hierarchical clustering on PC , nCluster if user defines cluster number, nPC is the number of PC used for clustering (default is 4), cMethod is hierarchical clustering method default is ward.D2
 
 })
 
@@ -72,3 +73,6 @@ sink()
 
 
 }
+
+# appendx
+

@@ -10,35 +10,24 @@
 # Variables:  datatype: which analysis; default , filtered, unfiltered
 
 
-analyze_rtsnekmeans <- function( datatype, dataype){ 
-  # set random seed
-  rand.seed = 1234
-  
+analyze_rtsnekmeans <- function( datatype, dataset){ 
+
   # source method rtsnekmeans and helpers
   source("skript/run_methods/run_functions/run_function_rtsnekmeans.R") 
   source("skript/helper_files/Helper_functions.R")
-
   # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
-  } else {
-    if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
-    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
-    
-    else {print("datatype not defined") }
-  }
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")}
+  else if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+  else if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+  else {print("datatype not defined") }
+  
       
   # load data sets
   data <- load_data(files, DATA_DIR)
   # load cell labels
   labels <- load_labels(data) 
   # define the number of cluster for kmeans clustering 
-  par.k <- list(
-  kumar2015 = 3,
-  trapnell2014 = 3,
-  zhengmix2016 = 4,
-  koh2016= 9,
-  simDataKumar=4
-  )
+
   # define the perplexity parameter  and the number of dimension from PCA for tSNE, 
   # default
   par.perp.1 <- list(
@@ -46,48 +35,74 @@ analyze_rtsnekmeans <- function( datatype, dataype){
     trapnell2014 = 30,
     zhengmix2016 = 30,
     koh2016 = 30,
-    simDataKumar=30
+    simDataKumar=30,
+    simDataKumar2=30
   )
   par.initial_dims.1 <- list(
-    kumar2015 = 30,
-    trapnell2014 = 30,
-    zhengmix2016 = 30,
-    koh2016= 30,
-    simDataKumar=30
+    kumar2015 = 50,
+    trapnell2014 = 50,
+    zhengmix2016 = 50,
+    koh2016= 50,
+    simDataKumar=50,
+    simDataKumar2=50
+    
     
   )
-  # filtered , unfiltered
-  par.perp.2<- list(
+  par.k1 <- list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016 = 4,
+    koh2016= 9,
+    simDataKumar=4,
+    simDataKumar2=4
+  )
+ # unfiltered
+  par.perp.2 <- list(
     kumar2015 = 30,
     trapnell2014 = 30,
     zhengmix2016 = 30,
     koh2016 = 30,
-    simDataKumar=30
+    simDataKumar=30,
+    simDataKumar2=30
   )
   par.initial_dims.2 <- list(
     kumar2015 = 20,
-    trapnell2014 =20,
+    trapnell2014 = 20,
     zhengmix2016 = 20,
     koh2016= 20,
-    simDataKumar=20
+    simDataKumar=20,
+    simDataKumar2=20
+    
     
   )
+  par.k2 <- list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016 = 4,
+    koh2016= 10,
+    simDataKumar=4,
+    simDataKumar2=4
+  )
+  
+  # filtered 
+
   # optimalk
   par.k3 <-  list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016=4,
     koh2016 = 12,
-    simDataKumar=3
+    simDataKumar=3,
+    simDataKumar2=3
+    
   )
   
   # which parameter set
-if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) {par.k <- par.k; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2
-} else {
-  if ((datatype == "default")) { par.k <- par.k; par.perp <- par.perp.1 ; par.initial_dims <-  par.initial_dims.1 }
-  if ((datatype == "optimalk")) { par.k <- par.k3; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 }
-  else {print("datatype not defined") }
-}
+ if ( (datatype=="filtered") | (datatype=="smooth")) {par.k <- par.k1; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 } 
+  else if ((datatype == "unfiltered")) { par.k <- par.k2; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 }
+  else if ((datatype == "default")) { par.k <- par.k1; par.perp <- par.perp.1 ; par.initial_dims <-  par.initial_dims.1 }
+ else if ((datatype == "optimalk")) { par.k <- par.k3; par.perp <- par.perp.2 ; par.initial_dims <-  par.initial_dims.2 }
+ else {print("datatype not defined") }
  print(par.perp)
  print(par.initial_dims)
  

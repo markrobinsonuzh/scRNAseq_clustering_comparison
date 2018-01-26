@@ -7,21 +7,16 @@
 
 analyze_simlrlargescale <- function( datatype, dataset ){ 
   
-  set.seed(1234)
-  
   source("skript/helper_files/Helper_functions.R")
   # source method SIMLR large scale
   source("skript/run_methods/run_functions/run_function_SIMLR_largescale.R")
   
+    # source file paths: fileterd , raw etc.
+  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")}
+  else if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
+  else if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
+  else {print("datatype not defined") }
   
-  # source file paths: fileterd , raw etc.
-  if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")
-  } else {
-    if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
-    if ((datatype == "smooth")) { source("FILESsmooth.R"); print("smooth files") }
-    
-    else {print("datatype not defined") }
-  }
 
   # load data sets
   
@@ -30,30 +25,45 @@ analyze_simlrlargescale <- function( datatype, dataset ){
   # load cell labels
   labels <- load_labels(data) 
   
-  # parameters default, filtered, unfiltered
+  # parameters default, filtered, 
   par.c1 <-  list(
     kumar2015 = 3,
     trapnell2014 = 3,
     zhengmix2016 = 4,
     koh2016 = 9,
-    simDataKumar = 4
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
+  )
+  # unfiltered
+  par.c2 <-  list(
+    kumar2015 = 3,
+    trapnell2014 = 3,
+    zhengmix2016 = 4,
+    koh2016 = 10,
+    simDataKumar = 4,
+    simDataKumar2 = 4
+    
   )
  
   # optimalk
-  par.c2 <-  list(
+  par.c3 <-  list(
     kumar2015 = 3,
     trapnell2014 = 2,
     zhengmix2016=4,
     koh2016 =10,
-    simDataKumar=3
+    simDataKumar=3,
+    simDataKumar2=3
+    
   )
   # which parameter set
-  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.c <- par.c1
-  } else {
-    if ((datatype == "default")) { par.c <- par.c1 }
-    if ((datatype == "optimalk")) { par.c <- par.c2 }
-    else {print("datatype not defined") }
-  }
+  if ((datatype == "unfiltered" ) | (datatype=="filtered")| (datatype=="smooth")) { par.c <- par.c1 } 
+  else if ((datatype == "unfiltered")) { par.c <- par.c2 }
+  
+  else if ((datatype == "default")) { par.c <- par.c1 }
+  else if ((datatype == "optimalk")) { par.c <- par.c3 }
+  else {print("datatype not defined") }
+  
 
   # check data files and parameters
   stopifnot( names(files) == names(data) )
