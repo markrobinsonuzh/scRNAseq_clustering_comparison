@@ -33,7 +33,6 @@ plot_ari_krange <- function(files.ari.krange){
   tmp$par <- as.numeric(tmp$par)
   tmp.k <- tmp%>%subset( .id %in% c("cidr","pcaReduce","RtSNEkmeans","SC3","SIMLR","SNNCliq"))  
   
-  tmp.eps <- subset( tmp, .id  %in% c("dbscan") )
   tmp.res <- subset( tmp, .id %in% c("Seurat") )
   
   # plot the ARIs per dataset

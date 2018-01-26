@@ -21,7 +21,9 @@ files.ari.krange <- list(
   trapnell2014 = file.path(DATA_DIR, "ari_krange_trapnell2014.rda"),
   zhengmix2106 = file.path(DATA_DIR, "ari_krange_zhengmix2016.rda"),
   koh2016 = file.path(DATA_DIR, "ari_krange_koh2016.rda"),
-  simDataKumar = file.path(DATA_DIR, "ari_krange_simDataKumar.rda")
+  simDataKumar = file.path(DATA_DIR, "ari_krange_simDataKumar.rda"),
+  simDataKumar2 = file.path(DATA_DIR, "ari_krange_simDataKumar2.rda")
+  
 )
 #________________________________________________________________________________________________________________________
 # function to plot each method seperately
@@ -32,7 +34,7 @@ plot_ari_krange <- function(files.ari.krange){
   tmp <- ldply(tmp[[1]], as.data.frame)  
   tmp$par <- as.character(tmp$par)
   tmp$par <- as.numeric(tmp$par)
-  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid"))  
+  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans",  "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid", "zinbwave", "SC3"))  
   # plot the ARIs per dataset
   
   p <- ggplot(data = tmp.k, aes(x = ncluster, y = ARI, colour = .id))+       
@@ -57,7 +59,7 @@ lapply(names(p.all),
 # in single plot
 
 p.grid <- plot_grid(plotlist = p.all ,labels="auto" )
-save_plot("results/plots/plot_ari_krange_ncluster_all.pdf", p.grid, base_height=10)
+save_plot("results/plots/plot_ari_krange_ncluster_all.pdf", p.grid, base_height=15)
 #________________________________________________________________________________________________________________________
 
 ### plot methods in one plot , per data set
@@ -68,7 +70,7 @@ plot_ari_krangemerged <- function(files.ari.krange){
   tmp <- ldply(tmp[[1]], as.data.frame)  
   tmp$par <- as.character(tmp$par)
   tmp$par <- as.numeric(tmp$par)
-  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid"))  
+  tmp.k <- tmp%>%subset( .id %in% c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR", "cidr" ,  "tscan", "linnorm", "Seurat", "raceid", "zinbwave"))  
   # plot the ARIs per dataset
   p <- ggplot(data = tmp.k, aes(x = ncluster, y = ARI, colour = .id))+       
     geom_line(aes(group=.id))+
@@ -90,3 +92,4 @@ p.allmerged <- ggarrange(plotlist=p.allmerged , common.legend = TRUE, labels="au
 # in single plot
 
 save_plot("results/plots/plot_ari_krange_ncluster_allmerged.pdf",p.allmerged, base_height = 8)
+
