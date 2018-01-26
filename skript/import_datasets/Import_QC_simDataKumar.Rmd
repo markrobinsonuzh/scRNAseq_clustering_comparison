@@ -9,7 +9,8 @@ Script and code follows "A step-by-step workflow for low-level analysis of singl
 Note that the design is possibly completely confounded, as the conditions and batches are identical.
 ```{r load libraries, include=FALSE}
 pdf("results/QC_data/QC_plots_simDataKumar.pdf")
-
+# set seed
+set.seed(1234)
 #knittr options 
 suppressPackageStartupMessages( library(MultiAssayExperiment) )
 suppressPackageStartupMessages( library(scater) )
