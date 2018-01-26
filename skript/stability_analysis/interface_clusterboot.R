@@ -158,7 +158,7 @@ sc3CBI <- function ( data, par.ks, par.k_estimator ,par.k, pct_dropout_max, rand
 }
 #-----------------------------------------------------
 # pcaReduce
-pcareduceCBI <- function ( data, par.nbt, par.q ,n.cluster, random.seed) {
+pcareduceCBI <- function ( data, par.nbt, par.q ,n.cluster) {
   require(pcaReduce)
   # extract k dimension 
   
@@ -186,7 +186,7 @@ pcareduceCBI <- function ( data, par.nbt, par.q ,n.cluster, random.seed) {
 }
 #-----------------------------------------------------
 # Seurat
-seuratCBI <- function( data, par.resolution, k.param , par.dims.use , random.seed) {
+seuratCBI <- function( data, par.resolution, k.param , par.dims.use , r.seed) {
 require(Seurat)
 res.cluster <-  vector("list", length(data))
 names(res.cluster) <- names(data)
@@ -217,7 +217,7 @@ names(res.cluster) <- names(data)
     # save.SNN = T saves the SNN so that the clustering algorithm can be rerun using the same graph
     # but with a different resolution value (see docs for full details)
     data <- FindClusters(object = data, reduction.type = "pca", dims.use = par.dims.use, k.param = k.param ,
-                              resolution = par.resolution, print.output = 0, save.SNN = FALSE, random.seed = random.seed)
+                              resolution = par.resolution, print.output = 0, save.SNN = FALSE, random.seed = r.seed)
  
    res.cluster <-  data@ident
    # out
