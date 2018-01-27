@@ -1,0 +1,231 @@
+---
+title: "Import and QC of Zhengmix"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Load and process data set Zhengmix (Zheng 2017)
+
+```{r load-packages}
+suppressPackageStartupMessages({
+  library(MultiAssayExperiment)
+  library(scater)
+  library(dplyr)
+  library(tidyr)
+  library(plyr)
+  library(scran)
+  library(cowplot)
+  library(tibble)
+})
+```
+
+## Load raw data
+
+```{r load-dataset}
+b.cells <- read10XResults("../../data/data_raw/zheng/b_cells_filtered/hg19") 
+naive.cytotoxic <- read10XResults("../../data/data_raw/zheng/naive_cytotoxic_filtered/hg19")
+cd14.monocytes <- read10XResults("../../data/data_raw/zheng/cd14_monocytes_filtered/hg19")
+regulatory.t <- read10XResults("../../data/data_raw/zheng/regulatory_t_filtered/hg19")
+
+colnames(b.cells) <-  paste0("b.cells", seq_len(ncol(b.cells)))
+colnames(naive.cytotoxic) <- paste0("naive.cytotoxic", seq_len(ncol(naive.cytotoxic)))
+colnames(cd14.monocytes) <- paste0("cd14.monocytes", seq_len(ncol(cd14.monocytes)))
+colnames(regulatory.t) <- paste0("regulatory.t", seq_len(ncol(regulatory.t)))
+
+colData(b.cells)$phenoid <- "b.cells"
+colData(naive.cytotoxic)$phenoid <- "naive.cytotoxic"
+colData(cd14.monocytes)$phenoid <- "cd14.monocytes"
+colData(regulatory.t)$phenoid <- "regulatory.t"
+
+## Subsample
+set.seed(123)
+b.cells <- b.cells[, sample(colnames(b.cells), 200, replace = FALSE)]
+naive.cytotoxic <- naive.cytotoxic[, sample(colnames(naive.cytotoxic), 200, replace = FALSE)]
+cd14.monocytes <- cd14.monocytes[, sample(colnames(cd14.monocytes), 200, replace = FALSE)]
+regulatory.t <- regulatory.t[, sample(colnames(regulatory.t), 200, replace = FALSE)]
+```
+
+## Create a SingleCellExperiment object
+
+```{r create-sce}
+sce <- cbind(b.cells, naive.cytotoxic, cd14.monocytes, regulatory.t)
+counts(sce) <-  as.matrix(counts(sce))
+logcounts(sce) <- log2(calculateCPM(sce) + 1)
+```
+
+Exclude features that are not expressed
+
+```{r reduce-expression-matrix}
+keep_features <- rowSums(counts(sce) > 0) >= 1
+table(keep_features)
+sce <- sce[keep_features, ]
+dim(sce)
+```
+
+## Identify the ERCC spike-ins.
+
+There are 92 ERCC spike-in genes, but no mitochondrial genes.
+
+```{r ercc-mt}
+is.spike <- grepl("^ERCC", rowData(sce)$symbol)
+is.mito <- grepl("^MT-", rowData(sce)$symbol)
+table(is.spike)
+table(is.mito)
+```
+
+## Calculate QC metrics
+
+```{r QC}
+sce <- calculateQCMetrics(sce)
+```
+
+## Quality control on cells
+
+```{r histogram}
+size.med <- median(log10(sce$total_counts), na.rm = TRUE)
+size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
+lower.limit.size <- 10^(size.med - 3 * size.mad)/1e3
+    
+feature.med <- median(log10(sce$total_features), na.rm = TRUE)
+feature.mad <- mad(log10(sce$total_features), center = size.med, na.rm = TRUE)
+lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
+
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts/1e3)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Library size (thousand reads)") + 
+  ylab("Number of cells") + 
+  geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
+  theme_bw()
+
+ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
+  ylab("Number of cells") + 
+  geom_vline(xintercept = lower.limit.feat, color = "red", linetype = "dashed") + 
+  theme_bw()
+```
+
+## Quality control using PCA and highest expressed genes
+
+We create a PCA plot based the quality metrics for each cell, e.g., the total
+number of reads, the total number of features and the proportion of
+mitochondrial or spike-in reads.
+
+```{r qc-pca}
+p1 <- scater::plotPCA(sce, exprs_values = "logcounts",
+                      selected_variables = "pdata",colour_by = "phenoid")
+p2 <- scater::plotQC(sce, type = "find-pcs", variable = "total_features")
+```
+
+## Filter dataset
+
+We remove cells with log-library sizes that are more than 3 median absolute
+deviations (MADs) below the median log-library size.
+
+```{r drop-qc}
+libsize.drop <- isOutlier(sce$total_counts, nmads = 3, type = "lower", log = TRUE)
+feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = TRUE)
+table(libsize.drop, feature.drop)
+```
+
+```{r filter-debris}
+sce <- sce[, !(libsize.drop | feature.drop)]
+
+data.frame(ByLibSize = sum(libsize.drop), ByFeature = sum(feature.drop),
+           Remaining = ncol(sce))
+```
+
+## Quality control using PCA and highest expressed genes
+
+Using the filtered data, we make a PCA plot based the quality metrics for each
+cell, e.g., the total number of reads, the total number of features and the
+proportion of mitochondrial or spike-in reads.
+
+```{r qc-filt}
+p3 <- plotQC(sce, type = "highest-expression", n = 50)
+```
+
+```{r mean-freq-expr}
+plotQC(sce, type = "exprs-freq-vs-mean")
+```
+
+## Gene filtering
+
+```{r gene-filtering}
+ave.counts <- rowMeans(counts(sce))
+keep <- ave.counts >= 0.01
+sum(keep)
+df <- data.frame(ave.counts = log10(ave.counts))
+
+p4 <- ggplot(df, aes(x = ave.counts)) + 
+  geom_histogram(binwidth = 0.5) + 
+  geom_vline(aes(xintercept = log10(1), color = "red")) +
+  guides(color = "none") + labs(x = expression(Log[10]~"average count"), 
+                                y = "Number of genes")
+
+sce.red <- sce[keep, ]
+```
+
+## Data normalization
+
+```{r sizefactors}
+sce <- computeSumFactors(sce, subset.row = calcAverage(sce) >= 0.001)
+summary(sizeFactors(sce))
+
+sce.red <- computeSumFactors(sce.red, subset.row = calcAverage(sce.red) >= 0.001)
+summary(sizeFactors(sce.red))
+
+ggplot(data.frame(tc = sce$total_counts/1e6, 
+                  sf = sizeFactors(sce)), aes(x = sf, y = tc)) + 
+  geom_point() + xlab("Size factor") + ylab("Library size (million reads)") + 
+  scale_x_log10() + scale_y_log10()
+
+ggplot(data.frame(tc = sce.red$total_counts/1e6, 
+                  sf = sizeFactors(sce.red)), aes(x = sf, y = tc)) + 
+  geom_point() + xlab("Size factor") + ylab("Library size (million reads)") + 
+  scale_x_log10() + scale_y_log10()
+```
+
+```{r normalization}
+sce <- normalise(sce)
+sce.red <- normalise(sce.red)
+```
+
+## Plot the proportion of explained variances
+
+```{r explained-variance} 
+expl_vars <- c("phenoid", "total_features")
+p5 <- plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
+```
+
+## Plot t-SNE representations
+
+```{r tSNE}
+set.seed(1234)
+p6 <- plotTSNE(sce.red, exprs_values = "logcounts", perplexity = 5,
+               colour_by = "total_features", size_by = "total_counts",
+               return_SCESet=FALSE) + ggtitle("tSNE plot")
+```
+
+## Plot a summary of the QC
+
+```{r qc-plot-out} 
+plot.qc <- plot_grid(p1, p2, p3, p4, p5, p6, ncol = 2, labels = "auto")
+pdf("../../plots/qc_data/qc_summary_Zhengmix.pdf", width = 10, height = 12)
+print(plot.qc)
+dev.off()
+```
+
+## Save the normalized and cell filtered datasets
+
+```{r save-data}
+saveRDS(sce, file = "../../data/sce_full/sce_full_Zhengmix.rds")
+saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Zhengmix.rds")
+```
+
+## Session info
+
+```{r}
+date()
+sessionInfo()
+```
+
