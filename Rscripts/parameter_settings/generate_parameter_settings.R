@@ -101,3 +101,27 @@ write(toJSON(list(normalize = FALSE, n_clusters = 4)),
 write(toJSON(list(normalize = FALSE, n_clusters = 4)),
       file = "parameter_settings/sce_filtered_SimKumar_simlr.json")
 
+## RtsneKmeans parameters
+## -------------------------------------------------------------------------- ##
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_full_Kumar_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_full_Trapnell_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:15, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_full_Koh_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_full_Zhengmix_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_full_SimKumar_RtsneKmeans.json")
+
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_filtered_Kumar_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_filtered_Trapnell_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:15, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_filtered_Koh_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_filtered_Zhengmix_RtsneKmeans.json")
+write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
+      file = "parameter_settings/sce_filtered_SimKumar_RtsneKmeans.json")
+
