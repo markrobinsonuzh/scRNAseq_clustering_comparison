@@ -1,32 +1,34 @@
-## Apply t-SNE + K-means. 
-## No automatic cluster number determination. 
-## Possible to set the desired number of clusters
-## Parameters: perplexity, initial_dims, range_clusters
+## Apply Linnorm
 
 suppressPackageStartupMessages({
   library(scater)
-  library(Rtsne)
-  library(dplyr)
+  library(DESeq2)
+  library(SC3)
 })
 
-apply_RtsneKmeans <- function(sce, params, n_rep) {
+apply_SC3 <- function(sce, params, n_rep) {
   ## Run repeatedly with a range of cluster numbers
-  dat <- t(logcounts(sce))
+  dat <- counts(sce)
   L <- lapply(seq_len(n_rep), function(i) {  ## For each replication
     tmp <- lapply(params$range_clusters, function(k) {  ## For each k
       st <- system.time({
-        rtsne <- Rtsne(X = dat, perplexity = params$perplexity, pca = TRUE, 
-                       initial_dims = params$initial_dims, check_duplicates = FALSE)
-        cluster <- structure(kmeans(rtsne$Y, centers = k)$cluster,
-                             names = rownames(dat))
+        data <- sc3_prepare(dat, ks = params$ks)
+        data <- sc3_estimate_k(data)
+        ifelse(params$k_estimator ==TRUE, 
+               params$k <- metadata(data)$sc3$k_estimation, 
+               params$k <- params$k)
+        data <- sc3(data, ks = params$k, pct_dropout_max = params$pct_dropout_max,
+                    gene_filter = TRUE, rand_seed = 1234, n_cores = 1)
+        p_data <- colData(data)
+        cluster <- p_data[, grep("sc3_", colnames(p_data))]
       })
-      df <- data.frame(method = "RtsneKmeans", 
+      df <- data.frame(method = "SC3", 
                        cell = names(cluster),
                        run = i,
                        k = k,
                        cluster = cluster,
                        stringsAsFactors = FALSE, row.names = NULL)
-      tm <- data.frame(method = "RtsneKmeans",
+      tm <- data.frame(method = "SC3",
                        run = i, 
                        k = k,
                        timing = st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"],

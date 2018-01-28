@@ -1,32 +1,32 @@
-## Apply t-SNE + K-means. 
-## No automatic cluster number determination. 
-## Possible to set the desired number of clusters
-## Parameters: perplexity, initial_dims, range_clusters
+## Apply RaceID
 
 suppressPackageStartupMessages({
-  library(scater)
-  library(Rtsne)
   library(dplyr)
 })
+source("Rscripts/clustering/RaceID_class.R")
 
-apply_RtsneKmeans <- function(sce, params, n_rep) {
+apply_RaceID <- function(sce, params, n_rep) {
   ## Run repeatedly with a range of cluster numbers
-  dat <- t(logcounts(sce))
+  dat <- as.data.frame(counts(sce))
   L <- lapply(seq_len(n_rep), function(i) {  ## For each replication
     tmp <- lapply(params$range_clusters, function(k) {  ## For each k
       st <- system.time({
-        rtsne <- Rtsne(X = dat, perplexity = params$perplexity, pca = TRUE, 
-                       initial_dims = params$initial_dims, check_duplicates = FALSE)
-        cluster <- structure(kmeans(rtsne$Y, centers = k)$cluster,
-                             names = rownames(dat))
+        sc <- SCseq(dat)
+        sc <- filterdata(sc, mintotal = params$mintotal, minexpr = params$minexprs, 
+                         minnumber = params$minnumber, maxexpr = params$maxexpr, 
+                         downsample = FALSE, dsn = 1, rseed = 1234)
+        cluster <- clustexp(sc, metric = "pearson", cln = params$cln, 
+                            do.gap = params$do.gap, clustnr = 20, B.gap = 50,
+                            SE.method = "Tibs2001SEmax", SE.factor = 0.25, 
+                            bootnr = 50, rseed = 1234)@kmeans$kpart
       })
-      df <- data.frame(method = "RtsneKmeans", 
+      df <- data.frame(method = "RaceID", 
                        cell = names(cluster),
                        run = i,
                        k = k,
                        cluster = cluster,
                        stringsAsFactors = FALSE, row.names = NULL)
-      tm <- data.frame(method = "RtsneKmeans",
+      tm <- data.frame(method = "RaceID",
                        run = i, 
                        k = k,
                        timing = st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"],

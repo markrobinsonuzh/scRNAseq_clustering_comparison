@@ -61,11 +61,10 @@ $(foreach d,Kumar SimKumar,$(eval $(call qckumarrule,$(d))))
 define clusterrule ## $(1) - sce_full, sce_filtered. $(2) - dataset. $(3) - clustering method
 results/$(1)_$(2)_$(3).rds: data/sce_filtered/sce_filtered_$(2).rds Rscripts/clustering/run_clustering.R \
 Rscripts/clustering/apply_$(3).R
-	$(R) "--args sce='$$(word 1,$$^)' paramfile='parameter_settings/$(1)_$(2)_$(3).json' method='$(3)'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
+	$(R) "--args sce='$$(word 1,$$^)' paramfile='parameter_settings/$(1)_$(2)_$(3).json' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
 $(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_full,$(d),$(m)))))
 $(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_filtered,$(d),$(m)))))
-
 
 
 

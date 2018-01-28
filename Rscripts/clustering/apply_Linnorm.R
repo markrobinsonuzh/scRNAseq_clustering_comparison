@@ -1,32 +1,29 @@
-## Apply t-SNE + K-means. 
-## No automatic cluster number determination. 
-## Possible to set the desired number of clusters
-## Parameters: perplexity, initial_dims, range_clusters
+## Apply Linnorm
 
 suppressPackageStartupMessages({
-  library(scater)
-  library(Rtsne)
-  library(dplyr)
+  library(Linnorm)
 })
 
-apply_RtsneKmeans <- function(sce, params, n_rep) {
+apply_Linnorm <- function(sce, params, n_rep) {
   ## Run repeatedly with a range of cluster numbers
-  dat <- t(logcounts(sce))
+  dat <- counts(sce)
   L <- lapply(seq_len(n_rep), function(i) {  ## For each replication
     tmp <- lapply(params$range_clusters, function(k) {  ## For each k
       st <- system.time({
-        rtsne <- Rtsne(X = dat, perplexity = params$perplexity, pca = TRUE, 
-                       initial_dims = params$initial_dims, check_duplicates = FALSE)
-        cluster <- structure(kmeans(rtsne$Y, centers = k)$cluster,
-                             names = rownames(dat))
+        transformedExp <- Linnorm(dat, spikein = NULL, 
+                                  minNonZeroPortion = params$minNonZeroPortion, 
+                                  BE_strength = params$BE_strength)
+        cluster <- Linnorm.tSNE(transformedExp, input = "Linnorm",
+                                num_center = params$num_center)$k_means$cluster
+        cluster <- structure(cluster, names = colnames(dat))
       })
-      df <- data.frame(method = "RtsneKmeans", 
+      df <- data.frame(method = "Linnorm", 
                        cell = names(cluster),
                        run = i,
                        k = k,
                        cluster = cluster,
                        stringsAsFactors = FALSE, row.names = NULL)
-      tm <- data.frame(method = "RtsneKmeans",
+      tm <- data.frame(method = "Linnorm",
                        run = i, 
                        k = k,
                        timing = st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"],

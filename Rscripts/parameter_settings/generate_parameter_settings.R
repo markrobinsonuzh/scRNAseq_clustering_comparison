@@ -125,3 +125,26 @@ write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
 write(toJSON(list(range_clusters = 2:10, perplexity = 30, initial_dims = 50)),
       file = "parameter_settings/sce_filtered_SimKumar_RtsneKmeans.json")
 
+## pcaReduce parameters
+## -------------------------------------------------------------------------- ##
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_full_Kumar_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_full_Trapnell_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_full_Koh_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_full_Zhengmix_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_full_SimKumar_pcaReduce.json")
+
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_filtered_Kumar_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_filtered_Trapnell_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_filtered_Koh_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_filtered_Zhengmix_pcaReduce.json")
+write(toJSON(list(nbt = 1, q = 30)),
+      file = "parameter_settings/sce_filtered_SimKumar_pcaReduce.json")
