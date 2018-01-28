@@ -1,5 +1,5 @@
 ---
-title: "Import and QC of GSE52529-GPL16791"
+title: "Import and QC of Trapnell data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -207,7 +207,7 @@ p6 <- plotTSNE(sce.red, exprs_values = "logcounts", perplexity = 5,
 
 ```{r qc-plot-out} 
 plot.qc <- plot_grid(p1, p2, p3, p4, p5, p6, ncol = 2, labels = "auto")
-pdf("../../plots/qc_data/qc_summary_GSE52529-GPL16791.pdf", width = 10, height = 12)
+pdf("../../plots/qc_data/qc_summary_Trapnell.pdf", width = 10, height = 12)
 print(plot.qc)
 dev.off()
 ```
@@ -215,8 +215,8 @@ dev.off()
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
-saveRDS(sce, file = "../../data/sce_full/sce_full_GSE52529-GPL16791.rds")
-saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_GSE52529-GPL16791.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_Trapnell.rds")
+saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Trapnell.rds")
 ```
 
 ## Session info

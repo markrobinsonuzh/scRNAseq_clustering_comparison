@@ -21,13 +21,15 @@ setup:
 	mkdir -p plots/qc_data
 
 ## Prepare data sets and generate QC plots
-define qcrule
-data/sce_filtered/sce_filtered_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
-data/data_raw/$(1).rds
+data/sce_filtered/sce_filtered_Trapnell.rds: Rscripts/import_datasets/import_QC_Trapnell.Rmd \
+data/data_raw/GSE52529-GPL16791.rds
 	cd Rscripts/import_datasets && \
-	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
-endef
-$(foreach d,GSE52529-GPL16791 GSE60749-GPL13112 SRP073808,$(eval $(call qcrule,$(d))))
+	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+
+data/sce_filtered/sce_filtered_Koh.rds: Rscripts/import_datasets/import_QC_Koh.Rmd \
+data/data_raw/SRP073808.rds
+	cd Rscripts/import_datasets && \
+	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
 data/sce_filtered/sce_filtered_Zhengmix.rds: Rscripts/import_datasets/import_QC_Zhengmix.Rmd \
 data/data_raw/zheng/b_cells_filtered/hg19/matrix.mtx data/data_raw/zheng/cd14_monocytes_filtered/hg19/matrix.mtx \
@@ -35,7 +37,10 @@ data/data_raw/zheng/naive_cytotoxic_filtered/hg19/matrix.mtx data/data_raw/zheng
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
-data/sce_filtered/sce_filtered_SimKumar.rds: Rscripts/import_datasets/import_QC_SimKumar.Rmd \
+define qckumarrule
+data/sce_filtered/sce_filtered_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
 data/data_raw/GSE60749-GPL13112.rds
 	cd Rscripts/import_datasets && \
-	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
+endef
+$(foreach d,Kumar SimKumar,$(eval $(call qckumarrule,$(d))))

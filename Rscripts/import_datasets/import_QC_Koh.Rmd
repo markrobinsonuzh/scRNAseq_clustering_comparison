@@ -1,5 +1,5 @@
 ---
-title: "Import and QC of SRP073808"
+title: "Import and QC of Koh data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -206,7 +206,7 @@ p6 <- plotTSNE(sce.red, exprs_values = "logcounts", perplexity = 5,
 
 ```{r qc-plot-out} 
 plot.qc <- plot_grid(p1, p2, p3, p4, p5, p6, ncol = 2, labels = "auto")
-pdf("../../plots/qc_data/qc_summary_SRP073808.pdf", width = 10, height = 12)
+pdf("../../plots/qc_data/qc_summary_Koh.pdf", width = 10, height = 12)
 print(plot.qc)
 dev.off()
 ```
@@ -214,8 +214,8 @@ dev.off()
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
-saveRDS(sce, file = "../../data/sce_full/sce_full_SRP073808.rds")
-saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_SRP073808.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_Koh.rds")
+saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Koh.rds")
 ```
 
 ## Session info
