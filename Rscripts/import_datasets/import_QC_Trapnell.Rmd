@@ -183,8 +183,17 @@ ggplot(data.frame(tc = sce.red$total_counts/1e6,
 ```
 
 ```{r normalization}
-sce <- normalise(sce)
-sce.red <- normalise(sce.red)
+sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
+                 return_norm_as_exprs = TRUE))
+logcounts(sce) <- log2(calculateCPM(sce) + 1)
+sce <- normalise(sce, exprs_values = "counts", return_log = FALSE, 
+                 return_norm_as_exprs = FALSE)
+
+sce.red <- normalise(sce.red, exprs_values = "counts", return_log = TRUE, 
+                 return_norm_as_exprs = TRUE))
+logcounts(sce.red) <- log2(calculateCPM(sce.red) + 1)
+sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE, 
+                     return_norm_as_exprs = FALSE)
 ```
 
 ## Plot the proportion of explained variances
