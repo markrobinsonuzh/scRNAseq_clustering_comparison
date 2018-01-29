@@ -129,40 +129,40 @@ write(toJSON(list(nbt = 1, q = 30)), file = "parameter_settings/sce_filtered_Sim
 
 ## DBSCAN parameters
 ## -------------------------------------------------------------------------- ##
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Kumar_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Trapnell_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Koh_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Zhengmix_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_SimKumar_DBSCAN.json")
-
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Kumar_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Trapnell_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Koh_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Zhengmix_DBSCAN.json")
-write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_SimKumar_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Kumar_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Trapnell_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Koh_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_Zhengmix_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_full_SimKumar_DBSCAN.json")
+# 
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Kumar_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Trapnell_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Koh_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_Zhengmix_DBSCAN.json")
+# write(toJSON(list(eps = , Pts = )), file = "parameter_settings/sce_filtered_SimKumar_DBSCAN.json")
 
 ## Seurat parameters
 ## -------------------------------------------------------------------------- ##
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_full_Kumar_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_full_Trapnell_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.7)), 
       file = "parameter_settings/sce_full_Koh_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_full_Zhengmix_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_full_SimKumar_Seurat.json")
 
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )),
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)),
       file = "parameter_settings/sce_filtered_Kumar_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_filtered_Trapnell_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.7)), 
       file = "parameter_settings/sce_filtered_Koh_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )), 
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)), 
       file = "parameter_settings/sce_filtered_Zhengmix_Seurat.json")
-write(toJSON(list(min.cells = , min.genes = , dims.use = , resolution = )),
+write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:10, resolution = 0.6)),
       file = "parameter_settings/sce_filtered_SimKumar_Seurat.json")
 
 ## SIMLRlargescale parameters
@@ -215,48 +215,48 @@ write(toJSON(list(minNonZeroPortion = 0.75, BE_strength = 0.5)),
 
 ## RaceID parameters
 ## -------------------------------------------------------------------------- ##
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_full_Kumar_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_full_Trapnell_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_full_Koh_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = 500, cln = 0)), 
       file = "parameter_settings/sce_full_Zhengmix_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_full_SimKumar_RaceID.json")
 
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_filtered_Kumar_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_filtered_Trapnell_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_filtered_Koh_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = 500, cln = 0)), 
       file = "parameter_settings/sce_filtered_Zhengmix_RaceID.json")
-write(toJSON(list(mintotal = , minexprs = , minnumber = , maxexpr = , cln = , do.gap = )), 
+write(toJSON(list(mintotal = 3000, minexprs = 5, minnumber = 1, maxexpr = Inf, cln = 0)), 
       file = "parameter_settings/sce_filtered_SimKumar_RaceID.json")
 
 ## SC3 parameters
 ## -------------------------------------------------------------------------- ##
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_full_Kumar_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_full_Trapnell_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:15, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_full_Koh_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_full_Zhengmix_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_full_SimKumar_SC3.json")
 
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_Kumar_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_Trapnell_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:15, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_Koh_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_Zhengmix_SC3.json")
-write(toJSON(list(ks = , estimate_k = , pct_dropout_max = )), 
+write(toJSON(list(ks = 2:10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_SimKumar_SC3.json")

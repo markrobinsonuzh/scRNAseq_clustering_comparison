@@ -1,4 +1,8 @@
 ## Apply Linnorm
+## Input: Count matrix
+## No automatic cluster number determination ???
+## Possible to set the desired number of clusters
+## Parameters: minNonZeroPortion, BE_strength
 
 suppressPackageStartupMessages({
   library(Linnorm)

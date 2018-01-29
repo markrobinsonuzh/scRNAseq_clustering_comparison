@@ -1,4 +1,8 @@
 ## Apply pcaReduce.
+## Input: logcount matrix
+## No automatic cluster number determination 
+## Possible to set the desired number of clusters
+## Parameters: nbt, q
 
 suppressPackageStartupMessages({
   library(pcaReduce)
