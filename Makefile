@@ -4,7 +4,7 @@
 R := R CMD BATCH --no-restore --no-save
 Rscript := Rscript --no-restore --no-save
 
-DATASETS := Kumar Trapnell Koh Zhengmix SimKumar
+DATASETS := Kumar Trapnell Koh Zhengmix# SimKumar
 METHODS := RtsneKmeans
 
 .PHONY: all prepare_data cluster
