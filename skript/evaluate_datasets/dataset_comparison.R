@@ -27,21 +27,19 @@ for (i in names(data)){
   data[[i]] <- res
   
 }
-
+names(data) <-  c("Kumar", "Trapnell", "Zheng", "Koh", "simDataKumar", "simDataKumar2")
 # compare datasets
 comparison <-splatter::compareSCEs(data)
-# 
 # available plots
 names(comparison$Plots)
-comparison$Plots$Means
 # create summary
-panel <- makeCompPanel(comparison)
+panel <- makeCompPanel(comparison, labels=c("a","b","c","d","e","f", "g", "h"), title="")
 cowplot::save_plot("results/QC_data/comp_panel.png", panel, nrow = 4, ncol = 3)
 
 
 
-
 # Appendix
-panel <- makeOverallPanel(comparison, difference)
-difference <- diffSCESets(data, ref = "Simple")
-cowplot::save_plot("results/QC_Data/comparison_panel.png", panel, ncol = 4, nrow = 7)
+#splatter::diffSCEs()
+#panel <- makeOverallPanel(comparison, difference)
+#difference <-diffSCEs(data, ref = "Simple")
+#cowplot::save_plot("results/QC_Data/comparison_panel.png", panel, ncol = 4, nrow = 7)
