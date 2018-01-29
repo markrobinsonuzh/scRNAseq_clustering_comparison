@@ -3,8 +3,8 @@
 #####################
 # uses count  matrix. 
 filter_hvg <- function(data, n.genes){
-  filter <- rowSums( ( assay(data, "normcounts")  )>5)>5 
-  data <- data[filter,]# filter out genes with at least five counts
+  filter <- rowSums( ( counts(data)  )>5)>5 
+  data <- data[filter,]# filter out genes with at zinbFirleast five counts
   counts( data ) %>% log1p %>% rowVars -> vars
   names(vars) <- rownames( data )
   vars <- sort(vars, decreasing = TRUE)
@@ -16,7 +16,6 @@ filter_hvg <- function(data, n.genes){
 run_function_zinbwave <-  function( data, labels, par.k,n.genes,datatype ){
   require(zinbwave)
   require(scater)
-  require(Rtsne)
   require(dplyr)
   # create vectors
   list<- vector("list", length(data))
@@ -31,7 +30,7 @@ run_function_zinbwave <-  function( data, labels, par.k,n.genes,datatype ){
                                 K=2, epsilon=n.genes[[i]], verbose=TRUE,
                               nb.repeat.initialize = 2, 
                               maxiter.optimize = 25,
-                              stop.epsilon.optimize = 1e-04)  # round data as it assumes whole counts
+                              stop.epsilon.optimize = 1e-04, normalizedValues =TRUE)  # round data as it assumes whole counts
 
     d[[i]]<- dist(getW( res.zinb[[i]] ))
     res.cluster[[i]] <- kmeans(d[[i]], centers=par.k[[i]] )$cluster
