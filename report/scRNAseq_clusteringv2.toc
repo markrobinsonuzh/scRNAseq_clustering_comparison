@@ -1,0 +1,42 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Methods}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}Dimension reduction}{3}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Clustering methods}{3}{subsection.2.2}
+\contentsline {paragraph}{K-means}{3}{section*.2}
+\contentsline {paragraph}{pcaReduce}{3}{section*.3}
+\contentsline {paragraph}{SC3}{4}{section*.4}
+\contentsline {paragraph}{SNNcliq}{4}{section*.5}
+\contentsline {paragraph}{SIMLR}{4}{section*.6}
+\contentsline {paragraph}{CIDR}{5}{section*.7}
+\contentsline {paragraph}{Seurat}{5}{section*.8}
+\contentsline {paragraph}{Linnorm }{5}{section*.9}
+\contentsline {paragraph}{TSCAN}{5}{section*.10}
+\contentsline {paragraph}{ZINB-WaVE}{6}{section*.11}
+\contentsline {subsection}{\numberline {2.3}Datasets}{7}{subsection.2.3}
+\contentsline {paragraph}{\citet {kumar2014deconstructing}}{7}{section*.12}
+\contentsline {paragraph}{\citet {trapnell2014dynamics}}{7}{section*.13}
+\contentsline {paragraph}{\citet {koh2016atlas} }{7}{section*.14}
+\contentsline {paragraph}{ \citet {zheng2017massively}}{7}{section*.15}
+\contentsline {paragraph}{Simulated datasets }{7}{section*.16}
+\contentsline {subsection}{\numberline {2.4}Data transformation and normalisation}{10}{subsection.2.4}
+\contentsline {paragraph}{Data transformation}{10}{section*.18}
+\contentsline {paragraph}{Filtering and normalisation}{11}{section*.19}
+\contentsline {subsection}{\numberline {2.5}Optimal number of clusters}{11}{subsection.2.5}
+\contentsline {section}{\numberline {3}Method}{13}{section.3}
+\contentsline {subsection}{\numberline {3.1}Evaluation of the clustering methods}{13}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Parameter settings}{14}{subsection.3.2}
+\contentsline {paragraph}{RtSNEkmeans}{15}{section*.34}
+\contentsline {paragraph}{pcaReduce}{15}{section*.35}
+\contentsline {paragraph}{SC3}{16}{section*.36}
+\contentsline {paragraph}{SNNCliq}{17}{section*.37}
+\contentsline {paragraph}{SIMLR}{17}{section*.38}
+\contentsline {paragraph}{Seurat}{17}{section*.39}
+\contentsline {paragraph}{dbscan}{18}{section*.40}
+\contentsline {paragraph}{CIDR}{18}{section*.41}
+\contentsline {paragraph}{TSCAN}{19}{section*.42}
+\contentsline {paragraph}{Linnorm}{19}{section*.43}
+\contentsline {subsection}{\numberline {3.3}Evaluation metrics}{19}{subsection.3.3}
+\contentsline {section}{\numberline {4}Results}{26}{section.4}
+\contentsline {paragraph}{Transformation and normalisation}{26}{section*.45}
+\contentsline {paragraph}{Clustering}{26}{section*.46}
+\contentsline {paragraph}{Clustering with the annotated number of cluster, under default mode and with unfiltered data sets}{26}{section*.47}

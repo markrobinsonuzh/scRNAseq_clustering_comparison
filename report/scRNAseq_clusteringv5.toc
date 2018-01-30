@@ -1,0 +1,47 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}Methods}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}Dimension reduction}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Clustering methods}{5}{subsection.2.2}
+\contentsline {paragraph}{K-means}{5}{section*.3}
+\contentsline {paragraph}{pcaReduce}{6}{section*.4}
+\contentsline {paragraph}{SC3}{6}{section*.5}
+\contentsline {paragraph}{SNNcliq}{6}{section*.6}
+\contentsline {paragraph}{SIMLR}{7}{section*.7}
+\contentsline {paragraph}{CIDR}{7}{section*.8}
+\contentsline {paragraph}{Linnorm }{7}{section*.9}
+\contentsline {paragraph}{TSCAN}{8}{section*.10}
+\contentsline {paragraph}{RaceID}{8}{section*.11}
+\contentsline {paragraph}{Seurat}{8}{section*.12}
+\contentsline {subsection}{\numberline {2.3}Datasets}{9}{subsection.2.3}
+\contentsline {paragraph}{\citet {kumar2014deconstructing}}{9}{section*.14}
+\contentsline {paragraph}{\citet {trapnell2014dynamics}}{10}{section*.15}
+\contentsline {paragraph}{\citet {koh2016atlas} }{10}{section*.16}
+\contentsline {paragraph}{ \citet {zheng2017massively}}{10}{section*.17}
+\contentsline {paragraph}{Simulated datasets }{10}{section*.18}
+\contentsline {subsection}{\numberline {2.4}Data transformation and normalisation}{12}{subsection.2.4}
+\contentsline {paragraph}{Data transformation}{12}{section*.21}
+\contentsline {paragraph}{Filtering and normalisation}{13}{section*.22}
+\contentsline {subsection}{\numberline {2.5}Optimal number of clusters}{14}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Evaluation of the clustering methods using different run modes}{15}{subsection.2.6}
+\contentsline {subsection}{\numberline {2.7}Parameter settings}{15}{subsection.2.7}
+\contentsline {paragraph}{RtSNEkmeans}{16}{section*.24}
+\contentsline {paragraph}{pcaReduce}{16}{section*.25}
+\contentsline {paragraph}{SC3}{16}{section*.26}
+\contentsline {paragraph}{SIMLR}{17}{section*.27}
+\contentsline {paragraph}{CIDR}{17}{section*.28}
+\contentsline {paragraph}{Seurat}{17}{section*.29}
+\contentsline {paragraph}{TSCAN}{17}{section*.30}
+\contentsline {paragraph}{SNNCliq}{18}{section*.31}
+\contentsline {paragraph}{RaceID}{18}{section*.32}
+\contentsline {paragraph}{Linnorm}{18}{section*.33}
+\contentsline {subsection}{\numberline {2.8}Evaluation metrics}{18}{subsection.2.8}
+\contentsline {subsection}{\numberline {2.9}Software and environment}{19}{subsection.2.9}
+\contentsline {section}{\numberline {3}Results}{20}{section.3}
+\contentsline {subsection}{\numberline {3.1}Transformation and normalisation}{20}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Evaluation of the clustering results}{20}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Evaluation of the clustering results}{20}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}F1 scores and overall dataset difficulty}{23}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Range of clusters}{24}{subsection.3.5}
+\contentsline {subsection}{\numberline {3.6}Stability analysis}{25}{subsection.3.6}
+\contentsline {subsection}{\numberline {3.7}Runtime}{27}{subsection.3.7}
+\contentsline {section}{\numberline {A}\\Additional information}{27}{appendix.A}

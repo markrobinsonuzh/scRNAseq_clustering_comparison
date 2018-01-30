@@ -1,0 +1,56 @@
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}
+\contentsline {paragraph}{Aims of the study}{2}{section*.2}
+\contentsline {section}{\numberline {2}Methods}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Dimension reduction}{4}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Clustering methods}{4}{subsection.2.2}
+\contentsline {paragraph}{K-means}{4}{section*.5}
+\contentsline {paragraph}{pcaReduce}{6}{section*.6}
+\contentsline {paragraph}{SC3}{6}{section*.7}
+\contentsline {paragraph}{SIMLR}{6}{section*.8}
+\contentsline {paragraph}{CIDR}{7}{section*.9}
+\contentsline {paragraph}{Linnorm }{7}{section*.10}
+\contentsline {paragraph}{TSCAN}{7}{section*.11}
+\contentsline {paragraph}{RaceID}{8}{section*.12}
+\contentsline {paragraph}{Seurat}{8}{section*.13}
+\contentsline {paragraph}{ZINBWaVE}{8}{section*.14}
+\contentsline {subsection}{\numberline {2.3}Datasets}{9}{subsection.2.3}
+\contentsline {paragraph}{\citet {kumar2014deconstructing}}{9}{section*.15}
+\contentsline {paragraph}{\citet {trapnell2014dynamics}}{9}{section*.16}
+\contentsline {paragraph}{\citet {koh2016atlas} }{9}{section*.17}
+\contentsline {paragraph}{ \citet {zheng2017massively}}{10}{section*.18}
+\contentsline {paragraph}{Simulated datasets }{10}{section*.19}
+\contentsline {subsection}{\numberline {2.4}Data transformation and normalisation}{12}{subsection.2.4}
+\contentsline {paragraph}{Data transformation}{12}{section*.22}
+\contentsline {paragraph}{Filtering and normalisation}{13}{section*.23}
+\contentsline {subsection}{\numberline {2.5}Evaluation of the clustering methods using different run modes}{14}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Parameter settings}{16}{subsection.2.6}
+\contentsline {paragraph}{RtSNEkmeans}{16}{section*.26}
+\contentsline {paragraph}{pcaReduce}{16}{section*.27}
+\contentsline {paragraph}{SC3}{16}{section*.28}
+\contentsline {paragraph}{SIMLR}{16}{section*.29}
+\contentsline {paragraph}{CIDR}{17}{section*.30}
+\contentsline {paragraph}{Seurat}{17}{section*.31}
+\contentsline {paragraph}{TSCAN}{17}{section*.32}
+\contentsline {paragraph}{SNNCliq}{17}{section*.33}
+\contentsline {paragraph}{RaceID}{18}{section*.34}
+\contentsline {paragraph}{Linnorm}{18}{section*.35}
+\contentsline {paragraph}{ZINB-WaVE}{18}{section*.36}
+\contentsline {subsection}{\numberline {2.7}Evaluation metrics}{19}{subsection.2.7}
+\contentsline {subsection}{\numberline {2.8}Software and environment}{19}{subsection.2.8}
+\contentsline {section}{\numberline {3}Results}{22}{section.3}
+\contentsline {subsection}{\numberline {3.1}Evaluation of the performances of the methods}{22}{subsection.3.1}
+\contentsline {paragraph}{}{22}{section*.39}
+\contentsline {paragraph}{}{23}{section*.40}
+\contentsline {paragraph}{}{23}{section*.41}
+\contentsline {paragraph}{}{24}{section*.42}
+\contentsline {paragraph}{}{24}{section*.43}
+\contentsline {paragraph}{}{25}{section*.44}
+\contentsline {subsection}{\numberline {3.2}Evaluation of the clustering results}{26}{subsection.3.2}
+\contentsline {paragraph}{}{30}{section*.49}
+\contentsline {subsection}{\numberline {3.3}Range of clusters}{32}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Stability analysis}{33}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Runtime}{34}{subsection.3.5}
+\contentsline {section}{\numberline {4}Conclusion and Outlook}{36}{section.4}
+\contentsline {section}{\numberline {A}\\Additional information}{41}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}F1 scores for the for the run modes with the unfiltered datasets and in the default mode}{41}{subsection.A.1}
+\contentsline {subsection}{\numberline {A.2}QC plots for the datasets}{43}{subsection.A.2}
