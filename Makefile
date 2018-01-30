@@ -24,9 +24,11 @@ setup:
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE60749-GPL13112.rds
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE52529-GPL16791.rds
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/SRP073808.rds
+	## TODO: Download Zheng data
 	mkdir -p plots/qc_data
 	mkdir -p results
 	mkdir -p Rout
+	$(R) Rscripts/parameter_settings/generate_parameter_settings.R Rout/generate_parameter_settings.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Prepare data sets and generate QC plots
@@ -61,7 +63,7 @@ $(foreach d,Kumar SimKumar,$(eval $(call qckumarrule,$(d))))
 define clusterrule ## $(1) - sce_full, sce_filtered. $(2) - dataset. $(3) - clustering method
 results/$(1)_$(2)_$(3).rds: data/sce_filtered/sce_filtered_$(2).rds Rscripts/clustering/run_clustering.R \
 Rscripts/clustering/apply_$(3).R
-	$(R) "--args sce='$$(word 1,$$^)' paramfile='parameter_settings/$(1)_$(2)_$(3).json' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
+	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
 $(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_full,$(d),$(m)))))
 $(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_filtered,$(d),$(m)))))
