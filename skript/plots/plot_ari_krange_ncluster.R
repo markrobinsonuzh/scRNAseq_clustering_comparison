@@ -26,7 +26,7 @@ files.ari.krange <- list(
   
 )
 
-# intercept at position of ground truth
+# set intercept at position of ground truth for datasets
 xintercept <- list(
   kumar2015 =3,
   trapnell2014 = 3,
@@ -36,9 +36,19 @@ xintercept <- list(
   simDataKumar2 = 4
   
 )
+# set limits for x axis for datasets
+xlim<- list(
+  kumar2015 =c(2,10),
+  trapnell2014 = c(2,10),
+  zhengmix2106 = c(2,10),
+  koh2016 = c(2,15),
+  simDataKumar = c(2,10),
+  simDataKumar2 = c(2,10)
+  
+)
 #________________________________________________________________________________________________________________________
 # function to plot each method seperately
-plot_ari_krange <- function(files.ari.krange, xintercept){
+plot_ari_krange <- function(files.ari.krange, xintercept, xlim){
   # load files
   tmp <- lapply(files.ari.krange[[1]], function(x) get(load(x)))
   #remove the label column, sort to long format
@@ -55,7 +65,8 @@ plot_ari_krange <- function(files.ari.krange, xintercept){
     facet_grid(.id~.)+
     guides(colour = "none")+
     labs(x="k")+
-    geom_vline(xintercept = xintercept)
+    geom_vline(xintercept = xintercept)+ 
+    xlim(xlim)
                        
   return(p)
   
@@ -63,7 +74,7 @@ plot_ari_krange <- function(files.ari.krange, xintercept){
 #________________________________________________________________________________________________________________________
 
 # plot all the data, store in list
-p.all <- mapply(plot_ari_krange,files.ari.krange,  xintercept, SIMPLIFY = FALSE)
+p.all <- mapply(plot_ari_krange,files.ari.krange,  xintercept,xlim, SIMPLIFY = FALSE)
 # save plot per datafile
 lapply(names(p.all), 
        function(x)ggsave(filename=paste0("results/plots/plot_ari_krange_ncluster_",x,".pdf"), plot=p.all[[x]]))
