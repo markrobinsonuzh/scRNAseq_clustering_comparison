@@ -1,11 +1,9 @@
 ---
-title: "Import and QC of Zhengmix"
+title: "Import and QC of Zheng data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
-
-# Load and process data set Zhengmix (Zheng 2017)
 
 ```{r load-packages}
 suppressPackageStartupMessages({
@@ -57,7 +55,7 @@ logcounts(sce) <- log2(calculateCPM(sce) + 1)
 Exclude features that are not expressed
 
 ```{r reduce-expression-matrix}
-keep_features <- rowSums(counts(sce) > 0) >= 1
+keep_features <- rowSums(counts(sce) > 0) > 0
 table(keep_features)
 sce <- sce[keep_features, ]
 dim(sce)
@@ -85,14 +83,14 @@ sce <- calculateQCMetrics(sce)
 ```{r histogram}
 size.med <- median(log10(sce$total_counts), na.rm = TRUE)
 size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
-lower.limit.size <- 10^(size.med - 3 * size.mad)/1e3
+lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sce$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sce$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
 
-ggplot(as.data.frame(colData(sce)), aes(x = total_counts/1e3)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Library size (thousand reads)") + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
   theme_bw()

@@ -1,11 +1,9 @@
 ---
-title: "Import and QC of Koh data set"
+title: "Import and QC of Koh data set (SRP073808)"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
-
-# Load and process data set SRP073808 (Koh 2016)
 
 ```{r load-packages}
 suppressPackageStartupMessages({
@@ -25,7 +23,7 @@ suppressPackageStartupMessages({
 ```{r load-dataset}
 (maex <- readRDS("../../data/data_raw/SRP073808.rds"))
 
-## Extract the gene-level TPM and the counts obtaines by scaling the TPMs
+## Extract the gene-level TPM and the counts obtained by scaling the TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 
@@ -39,6 +37,9 @@ table(phn$phenoid)
 ## Create a SingleCellExperiment object
 
 ```{r create-sce}
+stopifnot(all(colnames(cts) == rownames(phn)))
+stopifnot(all(colnames(tpm) == rownames(phn)))
+
 sce <- SingleCellExperiment(
   assays = list(counts = cts, 
                 tpm = tpms), 
@@ -49,21 +50,17 @@ logcounts(sce) <- log2(calculateCPM(sce) + 1)
 Exclude features that are not expressed
 
 ```{r reduce-expression-matrix}
-keep_features <- rowSums(counts(sce) > 0) >= 1
+keep_features <- rowSums(counts(sce) > 0) > 0
 table(keep_features)
 sce <- sce[keep_features, ]
 dim(sce)
 ```
 
-## Identify the ERCC spike-ins.
-
-There are 92 ERCC spike-in genes, but no mitochondrial genes.
+## Identify the remaining ERCC spike-ins.
 
 ```{r ercc-mt}
 is.spike <- grepl("^ERCC", rownames(sce))
-is.mito <- grepl("^mt-", rownames(sce))
 table(is.spike)
-table(is.mito)
 ```
 
 ## Calculate QC metrics
@@ -77,14 +74,14 @@ sce <- calculateQCMetrics(sce)
 ```{r histogram}
 size.med <- median(log10(sce$total_counts), na.rm = TRUE)
 size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
-lower.limit.size <- 10^(size.med - 3 * size.mad)/1e6
+lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sce$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sce$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
 
-ggplot(as.data.frame(colData(sce)), aes(x = total_counts/1e6)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Library size (million reads)") + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
   theme_bw()
@@ -99,15 +96,15 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_features)) +
 ## Quality control using PCA and highest expressed genes
 
 We create a PCA plot based the quality metrics for each cell, e.g., the total
-number of reads, the total number of features and the proportion of
-mitochondrial or spike-in reads.
+number of reads, the total number of features and the proportion of spike-in
+reads.
 
 ```{r qc-pca}
-p1 <- scater::plotPCA(sce, exprs_values = "logcounts",
-                      selected_variables = "pdata",colour_by = "phenoid") + 
+sce <- scater::runPCA(sce, pca_data_input = "coldata")
+scater::plotPCA(sce, colour_by = "phenoid") + 
   theme(legend.position = "bottom") + 
   guides(color = guide_legend(nrow = 3, byrow = TRUE))
-p2 <- scater::plotQC(sce, type = "find-pcs", variable = "total_features")
+scater::plotQC(sce, type = "find-pcs", variable = "total_features")
 ```
 
 ## Filter dataset
@@ -136,10 +133,11 @@ proportion of mitochondrial or spike-in reads.
 
 ```{r qc-filt}
 p3 <- plotQC(sce, type = "highest-expression", n = 50)
+p3
 ```
 
 ```{r mean-freq-expr}
-plotQC(sce, type = "exprs-freq-vs-mean")
+p2 <- plotQC(sce, type = "exprs-freq-vs-mean")
 ```
 
 ## Gene filtering
@@ -151,10 +149,11 @@ sum(keep)
 df <- data.frame(ave.counts = log10(ave.counts))
 
 p4 <- ggplot(df, aes(x = ave.counts)) + 
-  geom_histogram(binwidth = 0.5) + 
-  geom_vline(aes(xintercept = log10(1), color = "red")) +
-  guides(color = "none") + labs(x = expression(Log[10]~"average count"), 
+  geom_histogram(binwidth = 0.5, fill = "grey80") + 
+  geom_vline(aes(xintercept = log10(1)), color = "red", linetype = "dashed") +
+  guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
                                 y = "Number of genes")
+p4
 
 sce.red <- sce[keep, ]
 ```
@@ -168,14 +167,14 @@ summary(sizeFactors(sce))
 sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 80, 150))
 summary(sizeFactors(sce.red))
 
-ggplot(data.frame(tc = sce$total_counts/1e6, 
+ggplot(data.frame(tc = sce$total_counts, 
                   sf = sizeFactors(sce)), aes(x = sf, y = tc)) + 
-  geom_point() + xlab("Size factor") + ylab("Library size (million reads)") + 
+  geom_point() + xlab("Size factor") + ylab("Library size") + 
   scale_x_log10() + scale_y_log10()
 
-ggplot(data.frame(tc = sce.red$total_counts/1e6, 
+ggplot(data.frame(tc = sce.red$total_counts, 
                   sf = sizeFactors(sce.red)), aes(x = sf, y = tc)) + 
-  geom_point() + xlab("Size factor") + ylab("Library size (million reads)") + 
+  geom_point() + xlab("Size factor") + ylab("Library size") + 
   scale_x_log10() + scale_y_log10()
 ```
 
@@ -195,26 +194,29 @@ sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE,
 
 ## Plot the proportion of explained variances
 
-```{r explained-variance} 
+```{r explained-variance, warning = FALSE} 
 expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
 p5 <- plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
+p5
 ```
 
 ## Plot t-SNE representations
 
 ```{r tSNE}
 set.seed(1234)
-p6 <- plotTSNE(sce.red, exprs_values = "logcounts", perplexity = 5,
-               colour_by = "total_features", size_by = "total_counts",
-               return_SCESet=FALSE) + ggtitle("tSNE plot")
+sce.red <- runTSNE(sce.red, expr_values = "logcounts", perplexity = 5)
+p1 <- plotTSNE(sce.red, colour_by = "phenoid")
+p1
+p6 <- plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
+p6
 ```
 
 ## Plot a summary of the QC
 
 ```{r qc-plot-out} 
-plot.qc <- plot_grid(p1, p2, p3, p4, p5, p6, ncol = 2, labels = "auto")
+plot.qc <- plot_grid(p1, p6, p3, p4, p5, p2, ncol = 2, labels = "auto")
 pdf("../../plots/qc_data/qc_summary_Koh.pdf", width = 10, height = 12)
 print(plot.qc)
 dev.off()

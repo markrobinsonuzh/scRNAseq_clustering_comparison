@@ -1,11 +1,9 @@
 ---
-title: "Import and QC of Trapnell data set"
+title: "Import and QC of Trapnell data set (GSE52529-GPL16791)"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
-
-# Load and process data set GSE52529-GPL16791 (Trapnell 2014)
 
 ```{r load-packages}
 suppressPackageStartupMessages({
@@ -25,7 +23,7 @@ suppressPackageStartupMessages({
 ```{r load-dataset}
 (maex <- readRDS("../../data/data_raw/GSE52529-GPL16791.rds"))
 
-## Extract the gene-level TPM and the counts obtaines by scaling the TPMs
+## Extract the gene-level TPM and the counts obtained by scaling the TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 
@@ -39,6 +37,9 @@ table(phn$phenoid)
 ## Create a SingleCellExperiment object
 
 ```{r create-sce}
+stopifnot(all(colnames(cts) == rownames(phn)))
+stopifnot(all(colnames(tpm) == rownames(phn)))
+
 sce <- SingleCellExperiment(
   assays = list(counts = cts, 
                 tpm = tpms), 
@@ -49,7 +50,7 @@ logcounts(sce) <- log2(calculateCPM(sce) + 1)
 Exclude features that are not expressed
 
 ```{r reduce-expression-matrix}
-keep_features <- rowSums(counts(sce) > 0) >= 1
+keep_features <- rowSums(counts(sce) > 0) > 0
 table(keep_features)
 sce <- sce[keep_features, ]
 dim(sce)
@@ -77,14 +78,14 @@ sce <- calculateQCMetrics(sce)
 ```{r histogram}
 size.med <- median(log10(sce$total_counts), na.rm = TRUE)
 size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
-lower.limit.size <- 10^(size.med - 3 * size.mad)/1e6
+lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sce$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sce$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
 
-ggplot(as.data.frame(colData(sce)), aes(x = total_counts/1e6)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Library size (million reads)") + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
   theme_bw()

@@ -1,11 +1,9 @@
 ---
-title: "Import and QC of SimKumar"
+title: "Import and QC of SimKumar data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
 ---
-
-# Load and process data set SimKumar (Kumar 2014)
 
 ```{r load-packages}
 suppressPackageStartupMessages({
@@ -26,7 +24,7 @@ suppressPackageStartupMessages({
 ```{r load-dataset}
 (maex <- readRDS("../../data/data_raw/GSE60749-GPL13112.rds"))
 
-## Extract the gene-level TPM and the counts obtaines by scaling the TPMs
+## Extract the gene-level TPM and the counts obtained by scaling the TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 
 ## Extract the phenotype data. Here, we are interested in the three culture conditions
@@ -46,6 +44,8 @@ table(phn$phenoid)
 ## Extract one subpopulation
 
 ```{r}
+stopifnot(all(colnames(cts) == rownames(phn)))
+
 sub.cts <- cts[, phn$phenoid == "v6.5 mouse 2i+LIF"]
 dim(sub.cts)
 ```
@@ -94,14 +94,14 @@ sce <- calculateQCMetrics(sce)
 ```{r histogram}
 size.med <- median(log10(sce$total_counts), na.rm = TRUE)
 size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
-lower.limit.size <- 10^(size.med - 3 * size.mad)/1e6
+lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sce$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sce$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
 
-ggplot(as.data.frame(colData(sce)), aes(x = total_counts/1e6)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Library size (million reads)") + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
   theme_bw()

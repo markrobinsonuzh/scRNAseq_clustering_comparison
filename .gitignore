@@ -18,3 +18,8 @@ countsim_report.html
 res.full.tsne
 method_resources/
 skript/
+Rout/
+Rscripts/import_datasets/*.html
+plots/
+old/
+
