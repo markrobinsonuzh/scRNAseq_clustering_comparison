@@ -61,12 +61,13 @@ dim(sce)
 ```{r ercc-mt}
 is.spike <- grepl("^ERCC", rownames(sce))
 table(is.spike)
+isSpike(sce, "ERCC") <- which(is.spike)
 ```
 
 ## Calculate QC metrics
 
 ```{r QC}
-sce <- calculateQCMetrics(sce)
+sce <- calculateQCMetrics(sce, feature_controls = list(ERCC = grepl("^ERCC", rownames(sce))))
 ```
 
 ## Quality control on cells
@@ -93,7 +94,7 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_features)) +
   theme_bw()
 ```
 
-## Quality control using PCA and highest expressed genes
+## Quality control using PCA on column data
 
 We create a PCA plot based the quality metrics for each cell, e.g., the total
 number of reads, the total number of features and the proportion of spike-in
@@ -104,13 +105,13 @@ sce <- scater::runPCA(sce, pca_data_input = "coldata")
 scater::plotPCA(sce, colour_by = "phenoid") + 
   theme(legend.position = "bottom") + 
   guides(color = guide_legend(nrow = 3, byrow = TRUE))
-scater::plotQC(sce, type = "find-pcs", variable = "total_features")
 ```
 
 ## Filter dataset
 
-We remove cells with log-library sizes that are more than 3 median absolute
-deviations (MADs) below the median log-library size.
+We remove cells with log-library sizes (or total features) that are more than 3
+median absolute deviations (MADs) below the median log-library size (or total
+features).
 
 ```{r drop-qc}
 libsize.drop <- isOutlier(sce$total_counts, nmads = 3, type = "lower", log = TRUE)
@@ -125,11 +126,7 @@ data.frame(ByLibSize = sum(libsize.drop), ByFeature = sum(feature.drop),
            Remaining = ncol(sce))
 ```
 
-## Quality control using PCA and highest expressed genes
-
-Using the filtered data, we make a PCA plot based the quality metrics for each
-cell, e.g., the total number of reads, the total number of features and the
-proportion of mitochondrial or spike-in reads.
+## Quality control using highest expressed genes
 
 ```{r qc-filt}
 p3 <- plotQC(sce, type = "highest-expression", n = 50)
@@ -138,6 +135,7 @@ p3
 
 ```{r mean-freq-expr}
 p2 <- plotQC(sce, type = "exprs-freq-vs-mean")
+p2
 ```
 
 ## Gene filtering
@@ -149,7 +147,7 @@ sum(keep)
 df <- data.frame(ave.counts = log10(ave.counts))
 
 p4 <- ggplot(df, aes(x = ave.counts)) + 
-  geom_histogram(binwidth = 0.5, fill = "grey80") + 
+  geom_histogram(binwidth = 0.25, fill = "grey80") + 
   geom_vline(aes(xintercept = log10(1)), color = "red", linetype = "dashed") +
   guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
                                 y = "Number of genes")
@@ -225,6 +223,8 @@ dev.off()
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
+sce <- sce[!isSpike(sce, "ERCC"), ]
+sce.red <- sce.red[!isSpike(sce, "ERCC"), ]
 saveRDS(sce, file = "../../data/sce_full/sce_full_Koh.rds")
 saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Koh.rds")
 ```

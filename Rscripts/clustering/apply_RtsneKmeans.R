@@ -6,16 +6,19 @@ suppressPackageStartupMessages({
 
 apply_RtsneKmeans <- function(sce, params, k) {
   tryCatch({
-    dat <- t(logcounts(sce))
+    dat <- logcounts(sce)
     st <- system.time({
-      rtsne <- Rtsne(X = dat, perplexity = params$perplexity, pca = TRUE, 
+      rtsne <- Rtsne(X = t(dat), dims = params$dims, 
+                     perplexity = params$perplexity, pca = TRUE, 
                      initial_dims = params$initial_dims, check_duplicates = FALSE)
-      cluster <- structure(kmeans(rtsne$Y, centers = k)$cluster,
-                           names = rownames(dat))
+      cluster <- kmeans(rtsne$Y, centers = k, nstart = 25)$cluster
+      names(cluster) = colnames(dat)
     })
+    
+    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
     list(st = st, cluster = cluster, est_k = NA)
   }, error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, nrow(dat)), names = rownames(dat)),
+    list(st = NA, cluster = structure(rep(NA, ncol(dat)), names = colnames(dat)),
          est_k = NA)
   })
 }

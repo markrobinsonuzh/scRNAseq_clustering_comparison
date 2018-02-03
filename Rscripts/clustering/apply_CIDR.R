@@ -1,26 +1,33 @@
 ## Apply CIDR
 
 suppressPackageStartupMessages({
-  require(cidr)
+  library(cidr)
 })
 
 apply_CIDR <- function(sce, params, k) {
   tryCatch({
-    dat <- assay(sce, "normcounts")
+    dat <- counts(sce)
     st <- system.time({
-      sData <- scDataConstructor(dat)
+      sData <- scDataConstructor(dat, tagType = "raw")
       sData <- determineDropoutCandidates(sData)
-      sData <- wThreshold(sData, plotTornado = TRUE)
-      sData <- scDissim(sData)
-      sData <- scPCA(sData)
+      sData <- wThreshold(sData)
+      sData <- scDissim(sData, threads = 1)
+      sData <- scPCA(sData, plotPC = FALSE)
       sData <- nPC(sData)
       
-      # nCluster(sData) # different methods todefine the number of clusters, optional
-      sData <- scCluster(object = sData, nCluster = k, 
-                         cMethod = "ward.D2", nPC = params$nPC)
-      cluster <- sData@clusters
+      ## Cluster with preset number of clusters
+      sDataC <- scCluster(object = sData, nCluster = k, 
+                          nPC = sData@nPC, cMethod = "ward.D2")
+      cluster <- sDataC@clusters
+      names(cluster) <- colnames(sDataC@tags)
     })
-    list(st = st, cluster = cluster, est_k = NA)
+    ## Determine number of clusters automatically
+    sDataA <- scCluster(object = sData, n = max(params$range_clusters),
+                        nPC = sData@nPC, cMethod = "ward.D2")
+    est_k <- sDataA@nCluster
+    
+    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
+    list(st = st, cluster = cluster, est_k = est_k)
   }, error = function(e) {
     list(st = NA, cluster = structure(rep(NA, ncol(dat)), names = colnames(dat)),
          est_k = NA)

@@ -1,15 +1,16 @@
 ## Apply FlowSOM
 
 suppressPackageStartupMessages({
-  library(FlowSOM)
   library(flowCore)
+  library(FlowSOM)
 })
 
 apply_FlowSOM <- function(sce, params, k) {
   tryCatch({
     dat <- logcounts(sce)
     st <- system.time({
-      pca <- prcomp(t(dat), center = TRUE, scale. = FALSE)$x[, seq_len(params$nPC), drop = FALSE]
+      pca <- prcomp(t(dat), center = TRUE, scale. = FALSE)
+      pca <- pca$x[, seq_len(params$nPC), drop = FALSE]
       ff <- flowFrame(exprs = pca)
       fSOM <- FlowSOM::ReadInput(ff, compensate = FALSE, transform = FALSE, 
                                  scale = FALSE, silent = TRUE)
