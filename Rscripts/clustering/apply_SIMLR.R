@@ -10,12 +10,15 @@ apply_SIMLR <- function(sce, params, k) {
     dat <- logcounts(sce)
     st <- system.time({
       simlr = SIMLR(X = dat, c = k, no.dim = NA, k = params$k, 
-                    if.impute = FALSE, normalize = params$normalize)
+                    if.impute = FALSE, normalize = FALSE, cores.ratio = 1)
+      cluster <- simlr$y$cluster
+      names(cluster) <- colnames(sce)
     })
-    cluster <- simlr$y$cluster  
+    
+    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
     list(st = st, cluster = cluster, est_k = NA)
   }, error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, ncol(dat)), names = colnames(dat)),
+    list(st = NA, cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
          est_k = NA)
   })
 }

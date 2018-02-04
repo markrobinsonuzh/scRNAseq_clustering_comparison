@@ -6,14 +6,19 @@ suppressPackageStartupMessages({
 
 apply_TSCAN <- function(sce, params, k) {
   tryCatch({
-    dat <- counts(sce)
+    dat <- logcounts(sce)
     st <- system.time({
-      tscan <- preprocess(dat, minexpr_percent = params$minexpr_percent, logbase = 2)
-      cluster <- exprmclust(tscan, clusternum = k)$clusterid
+      cluster <- exprmclust(dat, clusternum = k, modelNames = "VVV", reduce = TRUE)$clusterid
     })
-    list(st = st, cluster = cluster, est_k = NA)
+    
+    ## Determine number of clusters automatically
+    est_k <- length(unique(exprmclust(dat, clusternum = params$range_clusters, 
+                                      modelNames = "VVV", reduce = TRUE)$clusterid))
+    
+    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
+    list(st = st, cluster = cluster, est_k = est_k)
   }, error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, ncol(dat)), names = colnames(dat)),
+    list(st = NA, cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
          est_k = NA)
   })
 }

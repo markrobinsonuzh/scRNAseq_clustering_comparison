@@ -33,32 +33,67 @@ sce <- readRDS(scefile)
 ## Run clustering
 set.seed(1234)
 L <- lapply(seq_len(n_rep), function(i) {  ## For each run
-  tmp <- lapply(params$range_clusters, function(k) {  ## For each k
-    ## Run clustering
-    res <- get(paste0("apply_", method))(sce = sce, params = params, k = k)
-
-    ## Put output in data frame
-    df <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
-                     method = method, 
-                     cell = names(res$cluster),
-                     run = i,
-                     k = k,
-                     cluster = res$cluster,
-                     stringsAsFactors = FALSE, row.names = NULL)
-    tm <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
-                     method = method,
-                     run = i, 
-                     k = k,
-                     timing = res$st,
-                     stringsAsFactors = FALSE, row.names = NULL)
-    kest <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+  if (method == "Seurat") {
+    tmp <- lapply(params$range_resolutions, function(resolution) {  ## For each resolution
+      ## Run clustering
+      res <- get(paste0("apply_", method))(sce = sce, params = params, resolution = resolution)
+      
+      ## Put output in data frame
+      df <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+                       method = method, 
+                       cell = names(res$cluster),
+                       run = i,
+                       k = length(unique(res$cluster)),
+                       resolution = resolution,
+                       cluster = res$cluster,
+                       stringsAsFactors = FALSE, row.names = NULL)
+      tm <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+                       method = method,
+                       run = i, 
+                       k = length(unique(res$cluster)),
+                       resolution = resolution,
+                       timing = res$st,
+                       stringsAsFactors = FALSE, row.names = NULL)
+      kest <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+                         method = method,
+                         run = i, 
+                         k = length(unique(res$cluster)),
+                         resolution = resolution,
+                         est_k = res$est_k,
+                         stringsAsFactors = FALSE, row.names = NULL)
+      list(clusters = df, timing = tm, kest = kest)
+    })  ## End for each resolution
+  } else {
+    tmp <- lapply(params$range_clusters, function(k) {  ## For each k
+      ## Run clustering
+      res <- get(paste0("apply_", method))(sce = sce, params = params, k = k)
+      
+      ## Put output in data frame
+      df <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+                       method = method, 
+                       cell = names(res$cluster),
+                       run = i,
+                       k = k,
+                       resolution = NA,
+                       cluster = res$cluster,
+                       stringsAsFactors = FALSE, row.names = NULL)
+      tm <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
                        method = method,
                        run = i, 
                        k = k,
-                       est_k = res$est_k,
+                       resolution = NA,
+                       timing = res$st,
                        stringsAsFactors = FALSE, row.names = NULL)
-    list(clusters = df, timing = tm, kest = kest)
-  })  ## End for each k
+      kest <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
+                         method = method,
+                         run = i, 
+                         k = k,
+                         resolution = NA,
+                         est_k = res$est_k,
+                         stringsAsFactors = FALSE, row.names = NULL)
+      list(clusters = df, timing = tm, kest = kest)
+    })  ## End for each k
+  }
   
   ## Summarize across different values of k
   assignments <- do.call(rbind, lapply(tmp, function(w) w$clusters))

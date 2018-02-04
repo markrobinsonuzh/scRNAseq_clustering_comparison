@@ -6,18 +6,26 @@ suppressPackageStartupMessages({
 
 apply_Linnorm <- function(sce, params, k) {
   tryCatch({
-    dat <- counts(sce)
+    dat <- assay(sce, "normcounts")
     st <- system.time({
-      transformedExp <- Linnorm(dat, spikein = NULL, 
+      transformedExp <- Linnorm(dat, spikein = NULL, Filter = FALSE, 
                                 minNonZeroPortion = params$minNonZeroPortion, 
-                                BE_strength = params$BE_strength)
+                                BE_strength = 0.5)
+      
+      ## Cluster with predetermined number of clusters
       cluster <- Linnorm.tSNE(transformedExp, input = "Linnorm",
-                              num_center = k)$k_means$cluster
-      cluster <- structure(cluster, names = colnames(dat))
+                              num_PC = params$num_PC, num_center = k)$k_means$cluster
+      names(cluster) = colnames(dat)
     })
-    list(st = st, cluster = cluster, est_k = NA)
+    ## Determine number of clusters automatically
+    est_k <- length(unique(Linnorm.tSNE(transformedExp, input = "Linnorm",
+                                        num_PC = params$num_PC, 
+                                        num_center = params$range_clusters)$k_means$cluster))
+    
+    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
+    list(st = st, cluster = cluster, est_k = est_k)
   }, error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, ncol(dat)), names = colnames(dat)),
+    list(st = NA, cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
          est_k = NA)
   })
 }
