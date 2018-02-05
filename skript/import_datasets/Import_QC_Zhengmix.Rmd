@@ -60,10 +60,10 @@ colData(cd14.monocytes)$phenoid <- array("cd14.monocytes", dim = ncol(cd14.monoc
 colData(regulatory.t)$phenoid <- array("regulatory.t", dim = ncol(regulatory.t) )
 
 ## sample
-b.cells <- b.cells[,sample( colnames(b.cells) , 200, replace = FALSE, prob = NULL) ]
-naive.cytotoxic<- naive.cytotoxic[,sample( colnames(naive.cytotoxic) , 200, replace = FALSE, prob = NULL) ]
-cd14.monocytes<- cd14.monocytes[,sample( colnames(cd14.monocytes) , 200, replace = FALSE, prob = NULL) ]
-regulatory.t <- regulatory.t[,sample( colnames(regulatory.t ) , 200, replace = FALSE, prob = NULL) ]
+b.cells <- b.cells[,sample( colnames(b.cells) , 500, replace = FALSE, prob = NULL) ]
+naive.cytotoxic<- naive.cytotoxic[,sample( colnames(naive.cytotoxic) , 500, replace = FALSE, prob = NULL) ]
+cd14.monocytes<- cd14.monocytes[,sample( colnames(cd14.monocytes) , 500, replace = FALSE, prob = NULL) ]
+regulatory.t <- regulatory.t[,sample( colnames(regulatory.t ) , 500, replace = FALSE, prob = NULL) ]
 
 ```
 
@@ -152,18 +152,17 @@ feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
 
 
+df.hist <- as.data.frame(cbind("total_counts"=sceset$total_counts,"total_features"=sceset$total_features) )
 
+hist.1 <- ggplot(df.hist, aes(x=total_counts))+
+  geom_histogram()+
+  labs(x="Library sizes ",y="Number of cells" )+
+  geom_vline(xintercept=lower.limit.size, color=2)
 
-par(mfrow=c(2,2))
-hist(sceset$total_counts, xlab="Library sizes ", main="", 
-    breaks=20, col="grey80", ylab="Number of cells")
-abline(v=lower.limit.size,col=2, lty=2 )
-hist(sceset$total_features, xlab="Number of expressed genes", main="", 
-    breaks=20, col="grey80", ylab="Number of cells")
-abline(v=lower.limit.feat, col=2, lty=2 )
-#hist(sceset$pct_counts_feature_controls_Mt, xlab="Mitochondrial proportion (%)", main="", 
-#    breaks=20, col="grey80", ylab="Number of cells")
-#abline(v=upper.limit.mito, col=2, lty=2 )
+hist.2 <- ggplot(df.hist, aes(x=total_features))+
+  geom_histogram()+
+  labs(x="Number of expressed genes",y="Number of cells" )+
+  geom_vline(xintercept=lower.limit.feat, color=2)
 
 ```
 
@@ -269,13 +268,13 @@ p5 <- plotQC(scset.red, type = "explanatory-variables", variables = expl_vars)
 ```
 plot tSNE represenatation
 ```{r tSNE}
-p6 <- plotTSNE(scset.red, exprs_values="normcounts", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
+p6 <- scater::plotTSNE(scset.red, exprs_values="logcounts", perplexity=5, colour_by="total_features",size_by="total_counts",return_SCESet=FALSE) + ggtitle("tSNE plot")
 ```
 
 ```{r create QC plots} 
 
 
-plot.qc <- plot_grid(p1,p2,p3,p4,p5,p6, ncol = 2, labels="auto")
+plot.qc <- plot_grid(hist.1, hist.2,p3,p4,p5,p6, ncol = 2, labels="auto")
 
 save_plot("results/QC_data/qc_summary_zheng.png", plot.qc,
           ncol = 2, # we're saving a grid plot of 2 columns
