@@ -343,7 +343,7 @@ zinbwaveCBI <- function( data, par.k  , n.genes) {
                                 stop.epsilon.optimize = 1e-04)  # round data as it assumes whole counts
       
       d<- dist(getW( res.zinb ))
-      tsne_data <- Rtsne(d, is_distance = TRUE, pca = FALSE, perplexity=10, max_iter=5000)
+      #tsne_data <- Rtsne(d, is_distance = TRUE, pca = FALSE, perplexity=10, max_iter=5000)
       res.cluster <- kmeans(d, centers=par.k )$cluster
   
   # out
