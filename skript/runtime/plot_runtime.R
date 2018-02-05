@@ -77,6 +77,15 @@ p1 <- ggplot(tbl)+
            stat='identity',position='dodge')+
   labs(x="dataset", y="log10( runtime (s))")+
   scale_fill_brewer(palette = "Set3")
+p1 <- ggplot(tbl)+
+  geom_bar(aes(x=dataset,y=.time,fill=method),
+           stat='identity',position='dodge')+
+  labs(x="dataset", y="runtime (s)")+
+  scale_fill_brewer(palette = "Set3")+
+  scale_y_log10(breaks=c(0,10,100,1000),labels=c(0,10,100,1000))
+
+
+
 
 p2 <- ggplot(tbl)+
   geom_bar(aes(x=dataset,y=.time,fill=method),
