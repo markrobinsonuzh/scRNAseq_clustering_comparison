@@ -126,7 +126,7 @@ pct_dropout_max2<- list(
   
 )
 # optimalk
-par.k3 <-  list(
+par.k4 <-  list(
   kumar2015 = 3,
   trapnell2014 = 2,
   zhengmix2016=4,
@@ -140,7 +140,7 @@ par.k3 <-  list(
 if ( (datatype=="filtered")| (datatype=="smooth")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k3; pct_dropout_max <- pct_dropout_max2}
 else if ((datatype == "unfiltered" )) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k2; pct_dropout_max <- pct_dropout_max2}
 else if ((datatype == "default")) { par.ks  <- par.ks1 ;par.k_estimator <- par.k_estimator1 ; par.k <- par.k1 ; pct_dropout_max <- pct_dropout_max1 }
-else if ((datatype == "optimalk")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k3; pct_dropout_max <- pct_dropout_max2 }
+else if ((datatype == "optimalk")) { par.ks  <- par.ks2  ;par.k_estimator <- par.k_estimator2; par.k <- par.k4; pct_dropout_max <- pct_dropout_max2 }
 else {print("datatype not defined") }
 
 print(par.ks )
