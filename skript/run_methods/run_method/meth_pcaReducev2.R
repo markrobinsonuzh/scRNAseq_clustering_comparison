@@ -19,7 +19,7 @@ analyze_pcareduce <- function( datatype, dataset){
   
   source("skript/helper_files/Helper_functions.R")
   # source method pcaReduce
-  source("skript/run_methods/run_functions/run_function_pcareduce.R")
+  source("skript/run_methods/run_functions/run_function_pcareduce_consensus.R")
   # source file paths: fileterd , raw etc.
   if ((datatype == "default") | (datatype=="filtered")| (datatype=="optimalk")) { source("FILES.R"); print("filtered files")}
   else if ((datatype == "unfiltered")) { source("FILESraw.R"); print("raw files") }
