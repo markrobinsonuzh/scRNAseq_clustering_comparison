@@ -184,6 +184,38 @@ pcareduceCBI <- function ( data, par.nbt, par.q ,n.cluster) {
       return(list)
   
 }
+
+# pcaReduce with consensus
+pcareduceCBI2<- function ( data, par.nbt, par.q ,n.cluster) {
+  require(pcaReduce)
+  # extract k dimension 
+  
+  par.k <- function(i){
+    (par.q+2)-(n.cluster)
+  }
+  
+  # run pce Reduce, vary q
+  pca.red <- PCAreduce(t(data), nbt = par.nbt, q = par.q, method = 'S')
+  part <- lapply(pca.red, function(x)x[,par.k(i)])
+  part<- lapply(part, function(x) as.cl_partition(x))
+  part <- as.cl_ensemble(part)
+  cl_cons <- cl_consensus(  part , method = "SE",  control = list(nruns=50))
+  res.cluster<- as.character( cl_class_ids( cl_cons ) )
+  # out
+  clusterlist <- vector("list", length( unique(res.cluster) ))
+  clusterlist <- lapply(seq_len(length( unique(res.cluster))), function(x){ res.cluster == x } )
+  cluster <- as.data.frame(res.cluster)
+  list <- list(
+    result=res.cluster,
+    nc= length( unique(res.cluster) ),
+    clusterlist=clusterlist,
+    partition=res.cluster,
+    clustermethod= "pcareduceCBI",
+    cluster=cbind(cluster, id=colnames(data) )
+  )
+  return(list)
+  
+}
 #-----------------------------------------------------
 # Seurat
 seuratCBI <- function( data, par.resolution, k.param , par.dims.use , r.seed) {
