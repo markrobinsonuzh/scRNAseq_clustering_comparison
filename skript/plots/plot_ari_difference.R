@@ -128,3 +128,4 @@ save_plot("results/plots/plot_ari_diff_filtdef.pdf", p.filtdef , base_width=12, 
 
 p.all <- plot_grid(p1$gtable, p2$gtable, p3$gtable, p4$gtable,ncol = 1, labels="auto")
 save_plot("results/plots/plot_ari_diff_all.pdf", p.all, base_width=7, base_height = 14)
+
