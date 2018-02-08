@@ -17,7 +17,7 @@ run_function_cidr <- function( data, labels, par.k, par.nPC,datatype  ) {
 # extract transposed expression data
 
 for (i in names(data) ){
-  tinput_matrix[[i]] <- t(assay( data[[i]], "normcounts")) # use  length scaled tpms, normalized and log2+1 transformed
+  tinput_matrix[[i]] <- t(exprs( data[[i]])) # use  length scaled tpms, normalized and log2+1 transformed
 }
 
 # RUN cidr
