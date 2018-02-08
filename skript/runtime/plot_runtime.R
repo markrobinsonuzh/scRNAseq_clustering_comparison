@@ -17,7 +17,7 @@ METHOD <- c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "cidr"
 
 # file paths to the clustering results, change the path according to the processed datasets
 DATA_DIR <-  "results"
-DATASET <-"simDataKumar2"  # "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar","simDataKumar2"
+DATASET <-"simDataKumar2"# "kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar","simDataKumar2"
 datatype <- "filtered"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -67,16 +67,16 @@ tbl <- cbind( method= rownames(tbl), tbl) %>% as.data.frame
 
 tbl<- melt(tbl, id.vars = c("method"), variable.name = "dataset", value.name = ".time")
 
-tbl$.timelog <- log10(as.integer(tbl$.time))
 tbl$.time <- as.integer(tbl$.time)
-# rename levels of datasets
+# rename levels of datasets and methods
 levels(tbl$dataset) <- c("Kumar", "Trapnell", "Zheng", "Koh", "simDataKumar", "simDatakumar2")
+tbl$method <- factor(tbl$method)
+levels(tbl$method) <- c("CIDR","linnorm" ,"pcaReduce","RaceID" ,"tSNEkmeans","SC3" ,"Seurat" ,"SIMLR" ,"SIMLRlargescale",
+                         "TSCAN" , "ZINBWaVE")
+# reorder
+tbl$dataset <- factor(tbl$dataset, levels =c("Kumar", "Trapnell", "simDataKumar", "simDatakumar2", "Koh","Zheng"))
 #-------------------------------------------------------------------------------------------------------------------
-p1 <- ggplot(tbl)+
-  geom_bar(aes(x=dataset,y=.timelog,fill=method),
-           stat='identity',position='dodge')+
-  labs(x="dataset", y="log10( runtime (s))")+
-  scale_fill_brewer(palette = "Set3")
+
 p1 <- ggplot(tbl)+
   geom_bar(aes(x=dataset,y=.time,fill=method),
            stat='identity',position='dodge')+
@@ -85,17 +85,7 @@ p1 <- ggplot(tbl)+
   scale_y_log10(breaks=c(0,10,100,1000),labels=c(0,10,100,1000))
 
 
-
-
-p2 <- ggplot(tbl)+
-  geom_bar(aes(x=dataset,y=.time,fill=method),
-           stat='identity',position='dodge')+
-  labs(x="data set", y="runtime (s)")+
-  scale_fill_brewer(palette = "Set3")  
-
-
 save_plot(plot=p1,filename= "results/plots/runtimeslog.pdf", base_width = 10)
-save_plot(plot=p2,filename= "results/plots/runtimes.pdf", base_width = 10)
 
 
 
