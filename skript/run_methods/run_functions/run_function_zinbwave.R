@@ -30,7 +30,7 @@ run_function_zinbwave <-  function( data, labels, par.k,n.genes,datatype ){
                                 K=2, epsilon=n.genes[[i]], verbose=TRUE,
                               nb.repeat.initialize = 2, 
                               maxiter.optimize = 25,
-                              stop.epsilon.optimize = 1e-04, normalizedValues =TRUE)  # round data as it assumes whole counts
+                              stop.epsilon.optimize = 1e-04)  # round data as it assumes whole counts
 
     d[[i]]<- dist(getW( res.zinb[[i]] ))
     res.cluster[[i]] <- kmeans(d[[i]], centers=par.k[[i]] )$cluster
