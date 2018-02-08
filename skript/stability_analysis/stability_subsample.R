@@ -94,9 +94,8 @@ res.raceid <-  stability.analysis(fun.method=raceidCBI,sample.full=data.normcts,
 res.rtsnekmeans <-  stability.analysis( fun.method=rtsnekmeansCBI,sample.full=data.normcts, subsample=sample.norm ,k=3, perplexity=30)
 res.seurat <-  seurat.stability.analysis( fun.method=seuratCBI, sample.full=data.normcts, subsample=sample.norm ,par.resolution=0.6, k.param = 25 , par.dims.use=1:9)
 
-#res.sc3 <-  stability.analysis(fun.method=sc3CBI,sample.full=data.normcts, subsample=sample.norm, par.ks = NULL, par.k_estimator=FALSE , par.k =3, pct_dropout_max =90 )
 res.zinbwave <-  stability.analysis(fun.method=zinbwaveCBI,sample.full=data.raw, subsample=sample.raw, par.k=3, n.genes=1000 )
-res.pcareduce <-  stability.analysis( fun.method=pcareduceCBI, sample.full=data.normcts, subsample=sample.norm,par.nbt=100, par.q=30 ,n.cluster=3)
+res.pcareduce <-  stability.analysis( fun.method=pcareduceCBI2, sample.full=data.normcts, subsample=sample.norm,par.nbt=100, par.q=30 ,n.cluster=3)
 
 
 #-------------------------------------------------------------
