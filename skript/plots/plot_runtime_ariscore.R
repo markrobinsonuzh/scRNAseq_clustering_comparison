@@ -52,24 +52,24 @@ return_runtime_single <- function( DATASET, METHOD,DATA_DIR, datatype  ){
   time <- lapply(files_systime, read_file)%>% unlist%>% as.vector%>%as.numeric
   names(time) <- names(files_systime)
   return(time )
-
+  
 }
 #load the ARI files , as long table
 ## define the data directories
+DATA_DIR <-  "results/run_results"
+files_ari <- list(
+  kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_kumar2015.rda") ),
+  trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_trapnell2014.rda") ),
+  koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_koh2016.rda")),
+  zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype,"_zhengmix2016.rda")),
+  simDataKumar = file.path(DATA_DIR,paste0("ari_single_",datatype,"_simDataKumar.rda")),
+  simDataKumar2 = file.path(DATA_DIR,paste0("ari_single_",datatype,"_simDataKumar2.rda"))
+  
+)
 
 
 # TABLE ARI scores
 tbl_ari <- function(files_ari, datatype){
-  DATA_DIR <-  "results/run_results"
-  files_ari <- list(
-    kumar2015 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_kumar2015.rda") ),
-    trapnell2014 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_trapnell2014.rda") ),
-    koh2016 = file.path(DATA_DIR, paste0("ari_single_",datatype,"_koh2016.rda")),
-    zhengmix = file.path(DATA_DIR, paste0("ari_single_",datatype,"_zhengmix2016.rda")),
-    simDataKumar = file.path(DATA_DIR,paste0("ari_single_",datatype,"_simDataKumar.rda")),
-    simDataKumar2 = file.path(DATA_DIR,paste0("ari_single_",datatype,"_simDataKumar2.rda"))
-    
-  )
 
   
   # load dataset
@@ -85,10 +85,10 @@ tbl_ari <- function(files_ari, datatype){
   tmp$data <-  as.factor(tmp$data)
   levels(tmp$data) <- c("Koh", "Kumar", "simDataKumar", "simDataKumar2", "Trapnell", "Zheng")
   tmp$method <- as.factor(tmp$method)
-
-
   
-return(tmp)
+  
+  
+  return(tmp)
 }
 
 #___________________________________________________________________________________________________________________
@@ -103,7 +103,7 @@ levels(t.tbl$dataset) <- c("Kumar", "Trapnell", "Zheng", "Koh", "simDataKumar", 
 
 # load ARI scores
 
-ari.tbl <- tbl_ari(files_ari, "default")
+ari.tbl <- tbl_ari(files_ari, "filtered")
 
 
 
@@ -115,12 +115,13 @@ m.tbl$.time <- as.numeric(m.tbl$.time)
 avg.tbl <- m.tbl%>%group_by(method)%>%summarise(avg.ari=mean(X..i..), avg.t = mean(.time))
 p1 <- ggplot(avg.tbl, aes(x=avg.ari,y=avg.t))+
   geom_point(aes(color=method) , size=4)+
-  labs(x="avg. ARI", y=" avg. runtime (s)")+
+  labs(x="ARI", y="runtime (s)")+
   scale_color_brewer(palette = "Set3")+
-  scale_y_log10(breaks=c(0,10,100,1000),labels=c(0,10,100,1000))
+  scale_y_log10(breaks=c(0,10,100,1000,5000),labels=c(0,10,100,1000,5000))
+  
 
 #_____________________________________________________________
-save_plot(plot=p1,filename= "results/plots/plot_avgaritime_default.pdf", base_width = 10)
+save_plot(plot=p1,filename= "results/plots/plot_avgaritime_filtered.pdf", base_width = 10)
 
 
 
