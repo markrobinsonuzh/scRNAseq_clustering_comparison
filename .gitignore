@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 scRNAseq_clustering_comparison.Rproj
 data/
 .DS_Store
