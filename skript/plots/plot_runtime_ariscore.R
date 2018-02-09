@@ -111,14 +111,23 @@ ari.tbl <- tbl_ari(files_ari, "filtered")
 m.tbl <- merge(ari.tbl,t.tbl, by.x=c("data", "method"), by.y=c("dataset", "method"), all.x = FALSE)
 m.tbl$method <- factor(m.tbl$method)
 m.tbl$.time <- as.numeric(m.tbl$.time)
+levels(m.tbl$method) <- c("CIDR" , "Linnorm" ,"pcaReduce" ,"RaceID" ,"tSNEkmeans" ,"SC3"  ,   "Seurat"         
+, "SIMLR" ,"SIMLRlargescale", "TSCAN","ZINBWaVE")
 # averages of ARI and time
 avg.tbl <- m.tbl%>%group_by(method)%>%summarise(avg.ari=mean(X..i..), avg.t = mean(.time))
 p1 <- ggplot(avg.tbl, aes(x=avg.ari,y=avg.t))+
   geom_point(aes(color=method) , size=4)+
   labs(x="ARI", y="runtime (s)")+
   scale_color_brewer(palette = "Set3")+
-  scale_y_log10(breaks=c(0,10,100,1000,5000),labels=c(0,10,100,1000,5000))
-  
+  scale_y_log10()
+
+p1 <- ggplot(avg.tbl, aes(x=avg.ari,y=avg.t))+
+  geom_point(aes(color=method) , size=4)+
+  labs(x="ARI", y="runtime (s)")+
+  scale_color_brewer(palette = "Set3")+
+  scale_y_continuous()+
+  scale_x_continuous(limits=c(0,1))
+
 
 #_____________________________________________________________
 save_plot(plot=p1,filename= "results/plots/plot_avgaritime_filtered.pdf", base_width = 10)

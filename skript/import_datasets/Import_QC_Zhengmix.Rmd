@@ -148,7 +148,7 @@ size.mad <- mad(log10(sceset$total_counts), center = size.med, na.rm = TRUE)
 lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sceset$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sceset$total_features), center =feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
 
 

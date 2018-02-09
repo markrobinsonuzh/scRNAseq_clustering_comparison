@@ -15,7 +15,7 @@ METHOD <- c("pcaReduce", "RtSNEkmeans", "SC3", "SIMLR","SIMLRlargescale", "cidr"
 # file paths to the clustering results, change the path according to the processed datasets
 DATA_DIR <-  "results"
 # datasets: "default", "filtered","unfiltered","optimalk"
-datatype <- "optimalk"
+datatype <- "unfiltered"
 #
 DATASET <-c("kumar2015" ,"trapnell2014" ,"zhengmix2016" , "koh2016" , "simDataKumar", "simDataKumar2")   
 # store .rda objects , per dataset

@@ -135,7 +135,7 @@ size.mad <- mad(log10(sceset$total_counts), center = size.med, na.rm = TRUE)
 lower.limit.size <- 10^(size.med - 3 * size.mad)
     
 feature.med <- median(log10(sceset$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sceset$total_features), center = size.med, na.rm = TRUE)
+feature.mad <- mad(log10(sceset$total_features), center =feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad  )
 
 
@@ -150,7 +150,6 @@ hist.2 <- ggplot(df.hist, aes(x=total_features))+
   geom_histogram()+
   labs(x="Number of expressed genes",y="Number of cells" )+
   geom_vline(xintercept=lower.limit.feat, color=2)
-    
 ```
 
 # Quality control using PCA and highest expressed genes

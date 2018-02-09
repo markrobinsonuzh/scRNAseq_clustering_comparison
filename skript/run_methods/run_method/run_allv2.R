@@ -20,7 +20,7 @@ source( paste0(FILE_DIR , "meth_seuratv2.R") )
 source( paste0(FILE_DIR , "meth_SC3v2.R") ) 
 # run the methods on the respetive datasets
 # which dataset "kumar2015"  ,  "trapnell2014" ,"zhengmix2016" ,"koh2016"  ,"simDataKumar", "simDataKumar2"
-dataset <- c( "kumar2015"  ,  "trapnell2014" ,"zhengmix2016" ,"koh2016"  ,"simDataKumar", "simDataKumar2"  )
+dataset <- c( "kumar2015"  ,  "trapnell2014" ,"zhengmix2016" ,"koh2016"  ,"simDataKumar", "simDataKumar2"    )
 # on defualt
 datatype <- "default"
 

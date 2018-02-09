@@ -42,11 +42,11 @@ p2 <-   ggplot(tbl)+
 
 
 p4 <- ggplot(tbl, aes(x=method, y=ari, fill=method))+
-  geom_dotplot(binaxis = "y", stackdir = "center",  dotsize = 0.5, stackratio=1)+
+  geom_dotplot(binaxis = "y", stackdir = "center",  dotsize = 0.5, stackratio=1, binwidth = 0.03)+
   labs(x="Method", y="ARI")+
   theme_gray()+
-  guides(fill = "none") 
-
+  guides(fill = "none")+ expand_limits(x = 0, y = 0)
+p4
 # save plot p4
 
-save_plot(plot=p4,filename= "results/plots/stability_subsample_boot.pdf", base_width = 12)
+save_plot(plot=p4,filename= "results/plots/stability_subsample_boot.pdf", base_width = 13)

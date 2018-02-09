@@ -1,9 +1,0 @@
-\begin{thebibliography}{}
-
-\bibitem[{R Development Core Team}, 2009]{R}
-{R Development Core Team} (2009).
-\newblock {\em \prog{R}: A Language and Environment for Statistical Computing}.
-\newblock R Foundation for Statistical Computing, Vienna, Austria.
-\newblock {ISBN} 3-900051-07-0.
-
-\end{thebibliography}
