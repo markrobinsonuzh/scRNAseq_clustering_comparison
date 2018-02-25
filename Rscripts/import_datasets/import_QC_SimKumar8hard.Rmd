@@ -11,6 +11,7 @@ suppressPackageStartupMessages({
   library(SingleCellExperiment)
   library(scater)
   library(scran)
+  library(plyr)
   library(dplyr)
   library(ggplot2)
   library(splatter)
@@ -25,13 +26,13 @@ suppressPackageStartupMessages({
 ## Extract the gene-level length-scaled TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 
-## Extract the phenotype data. 
+## Extract the phenotype data.
 phn <- colData(maex)
 phn$phenoid <- as.character(interaction(as.data.frame(phn[, c("source_name_ch1",
                                                               "characteristics_ch1.1")])))
 ## Simplify labels
 phn$phenoid <-  plyr::revalue(
-  phn$phenoid , 
+  phn$phenoid, 
   c("Dgcr8 knockout mouse embryonic stem cells.culture conditions: serum+LIF" = "Dgcr8 knockout mouse serum+LIF", 
     "v6.5 mouse embryonic stem cells.culture conditions: 2i+LIF" = "v6.5 mouse 2i+LIF",
     "v6.5 mouse embryonic stem cells.culture conditions: serum+LIF" = "v6.5 mouse serum+LIF")
@@ -67,7 +68,7 @@ sub.cts <- sub.cts[!is.spike, ]
 sce <- splatSimulate(params = params, batchCells = 500,
                      group.prob = c(0.13, 0.07, 0.1, 0.05, 0.4, 0.1, 0.1, 0.05), 
                      method = "groups", 
-                     de.prob = c(0.01, 0.03, 0.03, 0.05, 0.05, 0.07, 0.08, 0.1),
+                     de.prob = c(0.03, 0.03, 0.03, 0.05, 0.05, 0.07, 0.08, 0.1),
                      verbose = FALSE)
 sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
                  return_norm_as_exprs = TRUE) ## generates logcounts(sce)
@@ -124,7 +125,7 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_features)) +
 ```
 
 ```{r filter-cells}
-table(sce$libsize.drop, sce$feature.drop)
+table(libsize = sce$libsize.drop, feature = sce$feature.drop)
 sce <- sce[, !(sce$libsize.drop | sce$feature.drop)]
 dim(sce)
 ```
@@ -135,31 +136,11 @@ dim(sce)
 plotQC(sce, type = "highest-expression", n = 50)
 ```
 
-## Gene filtering
-
-```{r gene-filtering}
-ave.counts <- rowMeans(counts(sce))
-keep <- ave.counts >= 1
-sum(keep)
-df <- data.frame(ave.counts = log10(ave.counts))
-
-ggplot(df, aes(x = ave.counts)) + 
-  geom_histogram(binwidth = 0.25, fill = "grey80") + 
-  geom_vline(aes(xintercept = log10(1), color = "red")) +
-  guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
-                                y = "Number of genes")
-
-sce.red <- sce[keep, ]
-```
-
 ## Data normalization
 
 ```{r sizefactors}
-sce <- computeSumFactors(sce, sizes = c(20, 40, 60, 80))
+sce <- computeSumFactors(sce, sizes = pmin(ncol(sce), seq(20, 120, 20)), min.mean = 0.1)
 summary(sizeFactors(sce))
-
-sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 60, 80))
-summary(sizeFactors(sce.red))
 ```
 
 ```{r normalization}
@@ -167,11 +148,6 @@ sce <- normalise(sce, exprs_values = "counts", return_log = TRUE,
                  return_norm_as_exprs = TRUE)
 sce <- normalise(sce, exprs_values = "counts", return_log = FALSE, 
                  return_norm_as_exprs = FALSE)
-
-sce.red <- normalise(sce.red, exprs_values = "counts", return_log = TRUE, 
-                 return_norm_as_exprs = TRUE)
-sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE, 
-                     return_norm_as_exprs = FALSE)
 ```
 
 ## Plot the proportion of explained variances
@@ -180,22 +156,23 @@ sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE,
 expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
+plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 ```
 
 ## Plot t-SNE representations
 
 ```{r tSNE}
 set.seed(1234)
-sce.red <- runTSNE(sce.red, exprs_values = "logcounts", perplexity = 5)
-plotTSNE(sce.red, colour_by = "phenoid")
-plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
+sce <- runTSNE(sce, exprs_values = "logcounts", perplexity = 10)
+plotTSNE(sce, colour_by = "phenoid")
+plotTSNE(sce, colour_by = "total_features", size_by = "total_counts")
 ```
 
-## Save the normalized and cell filtered datasets
+## Save the normalized and cell filtered dataset
 
 ```{r save-data}
-saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_SimKumar8hard.rds")
+dim(sce)
+table(sce$phenoid)
 saveRDS(sce, file = "../../data/sce_full/sce_full_SimKumar8hard.rds")
 ```
 

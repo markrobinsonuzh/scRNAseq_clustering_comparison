@@ -135,33 +135,12 @@ dim(sce)
 plotQC(sce, type = "highest-expression", n = 50)
 ```
 
-## Gene filtering
-
-```{r gene-filtering}
-ave.counts <- rowMeans(counts(sce))
-keep <- ave.counts >= 1
-table(keep)
-df <- data.frame(ave.counts = log10(ave.counts))
-
-ggplot(df, aes(x = ave.counts)) + 
-  geom_histogram(binwidth = 0.25, fill = "grey80") + 
-  geom_vline(aes(xintercept = log10(1)), color = "red", linetype = "dashed") +
-  guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
-                                y = "Number of genes")
-
-sce.red <- sce[keep, ]
-```
-
 ## Data normalization
 
 ```{r sizefactors}
-sce <- computeSumFactors(sce, sizes = c(20, 40, 60, 80))
+sce <- computeSumFactors(sce, sizes = pmin(ncol(sce), seq(20, 120, 20)), min.mean = 0.1)
 summary(sizeFactors(sce))
 sce <- computeSpikeFactors(sce, general.use = FALSE)
-
-sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 60, 80))
-summary(sizeFactors(sce.red))
-sce.red <- computeSpikeFactors(sce.red, general.use = FALSE)
 ```
 
 ```{r normalization}
@@ -169,11 +148,6 @@ sce <- normalise(sce, exprs_values = "counts", return_log = TRUE,
                  return_norm_as_exprs = TRUE)
 sce <- normalise(sce, exprs_values = "counts", return_log = FALSE, 
                  return_norm_as_exprs = FALSE)
-
-sce.red <- normalise(sce.red, exprs_values = "counts", return_log = TRUE, 
-                 return_norm_as_exprs = TRUE)
-sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE, 
-                     return_norm_as_exprs = FALSE)
 ```
 
 ## Plot the proportion of explained variances
@@ -182,26 +156,24 @@ sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE,
 expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
+plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 ```
 
 ## Plot t-SNE representations
 
 ```{r tSNE}
 set.seed(1234)
-sce.red <- runTSNE(sce.red, expr_values = "logcounts", perplexity = 5)
-plotTSNE(sce.red, colour_by = "phenoid")
-plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
+sce <- runTSNE(sce, exprs_values = "logcounts", perplexity = 10)
+plotTSNE(sce, colour_by = "phenoid")
+plotTSNE(sce, colour_by = "total_features", size_by = "total_counts")
 ```
 
-## Save the normalized and cell filtered datasets
+## Save the normalized and cell filtered dataset
 
 ```{r save-data}
 sce <- sce[!isSpike(sce, "ERCC"), ]
-sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
 dim(sce)
-dim(sce.red)
-saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Kumar.rds")
+table(sce$phenoid)
 saveRDS(sce, file = "../../data/sce_full/sce_full_Kumar.rds")
 ```
 

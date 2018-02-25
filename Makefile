@@ -13,7 +13,9 @@ include include_filterings.mk
 all: cluster
 
 ## Prepare data
-prepare_data: $(foreach d,$(DATASETS),plots/qc_data/$(d).rds)
+prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
+
+#$(foreach d,$(DATASETS),plots/qc_data/$(d).rds)
 
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
@@ -104,7 +106,7 @@ $(foreach d,Kumar SimKumar4easy SimKumar4hard SimKumar8hard,$(eval $(call qckuma
 ## Generate filtered data sets
 ## ------------------------------------------------------------------------------------ ##
 define filterrule
-data/sce_filtered$(2)$(3)/sce_filtered$(2)$(3)_$(1).rds: data/sce_full/sce_full_$(1).rds
+data/sce_filtered$(2)$(3)/sce_filtered$(2)$(3)_$(1).rds: data/sce_full/sce_full_$(1).rds Rscripts/filtering/filter$(2).R
 	mkdir -p $$(@D)
 	$(R) "--args scefile='$$<' method='$(2)' pctkeep=$(3) outrds='$$@'" Rscripts/filtering/filter_genes.R Rout/filter_genes_$(1)_$(2)$(3).Rout
 endef

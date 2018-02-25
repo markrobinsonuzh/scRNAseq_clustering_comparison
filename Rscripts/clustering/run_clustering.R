@@ -25,7 +25,7 @@ if (any(duplicated(names(params)))) stop("Possibly conflicting settings")
 print(params)
 
 ## Set number of times to run clustering for each k
-n_rep <- 10
+n_rep <- 5
 
 ## Read data
 sce <- readRDS(scefile)

@@ -24,7 +24,7 @@ suppressPackageStartupMessages({
 ## Extract the gene-level length-scaled TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 
-## Extract the phenotype data. 
+## Extract the phenotype data.
 phn <- colData(maex)
 phn$phenoid <- as.character(phn$LibraryName)
 
@@ -117,7 +117,7 @@ plotQC(sce, type = "highest-expression", n = 50)
 ## Data normalization
 
 ```{r sizefactors}
-sce <- computeSumFactors(sce, sizes = c(20, 40, 80, 150))
+sce <- computeSumFactors(sce, sizes = pmin(ncol(sce), seq(20, 120, 20)), min.mean = 0.1)
 summary(sizeFactors(sce))
 ```
 
@@ -141,16 +141,17 @@ plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 
 ```{r tSNE}
 set.seed(1234)
-sce <- runTSNE(sce, expr_values = "logcounts", perplexity = 5)
+sce <- runTSNE(sce, exprs_values = "logcounts", perplexity = 10)
 plotTSNE(sce, colour_by = "phenoid")
 plotTSNE(sce, colour_by = "total_features", size_by = "total_counts")
 ```
 
-## Save the normalized and cell filtered datasets
+## Save the normalized and cell filtered dataset
 
 ```{r save-data}
 sce <- sce[!grepl("^ERCC", rownames(sce)), ]
 dim(sce)
+table(sce$phenoid)
 saveRDS(sce, file = "../../data/sce_full/sce_full_Koh.rds")
 ```
 

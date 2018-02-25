@@ -4,6 +4,8 @@ A study to compare methods for clustering of scRNA-seq data
 ## Instructions
 - Clone this repository
 - Modify the `R` and `Rscript` variables in the top of `Makefile` to point to the version of `R` that you want to use.
+- Run `conda env create -n scrnaseq_clustering --file envs/environment.yaml` to create a `conda` environment.
+- Run `source activate scrnaseq_clustering` to activate the environment.
 - Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.5GB).
 - Run `make` to perform the analysis.
 
