@@ -23,20 +23,32 @@ suppressPackageStartupMessages({
 ## Load raw data
 
 ```{r load-dataset}
-b.cells <- read10XResults("../../data/data_raw/zheng/b_cells_filtered/hg19") 
-naive.cytotoxic <- read10XResults("../../data/data_raw/zheng/naive_cytotoxic_filtered/hg19")
-cd14.monocytes <- read10XResults("../../data/data_raw/zheng/cd14_monocytes_filtered/hg19")
-regulatory.t <- read10XResults("../../data/data_raw/zheng/regulatory_t_filtered/hg19")
+b.cells <- read10XResults("../../data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19") 
+naive.cytotoxic <- read10XResults("../../data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19")
+cd14.monocytes <- read10XResults("../../data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19")
+regulatory.t <- read10XResults("../../data/data_raw/zheng/regulatory/filtered_matrices_mex/hg19")
+cd4.t.helper <- read10XResults("../../data/data_raw/zheng/cd4_t_helper/filtered_matrices_mex/hg19")
+cd56.nk <- read10XResults("../../data/data_raw/zheng/cd56_nk/filtered_matrices_mex/hg19")
+memory.t <- read10XResults("../../data/data_raw/zheng/memory_t/filtered_matrices_mex/hg19")
+naive.t <- read10XResults("../../data/data_raw/zheng/naive_t/filtered_matrices_mex/hg19")
 
 colnames(b.cells) <-  paste0("b.cells", seq_len(ncol(b.cells)))
 colnames(naive.cytotoxic) <- paste0("naive.cytotoxic", seq_len(ncol(naive.cytotoxic)))
 colnames(cd14.monocytes) <- paste0("cd14.monocytes", seq_len(ncol(cd14.monocytes)))
 colnames(regulatory.t) <- paste0("regulatory.t", seq_len(ncol(regulatory.t)))
+colnames(cd4.t.helper) <- paste0("cd4.t.helper", seq_len(ncol(cd4.t.helper)))
+colnames(cd56.nk) <- paste0("cd56.nk", seq_len(ncol(cd56.nk)))
+colnames(memory.t) <- paste0("memory.t", seq_len(ncol(memory.t)))
+colnames(naive.t) <- paste0("naive.t", seq_len(ncol(naive.t)))
 
 colData(b.cells)$phenoid <- "b.cells"
 colData(naive.cytotoxic)$phenoid <- "naive.cytotoxic"
 colData(cd14.monocytes)$phenoid <- "cd14.monocytes"
 colData(regulatory.t)$phenoid <- "regulatory.t"
+colData(cd4.t.helper)$phenoid <- "cd4.t.helper"
+colData(cd56.nk)$phenoid <- "cd56.nk"
+colData(memory.t)$phenoid <- "memory.t"
+colData(naive.t)$phenoid <- "naive.t"
 
 ## Subsample
 set.seed(1234)
@@ -44,12 +56,17 @@ b.cells <- b.cells[, sample(colnames(b.cells), 200, replace = FALSE)]
 naive.cytotoxic <- naive.cytotoxic[, sample(colnames(naive.cytotoxic), 200, replace = FALSE)]
 cd14.monocytes <- cd14.monocytes[, sample(colnames(cd14.monocytes), 200, replace = FALSE)]
 regulatory.t <- regulatory.t[, sample(colnames(regulatory.t), 200, replace = FALSE)]
+cd4.t.helper <- cd4.t.helper[, sample(colnames(cd4.t.helper), 200, replace = FALSE)]
+cd56.nk <- cd56.nk[, sample(colnames(cd56.nk), 200, replace = FALSE)]
+memory.t <- memory.t[, sample(colnames(memory.t), 200, replace = FALSE)]
+naive.t <- naive.t[, sample(colnames(naive.t), 200, replace = FALSE)]
 ```
 
 ## Create a SingleCellExperiment object
 
 ```{r create-sce}
-sce <- cbind(b.cells, naive.cytotoxic, cd14.monocytes, regulatory.t)
+sce <- cbind(b.cells, naive.cytotoxic, cd14.monocytes, regulatory.t, 
+             cd4.t.helper, cd56.nk, memory.t, naive.t)
 counts(sce) <-  as.matrix(counts(sce))
 logcounts(sce) <- log2(calculateCPM(sce) + 1)
 ```
@@ -212,8 +229,8 @@ plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```{r save-data}
 sce <- sce[!isSpike(sce, "ERCC"), ]
 sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
-saveRDS(sce, file = "../../data/sce_full/sce_full_Zhengmix.rds")
-saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Zhengmix.rds")
+saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Zhengmix8eq.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_Zhengmix8eq.rds")
 ```
 
 ## Session info

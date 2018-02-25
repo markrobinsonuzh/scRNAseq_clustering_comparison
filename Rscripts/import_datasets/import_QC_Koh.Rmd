@@ -209,8 +209,8 @@ plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```{r save-data}
 sce <- sce[!isSpike(sce, "ERCC"), ]
 sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
+saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Koh.rds")
 saveRDS(sce, file = "../../data/sce_full/sce_full_Koh.rds")
-saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Koh.rds")
 ```
 
 ## Session info

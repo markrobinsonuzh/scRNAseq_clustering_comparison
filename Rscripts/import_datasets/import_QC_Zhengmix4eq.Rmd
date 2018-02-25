@@ -1,5 +1,5 @@
 ---
-title: "Import and QC of Kumar data set (GSE60749-GPL13112)"
+title: "Import and QC of Zheng data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -20,39 +20,37 @@ suppressPackageStartupMessages({
 })
 ```
 
-## Load MultiAssayExperiment object
+## Load raw data
 
 ```{r load-dataset}
-(maex <- readRDS("../../data/data_raw/GSE60749-GPL13112.rds"))
+b.cells <- read10XResults("../../data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19") 
+naive.cytotoxic <- read10XResults("../../data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19")
+cd14.monocytes <- read10XResults("../../data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19")
+regulatory.t <- read10XResults("../../data/data_raw/zheng/regulatory/filtered_matrices_mex/hg19")
 
-## Extract the gene-level TPM and the counts obtained by scaling the TPMs
-cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
-tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
+colnames(b.cells) <-  paste0("b.cells", seq_len(ncol(b.cells)))
+colnames(naive.cytotoxic) <- paste0("naive.cytotoxic", seq_len(ncol(naive.cytotoxic)))
+colnames(cd14.monocytes) <- paste0("cd14.monocytes", seq_len(ncol(cd14.monocytes)))
+colnames(regulatory.t) <- paste0("regulatory.t", seq_len(ncol(regulatory.t)))
 
-## Extract the phenotype data.
-phn <- colData(maex)
-phn$phenoid <- as.character(interaction(as.data.frame(phn[, c("source_name_ch1",
-                                                              "characteristics_ch1.1")])))
-## Simplify labels
-phn$phenoid <-  plyr::revalue(
-  phn$phenoid , 
-  c("Dgcr8 knockout mouse embryonic stem cells.culture conditions: serum+LIF" = "Dgcr8 knockout mouse serum+LIF", 
-    "v6.5 mouse embryonic stem cells.culture conditions: 2i+LIF" = "v6.5 mouse 2i+LIF",
-    "v6.5 mouse embryonic stem cells.culture conditions: serum+LIF" = "v6.5 mouse serum+LIF")
-)
-table(phn$phenoid)
+colData(b.cells)$phenoid <- "b.cells"
+colData(naive.cytotoxic)$phenoid <- "naive.cytotoxic"
+colData(cd14.monocytes)$phenoid <- "cd14.monocytes"
+colData(regulatory.t)$phenoid <- "regulatory.t"
+
+## Subsample
+set.seed(1234)
+b.cells <- b.cells[, sample(colnames(b.cells), 200, replace = FALSE)]
+naive.cytotoxic <- naive.cytotoxic[, sample(colnames(naive.cytotoxic), 200, replace = FALSE)]
+cd14.monocytes <- cd14.monocytes[, sample(colnames(cd14.monocytes), 200, replace = FALSE)]
+regulatory.t <- regulatory.t[, sample(colnames(regulatory.t), 200, replace = FALSE)]
 ```
 
 ## Create a SingleCellExperiment object
 
 ```{r create-sce}
-stopifnot(all(colnames(cts) == rownames(phn)))
-stopifnot(all(colnames(tpm) == rownames(phn)))
-
-sce <- SingleCellExperiment(
-  assays = list(counts = cts, 
-                tpm = tpms), 
-  colData = phn)
+sce <- cbind(b.cells, naive.cytotoxic, cd14.monocytes, regulatory.t)
+counts(sce) <-  as.matrix(counts(sce))
 logcounts(sce) <- log2(calculateCPM(sce) + 1)
 ```
 
@@ -68,10 +66,10 @@ dim(sce)
 ## Identify the remaining ERCC spike-ins.
 
 ```{r ercc-mt}
-is.spike <- grepl("^ERCC", rownames(sce))
+is.spike <- grepl("^ERCC", rowData(sce)$symbol)
 table(is.spike)
 summary(colSums(counts(sce[is.spike, ])))
-isSpike(sce, "ERCC") <- is.spike
+isSpike(sce, "ERCC") <- which(is.spike)
 ```
 
 ## Calculate QC metrics
@@ -112,9 +110,7 @@ reads.
 
 ```{r qc-pca}
 sce <- scater::runPCA(sce, pca_data_input = "coldata")
-scater::plotPCA(sce, colour_by = "phenoid") + 
-  theme(legend.position = "bottom") + 
-  guides(color = guide_legend(nrow = 3, byrow = TRUE))
+scater::plotPCA(sce, colour_by = "phenoid")
 ```
 
 ## Filter dataset
@@ -129,19 +125,11 @@ feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = T
 table(libsize.drop, feature.drop)
 ```
 
-We also filter out cells with a large fraction of ERCC reads.
-
 ```{r filter-debris}
-ggplot(as.data.frame(colData(sce)), aes(x = pct_counts_ERCC)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("ERCC proportion (%)") + 
-  ylab("Number of cells") + theme_bw()
-    
-spike.drop <- isOutlier(sce$pct_counts_ERCC, nmads = 3, type = "higher")
-
-sce <- sce[, !(libsize.drop | feature.drop | spike.drop)]
+sce <- sce[, !(libsize.drop | feature.drop)]
 
 data.frame(ByLibSize = sum(libsize.drop), ByFeature = sum(feature.drop),
-           BySpike = sum(spike.drop), Remaining = ncol(sce))
+           Remaining = ncol(sce))
 ```
 
 ## Quality control using highest expressed genes
@@ -154,7 +142,7 @@ plotQC(sce, type = "highest-expression", n = 50)
 
 ```{r gene-filtering}
 ave.counts <- rowMeans(counts(sce))
-keep <- ave.counts >= 1
+keep <- ave.counts >= 0.01
 sum(keep)
 df <- data.frame(ave.counts = log10(ave.counts))
 
@@ -170,13 +158,11 @@ sce.red <- sce[keep, ]
 ## Data normalization
 
 ```{r sizefactors}
-sce <- computeSumFactors(sce, sizes = c(20, 40, 60, 80))
+sce <- computeSumFactors(sce, subset.row = calcAverage(sce) >= 0.001)
 summary(sizeFactors(sce))
-sce <- computeSpikeFactors(sce, general.use = FALSE)
 
-sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 60, 80))
+sce.red <- computeSumFactors(sce.red, subset.row = calcAverage(sce.red) >= 0.001)
 summary(sizeFactors(sce.red))
-sce.red <- computeSpikeFactors(sce.red, general.use = FALSE)
 
 ggplot(data.frame(tc = sce$total_counts, 
                   sf = sizeFactors(sce)), aes(x = sf, y = tc)) + 
@@ -216,7 +202,7 @@ plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
 
 ```{r tSNE}
 set.seed(1234)
-sce.red <- runTSNE(sce.red, expr_values = "logcounts", perplexity = 5)
+sce.red <- runTSNE(sce.red, exprs_values = "logcounts", perplexity = 5)
 plotTSNE(sce.red, colour_by = "phenoid")
 plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```
@@ -226,8 +212,8 @@ plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```{r save-data}
 sce <- sce[!isSpike(sce, "ERCC"), ]
 sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
-saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Kumar.rds")
-saveRDS(sce, file = "../../data/sce_full/sce_full_Kumar.rds")
+saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Zhengmix4eq.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_Zhengmix4eq.rds")
 ```
 
 ## Session info

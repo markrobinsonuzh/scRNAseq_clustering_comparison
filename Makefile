@@ -34,7 +34,7 @@ directories:
 	mkdir -p data/data_raw
 	mkdir -p data/data_raw/zheng
 	mkdir -p data/sce_full
-	mkdir -p data/sce_filtered
+	mkdir -p data/sce_filteredExpr
 	mkdir -p plots/qc_data
 	mkdir -p plots/performance
 	mkdir -p plots/runtime
@@ -57,44 +57,71 @@ zheng: directories
 ## ------------------------------------------------------------------------------------ ##
 ## Prepare data sets
 ## ------------------------------------------------------------------------------------ ##
-data/sce_filtered/sce_filtered_Trapnell.rds: Rscripts/import_datasets/import_QC_Trapnell.Rmd \
+data/sce_full/sce_full_Trapnell.rds: Rscripts/import_datasets/import_QC_Trapnell.Rmd \
 data/data_raw/GSE52529-GPL16791.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
-data/sce_filtered/sce_filtered_Koh.rds: Rscripts/import_datasets/import_QC_Koh.Rmd \
+data/sce_full/sce_full_Koh.rds: Rscripts/import_datasets/import_QC_Koh.Rmd \
 data/data_raw/SRP073808.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
-data/sce_filtered/sce_filtered_Zhengmix.rds: Rscripts/import_datasets/import_QC_Zhengmix.Rmd \
-data/data_raw/zheng/b_cells_filtered/hg19/matrix.mtx data/data_raw/zheng/cd14_monocytes_filtered/hg19/matrix.mtx \
-data/data_raw/zheng/naive_cytotoxic_filtered/hg19/matrix.mtx data/data_raw/zheng/regulatory_t_filtered/hg19/matrix.mtx
+define zheng4rule
+data/sce_full/sce_full_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
+data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/regulatory_t/filtered_matrices_mex/hg19/matrix.mtx
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+endef
+$(foreach d,Zhengmix4eq Zhengmix4uneq,$(eval $(call zheng4rule,$(d))))
+
+define zheng8rule
+data/sce_full/sce_full_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
+data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/regulatory_t/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/cd4_t_helper/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/cd56_nk/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/memory_t/filtered_matrices_mex/hg19/matrix.mtx \
+data/data_raw/zheng/naive_t/filtered_matrices_mex/hg19/matrix.mtx
+	cd Rscripts/import_datasets && \
+	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+endef
+$(foreach d,Zhengmix8eq,$(eval $(call zheng8rule,$(d))))
 
 define qckumarrule
-data/sce_filtered/sce_filtered_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
+data/sce_full/sce_full_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
 data/data_raw/GSE60749-GPL13112.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
 $(foreach d,Kumar SimKumar,$(eval $(call qckumarrule,$(d))))
 
+## Filtering by expression is done in the same script that is generating the full data sets
+define filteredExprrule
+data/sce_filteredExpr/sce_filteredExpr_$(1).rds: data/sce_full/sce_full_$(1).rds
+	touch $$@
+endef
+$(foreach d,$(DATASETS),$(eval $(call filteredExprrule,$(d))))
+
 ## ------------------------------------------------------------------------------------ ##
 ## Generate QC plots
 ## ------------------------------------------------------------------------------------ ##
 define qcrule
-plots/qc_data/$(1).rds: data/sce_filtered/sce_filtered_$(1).rds Rscripts/evaluate_datasets/plot_dataset_characteristics.R
-	$(R) "--args scefull='data/sce_full/sce_full_$(1).rds' scefiltered='data/sce_filtered/sce_filtered_$(1).rds' outrds='$$@'" Rscripts/evaluate_datasets/plot_dataset_characteristics.R Rout/plot_dataset_characteristics_$(1).Rout
+plots/qc_data/$(1).rds: data/sce_full/sce_full_$(1).rds Rscripts/evaluate_datasets/plot_dataset_characteristics.R
+	$(R) "--args scefull='data/sce_full/sce_full_$(1).rds' scefiltered='data/sce_filteredExpr/sce_filteredExpr_$(1).rds' outrds='$$@'" Rscripts/evaluate_datasets/plot_dataset_characteristics.R Rout/plot_dataset_characteristics_$(1).Rout
 endef
 $(foreach d,$(DATASETS),$(eval $(call qcrule,$(d))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Apply clustering methods
 ## ------------------------------------------------------------------------------------ ##
-define clusterrule ## $(1) - sce_full, sce_filtered. $(2) - dataset. $(3) - clustering method
-results/$(1)_$(2)_$(3).rds: data/sce_filtered/sce_filtered_$(2).rds Rscripts/clustering/run_clustering.R \
+define clusterrule ## $(1) - sce_full, sce_filteredExpr. $(2) - dataset. $(3) - clustering method
+results/$(1)_$(2)_$(3).rds: data/sce_full/sce_full_$(2).rds Rscripts/clustering/run_clustering.R \
 Rscripts/clustering/apply_$(3).R parameter_settings/$(1)_$(2).json parameter_settings/$(1)_$(2)_$(3).json \
 parameter_settings/$(3).json
 	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
