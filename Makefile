@@ -15,7 +15,7 @@ all: cluster
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),plots/qc_data/$(d).rds)
 
-cluster: $(foreach f,$(FILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
 plots: plots/runtime/runtime_by_k.rds plots/performance/performance_by_k.rds
 
@@ -34,7 +34,6 @@ directories:
 	mkdir -p data/data_raw
 	mkdir -p data/data_raw/zheng
 	mkdir -p data/sce_full
-	mkdir -p data/sce_filteredExpr
 	mkdir -p plots/qc_data
 	mkdir -p plots/performance
 	mkdir -p plots/runtime
@@ -74,7 +73,7 @@ data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19/matrix.mtx \
 data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19/matrix.mtx \
 data/data_raw/zheng/regulatory_t/filtered_matrices_mex/hg19/matrix.mtx
 	cd Rscripts/import_datasets && \
-	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
 $(foreach d,Zhengmix4eq Zhengmix4uneq,$(eval $(call zheng4rule,$(d))))
 
@@ -89,7 +88,7 @@ data/data_raw/zheng/cd56_nk/filtered_matrices_mex/hg19/matrix.mtx \
 data/data_raw/zheng/memory_t/filtered_matrices_mex/hg19/matrix.mtx \
 data/data_raw/zheng/naive_t/filtered_matrices_mex/hg19/matrix.mtx
 	cd Rscripts/import_datasets && \
-	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
 $(foreach d,Zhengmix8eq,$(eval $(call zheng8rule,$(d))))
 
@@ -99,14 +98,17 @@ data/data_raw/GSE60749-GPL13112.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
-$(foreach d,Kumar SimKumarEasy SimKumarHard,$(eval $(call qckumarrule,$(d))))
+$(foreach d,Kumar SimKumar4easy SimKumar4hard SimKumar8hard,$(eval $(call qckumarrule,$(d))))
 
-## Filtering by expression is done in the same script that is generating the full data sets
-define filteredExprrule
-data/sce_filteredExpr/sce_filteredExpr_$(1).rds: data/sce_full/sce_full_$(1).rds
-	touch $$@
+## ------------------------------------------------------------------------------------ ##
+## Generate filtered data sets
+## ------------------------------------------------------------------------------------ ##
+define filterrule
+data/sce_filtered$(2)$(3)/sce_filtered$(2)$(3)_$(1).rds: data/sce_full/sce_full_$(1).rds
+	mkdir -p $$(@D)
+	$(R) "--args scefile='$$<' method='$(2)' pctkeep=$(3) outrds='$$@'" Rscripts/filtering/filter_genes.R Rout/filter_genes_$(1)_$(2)$(3).Rout
 endef
-$(foreach d,$(DATASETS),$(eval $(call filteredExprrule,$(d))))
+$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),$(eval $(call filterrule,$(d),$(f),$(p))))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Generate QC plots

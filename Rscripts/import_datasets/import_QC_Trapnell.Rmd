@@ -10,13 +10,9 @@ suppressPackageStartupMessages({
   library(MultiAssayExperiment)
   library(SingleCellExperiment)
   library(scater)
-  library(dplyr)
-  library(tidyr)
-  library(plyr)
   library(scran)
-  library(cowplot)
-  library(tibble)
-  library(cluster)
+  library(dplyr)
+  library(ggplot2)
 })
 ```
 
@@ -25,9 +21,8 @@ suppressPackageStartupMessages({
 ```{r load-dataset}
 (maex <- readRDS("../../data/data_raw/GSE52529-GPL16791.rds"))
 
-## Extract the gene-level TPM and the counts obtained by scaling the TPMs
+## Extract the gene-level length-scaled TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
-tpms <- assays(experiments(maex)[["gene"]])[["TPM"]]
 
 ## Extract the phenotype data.
 phn <- colData(maex)
@@ -40,13 +35,12 @@ table(phn$phenoid)
 
 ```{r create-sce}
 stopifnot(all(colnames(cts) == rownames(phn)))
-stopifnot(all(colnames(tpm) == rownames(phn)))
 
 sce <- SingleCellExperiment(
-  assays = list(counts = cts, 
-                tpm = tpms), 
+  assays = list(counts = cts), 
   colData = phn)
-logcounts(sce) <- log2(calculateCPM(sce) + 1)
+sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
+                 return_norm_as_exprs = TRUE) ## generates logcounts(sce)
 ```
 
 Exclude features that are not expressed
@@ -73,30 +67,6 @@ isSpike(sce, "ERCC") <- which(is.spike)
 sce <- calculateQCMetrics(sce, feature_controls = list(ERCC = grepl("^ERCC", rownames(sce))))
 ```
 
-## Quality control on cells
-
-```{r histogram}
-size.med <- median(log10(sce$total_counts), na.rm = TRUE)
-size.mad <- mad(log10(sce$total_counts), center = size.med, na.rm = TRUE)
-lower.limit.size <- 10^(size.med - 3 * size.mad)
-    
-feature.med <- median(log10(sce$total_features), na.rm = TRUE)
-feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
-lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
-
-ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
-  ylab("Number of cells") + 
-  geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
-  theme_bw()
-
-ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
-  ylab("Number of cells") + 
-  geom_vline(xintercept = lower.limit.feat, color = "red", linetype = "dashed") + 
-  theme_bw()
-```
-
 ## Quality control using PCA on column data
 
 We create a PCA plot based the quality metrics for each cell, e.g., the total
@@ -108,28 +78,39 @@ sce <- scater::runPCA(sce, pca_data_input = "coldata")
 scater::plotPCA(sce, colour_by = "phenoid")
 ```
 
-## Filter dataset
+## Filter cells
 
 We remove cells with log-library sizes (or total features) that are more than 3
 median absolute deviations (MADs) below the median log-library size (or total
 features).
 
-```{r drop-qc}
-libsize.drop <- isOutlier(sce$total_counts, nmads = 3, type = "lower", log = TRUE)
-feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = TRUE)
-table(libsize.drop, feature.drop)
+```{r histogram}
+colData(sce)$libsize.drop <- isOutlier(sce$total_counts, nmads = 3, type = "lower", log = TRUE)
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
+  ylab("Number of cells") + 
+  geom_vline(xintercept = min(sce$total_counts[!sce$libsize.drop]), 
+             color = "red", linetype = "dashed") + 
+  theme_bw()
+
+colData(sce)$feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = TRUE)
+ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
+  geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
+  ylab("Number of cells") + 
+  geom_vline(xintercept = min(sce$total_features[!sce$feature.drop]), 
+             color = "red", linetype = "dashed") + 
+  theme_bw()
+
+table(sce$libsize.drop, sce$feature.drop)
 ```
 
 We also filter out observations that were classified as debris or doublets.
 
 ```{r filter-debris}
-is.debris <- colData(sce)$characteristics_ch1.2 == "debris: TRUE"
-is.multiplecell <-  colData(sce)$characteristics_ch1.4 != "cells in well: 1"
-sce <- sce[, !(libsize.drop | feature.drop | is.debris | is.multiplecell)]
-
-data.frame(ByLibSize = sum(libsize.drop), ByFeature = sum(feature.drop),
-           ByCellnumber = sum(is.multiplecell), ByDebris = sum(is.debris), 
-           Remaining = ncol(sce))
+colData(sce)$is.debris <- colData(sce)$characteristics_ch1.2 == "debris: TRUE"
+colData(sce)$is.multiplecell <-  colData(sce)$characteristics_ch1.4 != "cells in well: 1"
+sce <- sce[, !(sce$libsize.drop | sce$feature.drop | sce$is.debris | sce$is.multiplecell)]
+dim(sce)
 ```
 
 ## Quality control using highest expressed genes
@@ -163,28 +144,16 @@ summary(sizeFactors(sce))
 
 sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 60, 80, 120))
 summary(sizeFactors(sce.red))
-
-ggplot(data.frame(tc = sce$total_counts, 
-                  sf = sizeFactors(sce)), aes(x = sf, y = tc)) + 
-  geom_point() + xlab("Size factor") + ylab("Library size") + 
-  scale_x_log10() + scale_y_log10()
-
-ggplot(data.frame(tc = sce.red$total_counts, 
-                  sf = sizeFactors(sce.red)), aes(x = sf, y = tc)) + 
-  geom_point() + xlab("Size factor") + ylab("Library size") + 
-  scale_x_log10() + scale_y_log10()
 ```
 
 ```{r normalization}
 sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
                  return_norm_as_exprs = TRUE)
-logcounts(sce) <- log2(calculateCPM(sce) + 1)
 sce <- normalise(sce, exprs_values = "counts", return_log = FALSE, 
                  return_norm_as_exprs = FALSE)
 
 sce.red <- normalise(sce.red, exprs_values = "counts", return_log = TRUE, 
                  return_norm_as_exprs = TRUE)
-logcounts(sce.red) <- log2(calculateCPM(sce.red) + 1)
 sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE, 
                      return_norm_as_exprs = FALSE)
 ```

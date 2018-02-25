@@ -1,5 +1,5 @@
 ---
-title: "Import and QC of Kumar data set (GSE60749-GPL13112)"
+title: "Import and QC of SimKumar data set"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -11,9 +11,9 @@ suppressPackageStartupMessages({
   library(SingleCellExperiment)
   library(scater)
   library(scran)
-  library(plyr)
   library(dplyr)
   library(ggplot2)
+  library(splatter)
 })
 ```
 
@@ -25,13 +25,13 @@ suppressPackageStartupMessages({
 ## Extract the gene-level length-scaled TPMs
 cts <- assays(experiments(maex)[["gene"]])[["count_lstpm"]]
 
-## Extract the phenotype data.
+## Extract the phenotype data. 
 phn <- colData(maex)
 phn$phenoid <- as.character(interaction(as.data.frame(phn[, c("source_name_ch1",
                                                               "characteristics_ch1.1")])))
 ## Simplify labels
 phn$phenoid <-  plyr::revalue(
-  phn$phenoid, 
+  phn$phenoid , 
   c("Dgcr8 knockout mouse embryonic stem cells.culture conditions: serum+LIF" = "Dgcr8 knockout mouse serum+LIF", 
     "v6.5 mouse embryonic stem cells.culture conditions: 2i+LIF" = "v6.5 mouse 2i+LIF",
     "v6.5 mouse embryonic stem cells.culture conditions: serum+LIF" = "v6.5 mouse serum+LIF")
@@ -39,17 +39,38 @@ phn$phenoid <-  plyr::revalue(
 table(phn$phenoid)
 ```
 
-## Create a SingleCellExperiment object
+## Extract one subpopulation
 
-```{r create-sce}
+```{r}
 stopifnot(all(colnames(cts) == rownames(phn)))
 
-sce <- SingleCellExperiment(
-  assays = list(counts = cts), 
-  colData = phn
-)
+sub.cts <- cts[, phn$phenoid == "v6.5 mouse 2i+LIF"]
+dim(sub.cts)
+```
+
+## Remove the ERCC spike-ins
+
+```{r remove-spikes}
+is.spike <- grepl("^ERCC", rownames(sub.cts))
+sub.cts <- sub.cts[!is.spike, ]
+```
+
+## Estimate parameters for simulation
+
+```{r estimate-parameters}
+(params <- splatEstimate(sub.cts))
+```
+
+## Simulate new counts
+
+```{r simulate-counts}
+sce <- splatSimulate(params = params, batchCells = 500,
+                     group.prob = c(0.2, 0.15, 0.4, 0.25), 
+                     method = "groups", de.prob = c(0.01, 0.05, 0.05, 0.08),
+                     verbose = FALSE)
 sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
                  return_norm_as_exprs = TRUE) ## generates logcounts(sce)
+sce$phenoid <- colData(sce)$Group
 ```
 
 Exclude features that are not expressed
@@ -61,26 +82,16 @@ sce <- sce[keep_features, ]
 dim(sce)
 ```
 
-## Identify the remaining ERCC spike-ins.
-
-```{r ercc-mt}
-is.spike <- grepl("^ERCC", rownames(sce))
-table(is.spike)
-summary(colSums(counts(sce[is.spike, ])))
-isSpike(sce, "ERCC") <- is.spike
-```
-
 ## Calculate QC metrics
 
 ```{r QC}
-sce <- calculateQCMetrics(sce, feature_controls = list(ERCC = grepl("^ERCC", rownames(sce))))
+sce <- calculateQCMetrics(sce)
 ```
 
 ## Quality control using PCA on column data
 
 We create a PCA plot based the quality metrics for each cell, e.g., the total
-number of reads, the total number of features and the proportion of spike-in
-reads.
+number of reads and the total number of features.
 
 ```{r qc-pca}
 sce <- scater::runPCA(sce, pca_data_input = "coldata")
@@ -109,23 +120,11 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_features)) +
   geom_vline(xintercept = min(sce$total_features[!sce$feature.drop]), 
              color = "red", linetype = "dashed") + 
   theme_bw()
-
-table(libsize = sce$libsize.drop, feature = sce$feature.drop)
 ```
 
-We also filter out cells with a large fraction of ERCC reads.
-
-```{r filter-ercc}
-colData(sce)$spike.drop <- isOutlier(sce$pct_counts_ERCC, nmads = 3, type = "higher")
-ggplot(as.data.frame(colData(sce)), aes(x = pct_counts_ERCC)) + 
-  geom_histogram(bins = 20, fill = "grey80") + xlab("ERCC proportion (%)") + 
-  ylab("Number of cells") + 
-  geom_vline(xintercept = max(sce$pct_counts_ERCC[!sce$spike.drop]), 
-             color = "red", linetype = "dashed") + 
-  theme_bw()
-
-table(sce$spike.drop)
-sce <- sce[, !(sce$libsize.drop | sce$feature.drop | sce$spike.drop)]
+```{r filter-cells}
+table(sce$libsize.drop, sce$feature.drop)
+sce <- sce[, !(sce$libsize.drop | sce$feature.drop)]
 dim(sce)
 ```
 
@@ -140,12 +139,12 @@ plotQC(sce, type = "highest-expression", n = 50)
 ```{r gene-filtering}
 ave.counts <- rowMeans(counts(sce))
 keep <- ave.counts >= 1
-table(keep)
+sum(keep)
 df <- data.frame(ave.counts = log10(ave.counts))
 
 ggplot(df, aes(x = ave.counts)) + 
   geom_histogram(binwidth = 0.25, fill = "grey80") + 
-  geom_vline(aes(xintercept = log10(1)), color = "red", linetype = "dashed") +
+  geom_vline(aes(xintercept = log10(1), color = "red")) +
   guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
                                 y = "Number of genes")
 
@@ -157,11 +156,9 @@ sce.red <- sce[keep, ]
 ```{r sizefactors}
 sce <- computeSumFactors(sce, sizes = c(20, 40, 60, 80))
 summary(sizeFactors(sce))
-sce <- computeSpikeFactors(sce, general.use = FALSE)
 
 sce.red <- computeSumFactors(sce.red, sizes = c(20, 40, 60, 80))
 summary(sizeFactors(sce.red))
-sce.red <- computeSpikeFactors(sce.red, general.use = FALSE)
 ```
 
 ```{r normalization}
@@ -189,7 +186,7 @@ plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
 
 ```{r tSNE}
 set.seed(1234)
-sce.red <- runTSNE(sce.red, expr_values = "logcounts", perplexity = 5)
+sce.red <- runTSNE(sce.red, exprs_values = "logcounts", perplexity = 5)
 plotTSNE(sce.red, colour_by = "phenoid")
 plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```
@@ -197,12 +194,8 @@ plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
-sce <- sce[!isSpike(sce, "ERCC"), ]
-sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
-dim(sce)
-dim(sce.red)
-saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_Kumar.rds")
-saveRDS(sce, file = "../../data/sce_full/sce_full_Kumar.rds")
+saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_SimKumar4hard.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_SimKumar4hard.rds")
 ```
 
 ## Session info

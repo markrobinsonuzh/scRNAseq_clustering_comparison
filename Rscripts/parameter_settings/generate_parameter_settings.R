@@ -14,14 +14,20 @@ suppressPackageStartupMessages({
 write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Kumar.json")
 write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Trapnell.json")
 write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_full_Koh.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Zheng.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_SimKumar.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Zhengmix4eq.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Zhengmix4uneq.json")
+write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_full_Zhengmix8eq.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_SimKumarEasy.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_SimKumarHard.json")
 
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filtered_Kumar.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filtered_Trapnell.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filtered_Koh.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filtered_Zheng.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filtered_SimKumar.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Kumar.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Trapnell.json")
+write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filteredExpr_Koh.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Zhengmix4eq.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Zhengmix4uneq.json")
+write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filteredExpr_Zhengmix8eq.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_SimKumarEasy.json")
+write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_SimKumarHard.json")
 
 ## CIDR parameters
 ## -------------------------------------------------------------------------- ##
@@ -35,11 +41,11 @@ write(toJSON(list()), file = "parameter_settings/sce_full_Koh_CIDR.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_Zhengmix_CIDR.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_SimKumar_CIDR.json")
 
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Kumar_CIDR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Trapnell_CIDR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Koh_CIDR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Zhengmix_CIDR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_CIDR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Kumar_CIDR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Trapnell_CIDR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Koh_CIDR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Zhengmix_CIDR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_SimKumar_CIDR.json")
 
 ## TSCAN parameters
 ## -------------------------------------------------------------------------- ##
@@ -53,11 +59,11 @@ write(toJSON(list()), file = "parameter_settings/sce_full_Koh_TSCAN.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_Zhengmix_TSCAN.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_SimKumar_TSCAN.json")
 
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Kumar_TSCAN.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Trapnell_TSCAN.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Koh_TSCAN.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Zhengmix_TSCAN.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_TSCAN.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Kumar_TSCAN.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Trapnell_TSCAN.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Koh_TSCAN.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Zhengmix_TSCAN.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_SimKumar_TSCAN.json")
 
 ## RtsneKmeans parameters
 ## -------------------------------------------------------------------------- ##
@@ -77,15 +83,15 @@ write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_SimKumar_RtsneKmeans.json")
 
 write(toJSON(list(perplexity = 30, dims = 3)),
-      file = "parameter_settings/sce_filtered_Kumar_RtsneKmeans.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_RtsneKmeans.json")
 write(toJSON(list(perplexity = 30, dims = 3)),
-      file = "parameter_settings/sce_filtered_Trapnell_RtsneKmeans.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_RtsneKmeans.json")
 write(toJSON(list(perplexity = 30, dims = 3)),
-      file = "parameter_settings/sce_filtered_Koh_RtsneKmeans.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_RtsneKmeans.json")
 write(toJSON(list(perplexity = 30, dims = 3)),
-      file = "parameter_settings/sce_filtered_Zhengmix_RtsneKmeans.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_RtsneKmeans.json")
 write(toJSON(list(perplexity = 30, dims = 3)),
-      file = "parameter_settings/sce_filtered_SimKumar_RtsneKmeans.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_RtsneKmeans.json")
 
 ## pcaReduce parameters
 ## -------------------------------------------------------------------------- ##
@@ -105,15 +111,15 @@ write(toJSON(list(q = 30)),
       file = "parameter_settings/sce_full_SimKumar_pcaReduce.json")
 
 write(toJSON(list(q = 30)), 
-      file = "parameter_settings/sce_filtered_Kumar_pcaReduce.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_pcaReduce.json")
 write(toJSON(list(q = 30)), 
-      file = "parameter_settings/sce_filtered_Trapnell_pcaReduce.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_pcaReduce.json")
 write(toJSON(list(q = 30)), 
-      file = "parameter_settings/sce_filtered_Koh_pcaReduce.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_pcaReduce.json")
 write(toJSON(list(q = 30)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_pcaReduce.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_pcaReduce.json")
 write(toJSON(list(q = 30)), 
-      file = "parameter_settings/sce_filtered_SimKumar_pcaReduce.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_pcaReduce.json")
 
 ## Seurat parameters
 ## -------------------------------------------------------------------------- ##
@@ -134,15 +140,15 @@ write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)),
       file = "parameter_settings/sce_full_SimKumar_Seurat.json")
 
 write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)),
-      file = "parameter_settings/sce_filtered_Kumar_Seurat.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_Seurat.json")
 write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)), 
-      file = "parameter_settings/sce_filtered_Trapnell_Seurat.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_Seurat.json")
 write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)), 
-      file = "parameter_settings/sce_filtered_Koh_Seurat.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_Seurat.json")
 write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_Seurat.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_Seurat.json")
 write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)),
-      file = "parameter_settings/sce_filtered_SimKumar_Seurat.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_Seurat.json")
 
 ## SIMLR parameters
 ## -------------------------------------------------------------------------- ##
@@ -156,11 +162,11 @@ write(toJSON(list()), file = "parameter_settings/sce_full_Koh_SIMLR.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_Zhengmix_SIMLR.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_SimKumar_SIMLR.json")
 
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Kumar_SIMLR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Trapnell_SIMLR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Koh_SIMLR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Zhengmix_SIMLR.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_SIMLR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Kumar_SIMLR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Trapnell_SIMLR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Koh_SIMLR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Zhengmix_SIMLR.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_SimKumar_SIMLR.json")
 
 ## SIMLRlargescale parameters
 ## -------------------------------------------------------------------------- ##
@@ -174,11 +180,11 @@ write(toJSON(list()), file = "parameter_settings/sce_full_Koh_SIMLRlargescale.js
 write(toJSON(list()), file = "parameter_settings/sce_full_Zhengmix_SIMLRlargescale.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_SimKumar_SIMLRlargescale.json")
 
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Kumar_SIMLRlargescale.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Trapnell_SIMLRlargescale.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Koh_SIMLRlargescale.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Zhengmix_SIMLRlargescale.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_SIMLRlargescale.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Kumar_SIMLRlargescale.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Trapnell_SIMLRlargescale.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Koh_SIMLRlargescale.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Zhengmix_SIMLRlargescale.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_SimKumar_SIMLRlargescale.json")
 
 ## Linnorm parameters
 ## -------------------------------------------------------------------------- ##
@@ -198,15 +204,15 @@ write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)),
       file = "parameter_settings/sce_full_SimKumar_Linnorm.json")
 
 write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
-      file = "parameter_settings/sce_filtered_Kumar_Linnorm.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_Linnorm.json")
 write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
-      file = "parameter_settings/sce_filtered_Trapnell_Linnorm.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_Linnorm.json")
 write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
-      file = "parameter_settings/sce_filtered_Koh_Linnorm.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_Linnorm.json")
 write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_Linnorm.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_Linnorm.json")
 write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
-      file = "parameter_settings/sce_filtered_SimKumar_Linnorm.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_Linnorm.json")
 
 ## RaceID parameters
 ## -------------------------------------------------------------------------- ##
@@ -226,15 +232,15 @@ write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)),
       file = "parameter_settings/sce_full_SimKumar_RaceID.json")
 
 write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)), 
-      file = "parameter_settings/sce_filtered_Kumar_RaceID.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_RaceID.json")
 write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)), 
-      file = "parameter_settings/sce_filtered_Trapnell_RaceID.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_RaceID.json")
 write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)), 
-      file = "parameter_settings/sce_filtered_Koh_RaceID.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_RaceID.json")
 write(toJSON(list(mintotal = 200, minexpr = 1, minnumber = 1, maxexpr = Inf)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_RaceID.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_RaceID.json")
 write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)), 
-      file = "parameter_settings/sce_filtered_SimKumar_RaceID.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_RaceID.json")
 
 ## SC3 parameters
 ## -------------------------------------------------------------------------- ##
@@ -254,15 +260,15 @@ write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)),
       file = "parameter_settings/sce_full_SimKumar_SC3.json")
 
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Kumar_SC3.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_SC3.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Trapnell_SC3.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_SC3.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Koh_SC3.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_SC3.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_SC3.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_SC3.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_SimKumar_SC3.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_SC3.json")
 
 ## SC3svm parameters
 ## -------------------------------------------------------------------------- ##
@@ -282,15 +288,15 @@ write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)),
       file = "parameter_settings/sce_full_SimKumar_SC3svm.json")
 
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Kumar_SC3svm.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_SC3svm.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Trapnell_SC3svm.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_SC3svm.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Koh_SC3svm.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_SC3svm.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_Zhengmix_SC3svm.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_SC3svm.json")
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
-      file = "parameter_settings/sce_filtered_SimKumar_SC3svm.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_SC3svm.json")
 
 ## FlowSOM parameters
 ## -------------------------------------------------------------------------- ##
@@ -310,15 +316,15 @@ write(toJSON(list(xdim = 10, ydim = 10)),
       file = "parameter_settings/sce_full_SimKumar_FlowSOM.json")
 
 write(toJSON(list(xdim = 10, ydim = 10)), 
-      file = "parameter_settings/sce_filtered_Kumar_FlowSOM.json")
+      file = "parameter_settings/sce_filteredExpr_Kumar_FlowSOM.json")
 write(toJSON(list(xdim = 10, ydim = 10)),
-      file = "parameter_settings/sce_filtered_Trapnell_FlowSOM.json")
+      file = "parameter_settings/sce_filteredExpr_Trapnell_FlowSOM.json")
 write(toJSON(list(xdim = 10, ydim = 10)),
-      file = "parameter_settings/sce_filtered_Koh_FlowSOM.json")
+      file = "parameter_settings/sce_filteredExpr_Koh_FlowSOM.json")
 write(toJSON(list(xdim = 10, ydim = 10)),
-      file = "parameter_settings/sce_filtered_Zhengmix_FlowSOM.json")
+      file = "parameter_settings/sce_filteredExpr_Zhengmix_FlowSOM.json")
 write(toJSON(list(xdim = 10, ydim = 10)),
-      file = "parameter_settings/sce_filtered_SimKumar_FlowSOM.json")
+      file = "parameter_settings/sce_filteredExpr_SimKumar_FlowSOM.json")
 
 ## PCAKmeans parameters
 ## -------------------------------------------------------------------------- ##
@@ -332,8 +338,8 @@ write(toJSON(list()), file = "parameter_settings/sce_full_Koh_PCAKmeans.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_Zhengmix_PCAKmeans.json")
 write(toJSON(list()), file = "parameter_settings/sce_full_SimKumar_PCAKmeans.json")
 
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Kumar_PCAKmeans.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Trapnell_PCAKmeans.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Koh_PCAKmeans.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_Zhengmix_PCAKmeans.json")
-write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_PCAKmeans.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Kumar_PCAKmeans.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Trapnell_PCAKmeans.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Koh_PCAKmeans.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_Zhengmix_PCAKmeans.json")
+write(toJSON(list()), file = "parameter_settings/sce_filteredExpr_SimKumar_PCAKmeans.json")
