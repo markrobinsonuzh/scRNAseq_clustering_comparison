@@ -33,8 +33,10 @@ sce <- readRDS(scefile)
 ## Run clustering
 set.seed(1234)
 L <- lapply(seq_len(n_rep), function(i) {  ## For each run
+  cat(paste0("run = ", i, "\n"))
   if (method == "Seurat") {
     tmp <- lapply(params$range_resolutions, function(resolution) {  ## For each resolution
+      cat(paste0("resolution = ", resolution, "\n"))
       ## Run clustering
       res <- get(paste0("apply_", method))(sce = sce, params = params, resolution = resolution)
       
@@ -65,6 +67,7 @@ L <- lapply(seq_len(n_rep), function(i) {  ## For each run
     })  ## End for each resolution
   } else {
     tmp <- lapply(params$range_clusters, function(k) {  ## For each k
+      cat(paste0("k = ", k, "\n"))
       ## Run clustering
       res <- get(paste0("apply_", method))(sce = sce, params = params, k = k)
       
@@ -106,6 +109,12 @@ L <- lapply(seq_len(n_rep), function(i) {  ## For each run
 assignments <- do.call(rbind, lapply(L, function(w) w$assignments))
 timings <- do.call(rbind, lapply(L, function(w) w$timings))
 k_estimates <- do.call(rbind, lapply(L, function(w) w$k_estimates))
+
+## Add true group for each cell
+truth <- data.frame(cell = as.character(rownames(colData(sce))),
+                    trueclass = as.character(colData(sce)$phenoid),
+                    stringsAsFactors = FALSE)
+assignments$trueclass <- truth$trueclass[match(assignments$cell, truth$cell)]
 
 ## Save results
 saveRDS(list(assignments = assignments, timings = timings,

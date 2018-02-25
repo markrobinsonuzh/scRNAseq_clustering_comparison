@@ -65,54 +65,54 @@ write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_TSCAN.jso
 write(toJSON(list(initial_dims = 50)), file = "parameter_settings/RtsneKmeans.json")
 
 ## Dataset-specific
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_Kumar_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_Trapnell_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_Koh_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_Zhengmix_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_full_SimKumar_RtsneKmeans.json")
 
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_filtered_Kumar_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_filtered_Trapnell_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_filtered_Koh_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_filtered_Zhengmix_RtsneKmeans.json")
-write(toJSON(list(perplexity = 30, dims = 10)),
+write(toJSON(list(perplexity = 30, dims = 3)),
       file = "parameter_settings/sce_filtered_SimKumar_RtsneKmeans.json")
 
 ## pcaReduce parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list()), file = "parameter_settings/pcaReduce.json")
+write(toJSON(list(nbt = 100)), file = "parameter_settings/pcaReduce.json")
 
 ## Dataset-specific
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_full_Kumar_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_full_Trapnell_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_full_Koh_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_full_Zhengmix_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)),
+write(toJSON(list(q = 30)),
       file = "parameter_settings/sce_full_SimKumar_pcaReduce.json")
 
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_filtered_Kumar_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_filtered_Trapnell_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_filtered_Koh_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_filtered_Zhengmix_pcaReduce.json")
-write(toJSON(list(nbt = 1, q = 30)), 
+write(toJSON(list(q = 30)), 
       file = "parameter_settings/sce_filtered_SimKumar_pcaReduce.json")
 
 ## Seurat parameters
@@ -186,26 +186,26 @@ write(toJSON(list()), file = "parameter_settings/sce_filtered_SimKumar_SIMLRlarg
 write(toJSON(list()), file = "parameter_settings/Linnorm.json")
 
 ## Dataset-specific
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_full_Kumar_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_full_Trapnell_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_full_Koh_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
       file = "parameter_settings/sce_full_Zhengmix_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_full_SimKumar_Linnorm.json")
 
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_filtered_Kumar_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_filtered_Trapnell_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_filtered_Koh_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
       file = "parameter_settings/sce_filtered_Zhengmix_Linnorm.json")
-write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 10)), 
+write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
       file = "parameter_settings/sce_filtered_SimKumar_Linnorm.json")
 
 ## RaceID parameters
@@ -264,32 +264,60 @@ write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)),
 write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
       file = "parameter_settings/sce_filtered_SimKumar_SC3.json")
 
+## SC3svm parameters
+## -------------------------------------------------------------------------- ##
+## General
+write(toJSON(list()), file = "parameter_settings/SC3svm.json")
+
+## Dataset-specific
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_full_Kumar_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_full_Trapnell_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_full_Koh_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_full_Zhengmix_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_full_SimKumar_SC3svm.json")
+
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_filtered_Kumar_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_filtered_Trapnell_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_filtered_Koh_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_filtered_Zhengmix_SC3svm.json")
+write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+      file = "parameter_settings/sce_filtered_SimKumar_SC3svm.json")
+
 ## FlowSOM parameters
 ## -------------------------------------------------------------------------- ##
 ## General
 write(toJSON(list(nPC = 50)), file = "parameter_settings/FlowSOM.json")
 
 ## Dataset-specific
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_full_Kumar_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_full_Trapnell_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_full_Koh_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_full_Zhengmix_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_full_SimKumar_FlowSOM.json")
 
-write(toJSON(list(xdim = 15, ydim = 15)), 
+write(toJSON(list(xdim = 10, ydim = 10)), 
       file = "parameter_settings/sce_filtered_Kumar_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)),
+write(toJSON(list(xdim = 10, ydim = 10)),
       file = "parameter_settings/sce_filtered_Trapnell_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)),
+write(toJSON(list(xdim = 10, ydim = 10)),
       file = "parameter_settings/sce_filtered_Koh_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)),
+write(toJSON(list(xdim = 10, ydim = 10)),
       file = "parameter_settings/sce_filtered_Zhengmix_FlowSOM.json")
-write(toJSON(list(xdim = 15, ydim = 15)),
+write(toJSON(list(xdim = 10, ydim = 10)),
       file = "parameter_settings/sce_filtered_SimKumar_FlowSOM.json")
 
 ## PCAKmeans parameters

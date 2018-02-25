@@ -1,7 +1,7 @@
 ## Apply TSCAN
 
 suppressPackageStartupMessages({
-  require(TSCAN)
+  library(TSCAN)
 })
 
 apply_TSCAN <- function(sce, params, k) {

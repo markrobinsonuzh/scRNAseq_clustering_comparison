@@ -8,6 +8,7 @@ editor_options:
 ```{r load-packages}
 suppressPackageStartupMessages({
   library(MultiAssayExperiment)
+  library(SingleCellExperiment)
   library(scater)
   library(dplyr)
   library(tidyr)
@@ -15,6 +16,7 @@ suppressPackageStartupMessages({
   library(scran)
   library(cowplot)
   library(tibble)
+  library(cluster)
 })
 ```
 
@@ -68,6 +70,7 @@ dim(sce)
 ```{r ercc-mt}
 is.spike <- grepl("^ERCC", rownames(sce))
 table(is.spike)
+summary(colSums(counts(sce[is.spike, ])))
 isSpike(sce, "ERCC") <- is.spike
 ```
 
@@ -88,7 +91,7 @@ feature.med <- median(log10(sce$total_features), na.rm = TRUE)
 feature.mad <- mad(log10(sce$total_features), center = feature.med, na.rm = TRUE)
 lower.limit.feat <- 10^(feature.med - 3 * feature.mad)
 
-ggplot(as.data.frame(colData(sce)), aes(x = total_count)) + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) + 
   geom_histogram(bins = 20, fill = "grey80") + xlab("Total count") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = lower.limit.size, color = "red", linetype = "dashed") + 
@@ -144,13 +147,7 @@ data.frame(ByLibSize = sum(libsize.drop), ByFeature = sum(feature.drop),
 ## Quality control using highest expressed genes
 
 ```{r qc-filt}
-p3 <- plotQC(sce, type = "highest-expression", n = 50)
-p3
-```
-
-```{r mean-freq-expr}
-p2 <- plotQC(sce, type = "exprs-freq-vs-mean")
-p2
+plotQC(sce, type = "highest-expression", n = 50)
 ```
 
 ## Gene filtering
@@ -161,12 +158,11 @@ keep <- ave.counts >= 1
 sum(keep)
 df <- data.frame(ave.counts = log10(ave.counts))
 
-p4 <- ggplot(df, aes(x = ave.counts)) + 
+ggplot(df, aes(x = ave.counts)) + 
   geom_histogram(binwidth = 0.25, fill = "grey80") + 
   geom_vline(aes(xintercept = log10(1)), color = "red", linetype = "dashed") +
   guides(color = "none") + labs(x = expression(log[10]~"(average count)"), 
                                 y = "Number of genes")
-p4
 
 sce.red <- sce[keep, ]
 ```
@@ -213,8 +209,7 @@ sce.red <- normalise(sce.red, exprs_values = "counts", return_log = FALSE,
 expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-p5 <- plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
-p5
+plotQC(sce.red, type = "explanatory-variables", variables = expl_vars)
 ```
 
 ## Plot t-SNE representations
@@ -222,26 +217,15 @@ p5
 ```{r tSNE}
 set.seed(1234)
 sce.red <- runTSNE(sce.red, expr_values = "logcounts", perplexity = 5)
-p1 <- plotTSNE(sce.red, colour_by = "phenoid")
-p1
-p6 <- plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
-p6
-```
-
-## Plot a summary of the QC
-
-```{r qc-plot-out} 
-plot.qc <- plot_grid(p1, p6, p3, p4, p5, p2, ncol = 2, labels = "auto")
-pdf("../../plots/qc_data/qc_summary_Kumar.pdf", width = 10, height = 12)
-print(plot.qc)
-dev.off()
+plotTSNE(sce.red, colour_by = "phenoid")
+plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ```
 
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
 sce <- sce[!isSpike(sce, "ERCC"), ]
-sce.red <- sce.red[!isSpike(sce, "ERCC"), ]
+sce.red <- sce.red[!isSpike(sce.red, "ERCC"), ]
 saveRDS(sce, file = "../../data/sce_full/sce_full_Kumar.rds")
 saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_Kumar.rds")
 ```
