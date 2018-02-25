@@ -2,12 +2,14 @@
 R := R_LIBS=/home/Shared/Rlib/release-3.6-lib/ /usr/local/R/R-3.4.2/bin/R CMD BATCH --no-restore --no-save
 Rscript := /usr/local/R/R-3.4.2/src/unix/Rscript --no-restore --no-save
 
+## Include lists of methods, data sets and gene filtering approaches to use
 include include_methods.mk
 include include_datasets.mk
 include include_filterings.mk
 
 .PHONY: all prepare_data cluster
 
+## Define rules
 all: cluster
 
 ## Prepare data
@@ -19,7 +21,7 @@ plots: plots/runtime/runtime_by_k.rds plots/performance/performance_by_k.rds
 
 ## ------------------------------------------------------------------------------------ ##
 ## Setup
-## NB: Run the setup rule only once, to set up the directory structure and download the data. 
+## Note! Run the setup rule only once, to set up the directory structure and download the data. 
 ## If it is rerun, it will update the raw data files and cause the results to be out of date.
 ## If additional parameters need to be defined or modified at a later stage, generate only 
 ## those parameter files manually.
