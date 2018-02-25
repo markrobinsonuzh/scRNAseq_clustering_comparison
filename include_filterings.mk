@@ -2,5 +2,5 @@ comma := ,
 empty :=
 space := $(empty) $(empty)
 
-FILTERINGS := filteredExpr# full
+FILTERINGS := full filteredExpr
 FILTERINGSc := $(subst $(space),$(comma),$(FILTERINGS))

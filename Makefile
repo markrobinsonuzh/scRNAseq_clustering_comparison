@@ -99,7 +99,7 @@ data/data_raw/GSE60749-GPL13112.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
-$(foreach d,Kumar SimKumar,$(eval $(call qckumarrule,$(d))))
+$(foreach d,Kumar SimKumarEasy SimKumarHard,$(eval $(call qckumarrule,$(d))))
 
 ## Filtering by expression is done in the same script that is generating the full data sets
 define filteredExprrule

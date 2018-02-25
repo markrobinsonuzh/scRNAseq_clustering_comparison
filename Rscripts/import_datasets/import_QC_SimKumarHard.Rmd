@@ -69,8 +69,8 @@ sub.cts <- sub.cts[!is.spike, ]
 
 ```{r simulate-counts}
 sce <- splatSimulate(params = params, batchCells = 500,
-                     group.prob = c(0.1, 0.15, 0.5, 0.25), 
-                     method = "groups", de.prob = c(0.05, 0.1, 0.2, 0.4),
+                     group.prob = c(0.2, 0.15, 0.4, 0.25), 
+                     method = "groups", de.prob = c(0.01, 0.05, 0.05, 0.08),
                      verbose = FALSE)
 logcounts(sce) <- log2(calculateCPM(sce) + 1)
 sce$phenoid <- colData(sce)$Group
@@ -224,8 +224,8 @@ plotTSNE(sce.red, colour_by = "total_features", size_by = "total_counts")
 ## Save the normalized and cell filtered datasets
 
 ```{r save-data}
-saveRDS(sce, file = "../../data/sce_full/sce_full_SimKumar.rds")
-saveRDS(sce.red, file = "../../data/sce_filtered/sce_filtered_SimKumar.rds")
+saveRDS(sce.red, file = "../../data/sce_filteredExpr/sce_filteredExpr_SimKumarHard.rds")
+saveRDS(sce, file = "../../data/sce_full/sce_full_SimKumarHard.rds")
 ```
 
 ## Session info
