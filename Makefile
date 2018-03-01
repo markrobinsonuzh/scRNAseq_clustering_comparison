@@ -40,7 +40,9 @@ directories:
 	mkdir -p plots/performance
 	mkdir -p plots/runtime
 	mkdir -p results
-	mkdir -p Rout	
+	mkdir -p Rout
+	mkdir -p output/clustering_summary
+	mkdir -p output/parameter_range_investigation
 
 conquer: directories
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE60749-GPL13112.rds
@@ -115,37 +117,42 @@ $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),$(eval 
 ## ------------------------------------------------------------------------------------ ##
 ## Generate QC plots
 ## ------------------------------------------------------------------------------------ ##
-define qcrule
-plots/qc_data/$(1).rds: data/sce_full/sce_full_$(1).rds Rscripts/evaluate_datasets/plot_dataset_characteristics.R
-	$(R) "--args scefull='data/sce_full/sce_full_$(1).rds' scefiltered='data/sce_filteredExpr/sce_filteredExpr_$(1).rds' outrds='$$@'" Rscripts/evaluate_datasets/plot_dataset_characteristics.R Rout/plot_dataset_characteristics_$(1).Rout
-endef
-$(foreach d,$(DATASETS),$(eval $(call qcrule,$(d))))
+#define qcrule
+#plots/qc_data/$(1).rds: data/sce_full/sce_full_$(1).rds Rscripts/evaluate_datasets/plot_dataset_characteristics.R
+#	$(R) "--args scefull='data/sce_full/sce_full_$(1).rds' scefiltered='data/sce_filteredExpr/sce_filteredExpr_$(1).rds' outrds='$$@'" Rscripts/evaluate_datasets/plot_dataset_characteristics.R Rout/plot_dataset_characteristics_$(1).Rout
+#endef
+#$(foreach d,$(DATASETS),$(eval $(call qcrule,$(d))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Apply clustering methods
 ## ------------------------------------------------------------------------------------ ##
 define clusterrule ## $(1) - sce_full, sce_filteredExpr. $(2) - dataset. $(3) - clustering method
-results/$(1)_$(2)_$(3).rds: data/sce_full/sce_full_$(2).rds Rscripts/clustering/run_clustering.R \
+results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds Rscripts/clustering/run_clustering.R \
 Rscripts/clustering/apply_$(3).R parameter_settings/$(1)_$(2).json parameter_settings/$(1)_$(2)_$(3).json \
 parameter_settings/$(3).json
 	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
-$(foreach f,$(FILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
+
+## ------------------------------------------------------------------------------------ ##
+## Summarize clustering performance
+## ------------------------------------------------------------------------------------ ##
+output/clustering_summary/clustering_summary.rds: Rscripts/evaluate_results/summarize_clustering_results.R \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plot performance
 ## ------------------------------------------------------------------------------------ ##
-plots/performance/performance_by_k.rds: Rscripts/evaluate_results/plot_performance_by_k.R \
-$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach m,$(METHODS),results/sce_$(f)_$(d)_$(m).rds)))
-	$(R) "--args datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/plot_performance_by_k.R Rout/plot_performance_by_k.Rout
+plots/performance/performance_by_k.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_performance_by_k.R
+	$(R) "--args summaryrds='$<' outrds='$@'" Rscripts/evaluate_results/plot_performance_by_k.R Rout/plot_performance_by_k.Rout
 
 ## ------------------------------------------------------------------------------------ ##
-## Plot runtime
+## Investigate parameter range for certain methods
 ## ------------------------------------------------------------------------------------ ##
-plots/runtime/runtime_by_k.rds: Rscripts/evaluate_results/plot_runtime_by_k.R \
-$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach m,$(METHODS),results/sce_$(f)_$(d)_$(m).rds)))
-	$(R) "--args datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/plot_runtime_by_k.R Rout/plot_runtime_by_k.Rout
-
-
-
+output/parameter_range_investigation/parameter_range_investigation_Linnorm_Kumar.rds: \
+data/sce_filteredExpr10/sce_filteredExpr10_Kumar.rds \
+Rscripts/investigate_parameter_range/investigate_parameter_range_Linnorm.R
+	$(R) "--args scefile='$<' k=3 outrds='$@'" Rscripts/investigate_parameter_range/investigate_parameter_range_Linnorm.R Rout/investigate_parameter_range_Linnorm.R
 

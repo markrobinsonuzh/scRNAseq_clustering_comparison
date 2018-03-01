@@ -16,25 +16,26 @@ datasets <- c("Kumar", "Trapnell", "Koh", "Zhengmix4eq", "Zhengmix4uneq",
 
 ## General dataset-specific (but method-agnostic) parameters (range of cluster numbers etc)
 ## -------------------------------------------------------------------------- ##
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Kumar.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Trapnell.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_full_Koh.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Zhengmix4eq.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_Zhengmix4uneq.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_full_Zhengmix8eq.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_SimKumar4easy.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_full_SimKumar4hard.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_full_SimKumar8hard.json")
-
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Kumar.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Trapnell.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filteredExpr_Koh.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Zhengmix4eq.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_Zhengmix4uneq.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filteredExpr_Zhengmix8eq.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_SimKumar4easy.json")
-write(toJSON(list(range_clusters = 2:10)), file = "parameter_settings/sce_filteredExpr_SimKumar4hard.json")
-write(toJSON(list(range_clusters = 2:15)), file = "parameter_settings/sce_filteredExpr_SimKumar8hard.json")
+for (f in filterings) {
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_Kumar.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_Trapnell.json"))
+  write(toJSON(list(range_clusters = 2:15)), 
+        file = paste0("parameter_settings/sce_", f, "_Koh.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_Zhengmix4eq.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_Zhengmix4uneq.json"))
+  write(toJSON(list(range_clusters = 2:15)), 
+        file = paste0("parameter_settings/sce_", f, "_Zhengmix8eq.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_SimKumar4easy.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_SimKumar4hard.json"))
+  write(toJSON(list(range_clusters = 2:15)), 
+        file = paste0("parameter_settings/sce_", f, "_SimKumar8hard.json"))
+}
 
 ## CIDR parameters
 ## -------------------------------------------------------------------------- ##

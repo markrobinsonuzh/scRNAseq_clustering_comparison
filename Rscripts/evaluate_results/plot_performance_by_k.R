@@ -3,16 +3,17 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
-datasets <- strsplit(datasets, ",")[[1]]
-names(datasets) <- datasets
-filterings <- strsplit(filterings, ",")[[1]]
-names(filterings) <- filterings
-methods <- strsplit(methods, ",")[[1]]
-names(methods) <- methods
+# datasets <- strsplit(datasets, ",")[[1]]
+# names(datasets) <- datasets
+# filterings <- strsplit(filterings, ",")[[1]]
+# names(filterings) <- filterings
+# methods <- strsplit(methods, ",")[[1]]
+# names(methods) <- methods
 
-print(datasets)
-print(filterings)
-print(methods)
+# print(datasets)
+# print(filterings)
+# print(methods)
+print(summaryrds)
 print(outrds)
 
 suppressPackageStartupMessages({
@@ -26,19 +27,20 @@ suppressPackageStartupMessages({
 })
 
 ## Read clustering results
-res <- do.call(rbind, lapply(datasets, function(d) {
-  do.call(rbind, lapply(filterings, function(f) {
-    do.call(rbind, lapply(methods, function(m) {
-      x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
-      dplyr::full_join(x$assignments %>%
-                         dplyr::select(dataset, method, cell, run, k, resolution, cluster, trueclass),
-                       x$k_estimates %>%
-                         dplyr::select(dataset, method, run, k, resolution, est_k)
-      ) %>%
-        dplyr::full_join(x$timings %>% dplyr::select(dataset, method, run, k, resolution, timing))
-    }))
-  }))
-}))
+res <- readRDS(summaryrds)
+# res <- do.call(rbind, lapply(datasets, function(d) {
+#   do.call(rbind, lapply(filterings, function(f) {
+#     do.call(rbind, lapply(methods, function(m) {
+#       x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
+#       dplyr::full_join(x$assignments %>%
+#                          dplyr::select(dataset, method, cell, run, k, resolution, cluster, trueclass),
+#                        x$k_estimates %>%
+#                          dplyr::select(dataset, method, run, k, resolution, est_k)
+#       ) %>%
+#         dplyr::full_join(x$timings %>% dplyr::select(dataset, method, run, k, resolution, timing))
+#     }))
+#   }))
+# }))
 
 pdf(gsub("rds$", "pdf", outrds), width = 10, height = 6)
 
@@ -116,14 +118,16 @@ print(res_summary %>% dplyr::filter(k == truenclust) %>%
         dplyr::summarize(medianARI = median(ARI)) %>%
         ggplot(aes(x = method, y = dataset, fill = medianARI)) + 
         geom_raster() + facet_wrap(~ filtering) + 
-        theme(rect = element_blank(), line = element_blank()))
+        theme(rect = element_blank(), line = element_blank(),
+              axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)))
 
 print(res_summary %>% dplyr::filter(k == estnclust) %>%
         dplyr::group_by(dataset, filtering, method, k) %>%
         dplyr::summarize(medianARI = median(ARI)) %>%
         ggplot(aes(x = method, y = dataset, fill = medianARI)) + 
         geom_raster() + facet_wrap(~ filtering) + 
-        theme(rect = element_blank(), line = element_blank()))
+        theme(rect = element_blank(), line = element_blank(),
+              axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)))
 
 par(mfrow = c(2, 2), oma = c(1, 1, 1, 1), mar = c(1, 1, 1, 1), xpd = NA)
 tmp <- res_summary %>% dplyr::filter(k == truenclust) %>%
@@ -147,13 +151,15 @@ for (f in unique(tmp$filtering)) {
 print(res_summary %>% dplyr::filter(k == estnclust | k == truenclust) %>% 
         dplyr::group_by(dataset, filtering, method, k) %>%
         dplyr::summarize(medianARI = median(ARI), truenclust = unique(truenclust),
-                         estnclust = unique(estnclust)) %>%
+                         estnclust = unique(estnclust)[1]) %>%
         dplyr::mutate(n = length(medianARI)) %>%
         dplyr::filter(n == 2) %>% 
-        dplyr::summarize(diffARI = medianARI[k == truenclust] - medianARI[k == estnclust]) %>%
+        dplyr::summarize(diffARI = medianARI[k == truenclust] - 
+                           median(medianARI[k == estnclust])) %>%
         ggplot(aes(x = method, y = dataset, fill = diffARI)) + 
         geom_raster() + facet_wrap(~ filtering) + 
-        theme(rect = element_blank(), line = element_blank()))
+        theme(rect = element_blank(), line = element_blank(),
+              axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)))
 
 ## -------------------------------------------------------------------------- ##
 ## Plot the estimated number of clusters
@@ -164,33 +170,43 @@ print(ggplot(res_summary %>% dplyr::filter(!is.na(estnclust)),
         geom_point(position = position_jitter(width = 0.2, height = 0)) + 
         facet_grid(filtering ~ dataset) + 
         expand_limits(y = 0) + 
-        scale_y_continuous(breaks = seq_len(max(res_summary$estnclust, na.rm = TRUE))))
+        scale_y_continuous(breaks = seq_len(max(res_summary$estnclust, na.rm = TRUE))) + 
+        theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)))
+
+## -------------------------------------------------------------------------- ##
+## Plot timing
+print(ggplot(res_summary, aes(x = k, y = timing, group = method, color = method)) + 
+        geom_smooth() + 
+        facet_grid(filtering ~ dataset, scales = "free") + 
+        scale_color_discrete(name = "") + 
+        scale_y_log10())
+
 
 ## -------------------------------------------------------------------------- ##
 ## Calculate stability scores for each method and k, across runs
-res <- res %>% dplyr::filter(method != "Seurat") ## Problem since different resolutions can give the same number of clusters, so there may be many "k clusters, run 1" lines. 
-
-tbl <- res %>% dplyr::mutate(ds = paste0(dataset, method, k))
-tbl <- split(tbl, f = tbl$ds)
-tbl <- do.call(rbind, lapply(tbl, function(w) {
-  setNames(data.frame(t(combn(unique(w$run), 2))), c("run1", "run2")) %>%
-    dplyr::mutate(dataset = unique(w$dataset), method = unique(w$method), k = unique(w$k)) %>%
-    dplyr::select(dataset, method, k, run1, run2)
-}))
-tbl$ARI <- sapply(seq_len(nrow(tbl)), function(i) {
-  tmp <- res %>% dplyr::select(-resolution) %>% 
-    dplyr::filter(dataset == tbl$dataset[i] & method == tbl$method[i] & 
-                    k == tbl$k[i] & run %in% c(tbl$run1[i], tbl$run2[i])) %>%
-    tidyr::spread(run, cluster)
-  mclust::adjustedRandIndex(tmp[, as.character(tbl$run1[i])], 
-                            tmp[, as.character(tbl$run2[i])])
-})
-tbl <- tbl %>% tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset"))
-
-print(ggplot(tbl, aes(x = k, y = ARI, group = method, color = method)) + 
-        geom_smooth() + 
-        facet_grid(filtering ~ dataset, scales = "free_x") + 
-        scale_color_discrete(name = ""))
+# res <- res %>% dplyr::filter(method != "Seurat") ## Problem since different resolutions can give the same number of clusters, so there may be many "k clusters, run 1" lines. 
+# 
+# tbl <- res %>% dplyr::mutate(ds = paste0(dataset, method, k))
+# tbl <- split(tbl, f = tbl$ds)
+# tbl <- do.call(rbind, lapply(tbl, function(w) {
+#   setNames(data.frame(t(combn(unique(w$run), 2))), c("run1", "run2")) %>%
+#     dplyr::mutate(dataset = unique(w$dataset), method = unique(w$method), k = unique(w$k)) %>%
+#     dplyr::select(dataset, method, k, run1, run2)
+# }))
+# tbl$ARI <- sapply(seq_len(nrow(tbl)), function(i) {
+#   tmp <- res %>% dplyr::select(-resolution) %>% 
+#     dplyr::filter(dataset == tbl$dataset[i] & method == tbl$method[i] & 
+#                     k == tbl$k[i] & run %in% c(tbl$run1[i], tbl$run2[i])) %>%
+#     tidyr::spread(run, cluster)
+#   mclust::adjustedRandIndex(tmp[, as.character(tbl$run1[i])], 
+#                             tmp[, as.character(tbl$run2[i])])
+# })
+# tbl <- tbl %>% tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset"))
+# 
+# print(ggplot(tbl, aes(x = k, y = ARI, group = method, color = method)) + 
+#         geom_smooth() + 
+#         facet_grid(filtering ~ dataset, scales = "free_x") + 
+#         scale_color_discrete(name = ""))
 
 dev.off()
 
