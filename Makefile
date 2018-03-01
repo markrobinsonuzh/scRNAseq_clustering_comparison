@@ -19,7 +19,7 @@ prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PC
 
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-plots: plots/runtime/runtime_by_k.rds plots/performance/performance_by_k.rds
+plots: plots/performance/performance_by_k.rds
 
 ## ------------------------------------------------------------------------------------ ##
 ## Setup
