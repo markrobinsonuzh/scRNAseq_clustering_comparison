@@ -127,9 +127,9 @@ $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),$(eval 
 ## Apply clustering methods
 ## ------------------------------------------------------------------------------------ ##
 define clusterrule ## $(1) - sce_full, sce_filteredExpr. $(2) - dataset. $(3) - clustering method
-results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds Rscripts/clustering/run_clustering.R \
-Rscripts/clustering/apply_$(3).R parameter_settings/$(1)_$(2).json parameter_settings/$(1)_$(2)_$(3).json \
-parameter_settings/$(3).json
+results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds parameter_settings/$(1)_$(2).json \
+parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
+Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
 	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
