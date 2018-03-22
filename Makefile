@@ -17,7 +17,8 @@ prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PC
 
 #$(foreach d,$(DATASETS),plots/qc_data/$(d).rds)
 
-cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
 
 plots: plots/performance/performance_by_k.rds
 
@@ -132,14 +133,16 @@ parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
 Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
 	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Summarize clustering performance
 ## ------------------------------------------------------------------------------------ ##
 output/clustering_summary/clustering_summary.rds: Rscripts/evaluate_results/summarize_clustering_results.R \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
-	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds))) \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds)))
+	$(R) "--args datasetssmall='$(DATASETSsmallc)' datasetsbig='$(DATASETSbigc)' filterings='$(ALLFILTERINGSc)' methodssmall='$(METHODSsmallc)' methodsbig='$(METHODSbigc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plot performance
