@@ -55,7 +55,6 @@ plot_pheatmap_ari <- function(files_ari, datatype){
   # which methods are missing?
   print(table(tmp$method, tmp$data)==0)
   # table
-  #xtabs <-  xtabs(X..i..~ data+ method, data=tmp)
   tbl <- acast(tmp, data~method, value.var="X..i..")
   # rename
   rownames(tbl) <- c("Koh", "Kumar", "simDataKumar", "simDataKumar2", "Trapnell", "Zheng")
