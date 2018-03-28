@@ -10,9 +10,10 @@ suppressPackageStartupMessages({
 })
 
 filterings <- c("full", "filteredExpr50", "filteredExpr10", "filteredHVG50", 
-                "filteredHVG10")
+                "filteredHVG10", "filteredM3Drop50", "filteredM3Drop10")
 datasets <- c("Kumar", "Trapnell", "Koh", "Zhengmix4eq", "Zhengmix4uneq", 
-              "Zhengmix8eq", "SimKumar4easy", "SimKumar4hard", "SimKumar8hard")
+              "Zhengmix8eq", "SimKumar4easy", "SimKumar4hard", "SimKumar8hard",
+              "KohTCC", "KumarTCC", "TrapnellTCC")
 
 ## General dataset-specific (but method-agnostic) parameters (range of cluster numbers etc)
 ## -------------------------------------------------------------------------- ##
@@ -35,6 +36,12 @@ for (f in filterings) {
         file = paste0("parameter_settings/sce_", f, "_SimKumar4hard.json"))
   write(toJSON(list(range_clusters = 2:15)), 
         file = paste0("parameter_settings/sce_", f, "_SimKumar8hard.json"))
+  write(toJSON(list(range_clusters = 2:10)),
+        file = paste0("parameter_settings/sce_", f, "_KumarTCC.json"))
+  write(toJSON(list(range_clusters = 2:10)), 
+        file = paste0("parameter_settings/sce_", f, "_TrapnellTCC.json"))
+  write(toJSON(list(range_clusters = 2:15)), 
+        file = paste0("parameter_settings/sce_", f, "_KohTCC.json"))
 }
 
 ## CIDR parameters
@@ -143,7 +150,7 @@ for (f in filterings) {
 }
 
 for (f in filterings) {
-  for (d in c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq")) {
+  for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
     write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_Linnorm.json"))
   }
@@ -163,7 +170,7 @@ for (f in filterings) {
 }
 
 for (f in filterings) {
-  for (d in c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq")) {
+  for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
     write(toJSON(list(mintotal = 200, minexpr = 1, minnumber = 1, maxexpr = Inf)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID.json"))
   }

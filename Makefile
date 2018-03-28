@@ -1,5 +1,6 @@
 ## Define the versions of R and the paths to the libraries
 R := R_LIBS=/home/Shared/Rlib/release-3.6-lib/ /usr/local/R/R-3.4.2/bin/R CMD BATCH --no-restore --no-save
+Rd := R_LIBS=/home/Shared/Rlib/devel-lib/ /usr/local/R/R-devel/bin/R CMD BATCH --no-restore --no-save
 Rscript := /usr/local/R/R-3.4.2/src/unix/Rscript --no-restore --no-save
 
 ## Include lists of methods, data sets and gene filtering approaches to use
@@ -49,6 +50,9 @@ conquer: directories
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE60749-GPL13112.rds
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE52529-GPL16791.rds
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/SRP073808.rds
+	wget -O data/data_raw/SRP073808TCC.rds http://imlspenticton.uzh.ch/robinson_lab/conquer/data-tcc/SRP073808.rds
+	wget -O data/data_raw/GSE52529-GPL16791TCC.rds http://imlspenticton.uzh.ch/robinson_lab/conquer/data-tcc/GSE52529-GPL16791.rds
+	wget -O data/data_raw/GSE60749-GPL13112TCC.rds http://imlspenticton.uzh.ch/robinson_lab/conquer/data-tcc/GSE60749-GPL13112.rds
 
 zheng: directories
 	for D in b_cells naive_cytotoxic cd14_monocytes regulatory_t cd56_nk memory_t cd4_t_helper naive_t; do \
@@ -66,8 +70,18 @@ data/data_raw/GSE52529-GPL16791.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
+data/sce_full/sce_full_TrapnellTCC.rds: Rscripts/import_datasets/import_QC_TrapnellTCC.Rmd \
+data/data_raw/GSE52529-GPL16791TCC.rds
+	cd Rscripts/import_datasets && \
+	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+
 data/sce_full/sce_full_Koh.rds: Rscripts/import_datasets/import_QC_Koh.Rmd \
 data/data_raw/SRP073808.rds
+	cd Rscripts/import_datasets && \
+	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
+
+data/sce_full/sce_full_KohTCC.rds: Rscripts/import_datasets/import_QC_KohTCC.Rmd \
+data/data_raw/SRP073808TCC.rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$(<F)', clean = TRUE)"
 
@@ -98,12 +112,13 @@ endef
 $(foreach d,Zhengmix8eq,$(eval $(call zheng8rule,$(d))))
 
 define qckumarrule
-data/sce_full/sce_full_$(1).rds: Rscripts/import_datasets/import_QC_$(1).Rmd \
-data/data_raw/GSE60749-GPL13112.rds
+data/sce_full/sce_full_$(1)$(2).rds: Rscripts/import_datasets/import_QC_$(1)$(2).Rmd \
+data/data_raw/GSE60749-GPL13112$(2).rds
 	cd Rscripts/import_datasets && \
 	$(Rscript) -e "rmarkdown::render('$$(<F)', clean = TRUE)"
 endef
-$(foreach d,Kumar SimKumar4easy SimKumar4hard SimKumar8hard,$(eval $(call qckumarrule,$(d))))
+$(foreach d,Kumar SimKumar4easy SimKumar4hard SimKumar8hard,$(eval $(call qckumarrule,$(d),)))
+$(foreach d,Kumar,$(eval $(call qckumarrule,$(d),TCC)))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Generate filtered data sets
@@ -131,10 +146,12 @@ define clusterrule ## $(1) - sce_full, sce_filteredExpr. $(2) - dataset. $(3) - 
 results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds parameter_settings/$(1)_$(2).json \
 parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
 Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
-	$(R) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
+	$(4) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.4),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.4),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.5),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.5),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Summarize clustering performance

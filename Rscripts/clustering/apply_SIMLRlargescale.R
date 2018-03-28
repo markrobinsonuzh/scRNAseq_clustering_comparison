@@ -10,7 +10,7 @@ apply_SIMLRlargescale <- function(sce, params, k) {
     dat <- logcounts(sce)
     st <- system.time({
       simlr = SIMLR_Large_Scale(X = dat, c = k, k = params$k, 
-                                if.impute = FALSE, normalize = FALSE, cores.ratio = 1)
+                                if.impute = FALSE, normalize = FALSE)
       cluster <- simlr$y$cluster
       names(cluster) <- colnames(sce)
     })

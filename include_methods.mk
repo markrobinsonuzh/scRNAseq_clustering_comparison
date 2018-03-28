@@ -2,8 +2,12 @@ comma := ,
 empty :=
 space := $(empty) $(empty)
 
-METHODSbig := PCAKmeans RtsneKmeans Seurat FlowSOM SIMLRlargescale SC3 CIDR RaceID PCAHC
-METHODSsmall := PCAKmeans RtsneKmeans Seurat FlowSOM pcaReduce SIMLRlargescale SC3 SIMLR CIDR Linnorm RaceID SC3svm TSCAN PCAHC
+METHODSbig3.4 := PCAKmeans RtsneKmeans Seurat FlowSOM SC3 CIDR RaceID PCAHC# SIMLRlargescale
+METHODSbig3.5 := 
+METHODSbig := $(METHODSbig3.4) $(METHODSbig3.5)
+METHODSsmall3.4 := PCAKmeans RtsneKmeans Seurat FlowSOM pcaReduce SC3 SIMLR CIDR RaceID SC3svm TSCAN PCAHC# Linnorm SIMLRlargescale
+METHODSsmall3.5 := 
+METHODSsmall := $(METHODSsmall3.4) $(METHODSsmall3.5)
 METHODS := $(METHODSsmall)
 
 METHODSbigc := $(subst $(space),$(comma),$(METHODSbig))
