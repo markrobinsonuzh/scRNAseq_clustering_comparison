@@ -4,3 +4,5 @@
 .Ruserdata
 clustering_duo.Rproj
 .DS_Store
+output/
+plots/
