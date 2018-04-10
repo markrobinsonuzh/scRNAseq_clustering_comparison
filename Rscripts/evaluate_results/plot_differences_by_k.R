@@ -3,8 +3,8 @@ args <- (commandArgs(trailingOnly = TRUE))
 for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
-print(summaryrds)
-print(outrds)
+
+
 suppressPackageStartupMessages({
   library(dplyr)
   library(tidyr)
@@ -18,7 +18,7 @@ suppressPackageStartupMessages({
 })
 
 ## Read clustering results
-res <- readRDS(file="clustering_summary.rds")
+res <- readRDS(file="../../output/clustering_summary/clustering_summary.rds")
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
 # ------------------------------------
@@ -29,9 +29,6 @@ res_summary <- res %>% dplyr::group_by(dataset,method, run, k) %>%
                    timing = median(timing)) %>%
   tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
   dplyr::select(-sce) %>% dplyr::ungroup()
-
-diff_abs1 <- res_summary %>% dplyr::group_by(dataset,filtering,method, run) %>% filter(ARI==max(ARI)  )%>%mutate(k_diff= (k-truenclust))
-diff_abs2 <- res_summary %>% dplyr::group_by(dataset,filtering,method,k) %>% summarise(ARI=max(ARI)  ) %>%summarise(k_diff= (k-truenclust))
 
 
 diff_abs3 <- res_summary %>% dplyr::group_by(dataset,filtering,method, truenclust,k) %>%summarize(medARI=median(ARI)) %>%filter(medARI==max(medARI)) %>%mutate(k_diff= (k-truenclust))
@@ -44,7 +41,7 @@ print(ggplot(diff_abs3, aes(x = method, y = k_diff, group = method, color = meth
         theme(axis.text.x = element_text(size=rel(0.8),angle = 90, hjust = 1, vjust = 1)) )
 
 
-pdf("diff_maxARI.pdf")
+pdf("../../plots/performance/diff_maxARI.pdf")
 print(ggplot(diff_abs3, aes(x = method, y = k_diff, group = method, color = method)) + 
         geom_boxplot( outlier.color = NA) + 
         geom_point(position = position_jitter(width = 0.1), alpha = 0.1)+
@@ -79,7 +76,7 @@ diff_abs <- res_summary %>% dplyr::group_by(dataset,filtering,method, run) %>% f
 diff_estnclust <- res_summary %>%dplyr::group_by(dataset,filtering,method,estnclust,truenclust) %>%
   summarize(medARI=median(ARI)) %>%
   filter(medARI==max(medARI))%>%filter(estnclust != is.na(estnclust))%>%mutate(k_diff= (estnclust-truenclust))
-pdf("diff_estnclust.pdf")
+pdf("../../plots/performance/diff_estnclust.pdf")
 diff_estnclust <- res_summary %>%  filter(estnclust != is.na(estnclust))%>%group_by(method, dataset, filtering, estnclust, truenclust)%>%summarise(k_diff= unique(estnclust)- unique(truenclust))
 print(ggplot(diff_estnclust, aes(x = method, y = k_diff, group = method, color = method)) + 
         geom_boxplot( outlier.color = NA) + 
