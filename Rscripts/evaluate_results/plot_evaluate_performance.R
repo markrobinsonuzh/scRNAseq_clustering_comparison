@@ -15,10 +15,12 @@ suppressPackageStartupMessages({
   
 })
 
-
 ## Read clustering results
 res <- readRDS(file="../../output/clustering_summary/clustering_summary.rds")
+res2 <- readRDS(file="../../output/clustering_summary/clustering_summary_old.rds")
+
 pdf("../../plots/performance/res_performance.pdf", width=15, height = 8)
+
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
 # ------------------------------------
@@ -29,7 +31,7 @@ res_summary <- res %>% dplyr::group_by(dataset,method, run, k) %>%
                    timing = median(timing)) %>%
   tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
   dplyr::select(-sce) %>% dplyr::ungroup()
-
+unique(res_summary$filtering)
 # --------------------------------------
 # ## Calculate performance indices for each method and clustering run
 # --------------------------------------
