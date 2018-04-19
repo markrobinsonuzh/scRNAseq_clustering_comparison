@@ -24,32 +24,37 @@ suppressPackageStartupMessages({
 #------------------------------------------------------------------
 
 # load files
-df <- readRDS(file = "../clustering_summary.rds")
-df.sub <- df%>%filter(!dataset %in% grep("Zheng", unique(df$dataset) , value=TRUE) )
+df <- readRDS(file = "../../output/clustering_summary/clustering_summary_old.rds")
+df.sub <- df%>%filter( !method %in% c("Seurat","SIMLRlargescale", "RaceID") ) 
 
-         
 helper_ensemble <- function(methods, df){
   
   l <- vector("list",length(unique(df$dataset)) )
   names(l) <- unique(df$dataset)
   
-  for(i in unique(df$dataset) ){
+  for(i in unique( df$dataset ) ){
     print(i)
-    
-    res <- df %>% filter( dataset %in% i ) %>% filter(k==length(unique(trueclass))) 
-    
+    res <- df.sub %>% filter( dataset %in% i ) %>% filter( k==length(unique(trueclass)) ) 
+    # skip dataset if results for one method not exist
+    if ( sum( unique( res$method) %in% methods) != length(methods)  ) {next}
+    else {
     # wide format
     res.w <- dcast(res%>%filter(!method %in% c("Seurat"), method %in% methods), trueclass+cell ~ method + run, 
                    value.var = c("cluster"))
     
     res2 <- res.w%>%select(-trueclass)%>% tibble::column_to_rownames('cell')%>%as.matrix # name data.frame
-    
+    # all NAs, replace by zero
+     ifelse( all(is.na(res2)==TRUE),
+             res2[] <- 0,
+          res2 <- res2 )
+    # compute conesnsus:
     m <- matrix(NA, nrow=nrow(res2),ncol = 5)
-    for(j in 1:5){
+    
+    for( j in 1:5 ){
       run <- grep(j, colnames(res2))
       res3 <- res2[, run  ] 
       re <- res3%>%plyr::alply(2, clue::as.cl_partition ) # partition
-      re <- lapply(re, function(x) { x <- as.matrix(x$.Data) # replace Nas by zeros
+      re <- lapply(re, function(x) { x <- as.matrix(x$.Data) # some Nas, replace Nas by zeros
       x[is.na(x)] <- 0
       return(x)}
       ) 
@@ -60,28 +65,32 @@ helper_ensemble <- function(methods, df){
       m[,j]<- clue::cl_class_ids(re)%>%as.matrix
       rownames(m) <- row.names(re$.Data)
     }
-    colnames(m) <-  paste0("cons_run",c(1:5))
-    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) ) ,m, as.matrix(res.w) ) %>%as.data.frame
+    colnames(m) <-  paste0(c(1:5))
+ 
+    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) )  ,m, as.matrix(res.w) ,method= rep( paste(methods, collapse = ""), nrow(m) )) %>%as.data.frame
+    print(unique(out$method))
     l[[i]] <-out
-    
+  
+    }
   }
+  # collapse list
   res.df <-  plyr::rbind.fill(l)
-  res.df <- reshape2::melt(data=res.df  , id.vars=c(1,7,8), measure.vars=c(2:6),value.name=c("cons_cluster") )
-
+  res.df <- reshape2::melt(data=res.df  , id.vars=c("dataset","trueclass","cell","method"), measure.vars=c("1","2","3","4","5"),value.name=c("cons_cluster"), variable.name=c("run") )
   return( res.df )
 }
 # which ensemble combinations
 
-comb.ensmbl <- combn( unique(df$method),2 , simplify = FALSE)
+
+comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ""))
 
-ensembles <- list( RtsneKmeans_CIDR= c("CIDR","RtsneKmeans"),
-                   SIMLR_CIDR= c("SIMLR", "RtsneKmeans"))
+ensembles <- list( methods= c("PCAKmeans"  ,"pcaReduce"))
 
 
-out <- lapply(ensembles, helper_ensemble, df=df.sub  )
-
+system.time( out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  ))
+out <- plyr::rbind.fill(out)
 # saVE
 
-saveRDS(out, file= paste0("../clustering_ensemble.rds" ) )
+
+saveRDS(out, file= paste0("../../output/ensemble/clustering_ensemble_allmethods2.rds" ) )
