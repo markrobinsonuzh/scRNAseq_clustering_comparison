@@ -24,20 +24,25 @@ suppressPackageStartupMessages({
 #------------------------------------------------------------------
 
 # load files
-df <- readRDS(file = "../../output/clustering_summary/clustering_summary_old.rds")
-df.sub <- df%>%filter( !dataset %in% grep("Zheng", unique(df$dataset) , value=TRUE), !method %in% c("Seurat","SIMLRlargescale", "RaceID") ) 
+df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
+df.sub <- df%>%filter( !method %in% c("Seurat","SIMLRlargescale", "RaceID") ) 
 
 helper_ensemble <- function(methods, df){
   
   l <- vector("list",length(unique(df$dataset)) )
   names(l) <- unique(df$dataset)
+  
   for(i in unique( df$dataset ) ){
   print(i)
   res <- df %>% filter( dataset %in% i ) 
+  # skip dataset if results for one method not exist
   combined_l <- vector("list", length(2:max(res$k))  )
       for ( u in 2:max(res$k) ) {
       res.k <- res %>% filter( k == u )
-    
+      # skip dataset if results for one method not exist
+      if ( sum( unique( res.k$method) %in% methods) != length(methods)  ) {next}
+      else {
+      
       # wide format
       res.w <- dcast(res.k%>%filter(!method %in% c("Seurat"), method %in% methods), trueclass+cell ~ method + run, 
                    value.var = c("cluster"))
@@ -65,7 +70,9 @@ helper_ensemble <- function(methods, df){
       colnames(m) <-  paste0(c(1:5))
     
     out <- cbind( dataset=rep(unique( res$dataset), nrow(m) ), m , as.matrix(res.w) ,method= rep( paste(methods, collapse = ""), nrow(m) ), k= rep(u, nrow(m)) ) %>%as.data.frame
+    print(unique(out$method))
     combined_l[[u]]<- out
+      }
       }
   
   l[[i]] <- plyr::rbind.fill(combined_l)
@@ -82,12 +89,7 @@ comb.ensmbl <- combn( unique(df.sub$method), 3 , simplify = FALSE)
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ""))
 
-ensembles <- list( methods= c("CIDR"  ,"PCAHC"))
-
-
 system.time( out <- lapply( ensembles , helper_ensemble, df=df.sub  ))
 out <- plyr::rbind.fill(out)
 # saVE
-
-
-saveRDS(out, file= paste0("../../output/ensemble/clustering_ensemble_allmethods3.rds" ) )
+saveRDS(out, file= paste0("output/ensemble/clustering_ensemble_allmethods2_by_k.rds" ) )
