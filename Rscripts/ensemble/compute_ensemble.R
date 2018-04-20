@@ -24,8 +24,8 @@ suppressPackageStartupMessages({
 #------------------------------------------------------------------
 
 # load files
-df <- readRDS(file = "../../output/clustering_summary/clustering_summary_old.rds")
-df.sub <- df%>%filter( !method %in% c("Seurat","SIMLRlargescale", "RaceID") ) 
+df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
+df.sub <- df%>%filter(!method %in% c("Seurat") )
 
 helper_ensemble <- function(methods, df){
   
@@ -39,7 +39,7 @@ helper_ensemble <- function(methods, df){
     if ( sum( unique( res$method) %in% methods) != length(methods)  ) {next}
     else {
     # wide format
-    res.w <- dcast(res%>%filter(!method %in% c("Seurat"), method %in% methods), trueclass+cell ~ method + run, 
+    res.w <- dcast(res%>%filter( method %in% methods), trueclass+cell ~ method + run, 
                    value.var = c("cluster"))
     
     res2 <- res.w%>%select(-trueclass)%>% tibble::column_to_rownames('cell')%>%as.matrix # name data.frame
@@ -67,7 +67,7 @@ helper_ensemble <- function(methods, df){
     }
     colnames(m) <-  paste0(c(1:5))
  
-    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) )  ,m, as.matrix(res.w) ,method= rep( paste(methods, collapse = ""), nrow(m) )) %>%as.data.frame
+    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) )  ,m, as.matrix(res.w) ,method= rep( paste(methods, collapse = "."), nrow(m) )) %>%as.data.frame
     print(unique(out$method))
     l[[i]] <-out
   
@@ -85,12 +85,12 @@ comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ""))
 
-ensembles <- list( methods= c("PCAKmeans"  ,"pcaReduce"))
+ensembles <- list( methods= c("pcaReduce"  ,"CIDR"))
 
 
-system.time( out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  ))
+system.time( out <- lapply(comb.ensmbl  , helper_ensemble, df=df.sub  ))
 out <- plyr::rbind.fill(out)
 # saVE
 
 
-saveRDS(out, file= paste0("../../output/ensemble/clustering_ensemble_allmethods2.rds" ) )
+saveRDS(out, file= paste0("output/ensemble/clustering_ensemble_allmethods2.rds" ) )
