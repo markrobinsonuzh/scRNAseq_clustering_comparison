@@ -85,7 +85,7 @@ helper_ensemble <- function(methods, df){
 # which ensemble combinations
 
 
-comb.ensmbl <- combn( unique(df.sub$method), 3 , simplify = FALSE)
+comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ""))
 
