@@ -69,7 +69,7 @@ helper_ensemble <- function(methods, df){
        }
       colnames(m) <-  paste0(c(1:5))
     
-    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) ), m , as.matrix(res.w) ,method= rep( paste(methods, collapse = ""), nrow(m) ), k= rep(u, nrow(m)) ) %>%as.data.frame
+    out <- cbind( dataset=rep(unique( res$dataset), nrow(m) ), m , as.matrix(res.w) ,method= rep( paste(methods, collapse = "."), nrow(m) ), k= rep(u, nrow(m)) ) %>%as.data.frame
     print(unique(out$method))
     combined_l[[u]]<- out
       }
