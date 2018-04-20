@@ -1,7 +1,3 @@
-args <- (commandArgs(trailingOnly = TRUE))
-for (i in 1:length(args)) {
-  eval(parse(text = args[[i]]))
-}
 
 suppressPackageStartupMessages({
   library(dplyr)
