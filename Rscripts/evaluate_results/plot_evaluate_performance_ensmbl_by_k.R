@@ -19,7 +19,7 @@ suppressPackageStartupMessages({
 res <- readRDS(file="output/ensemble/clustering_ensemble_allmethods2_by_k.rds")
 
 
-pdf("plots/ensembles/res_performance_ensemble2_by_k.pdf", width=15, height = 8)
+pdf("plots/ensembles/res_performance_ensemble2_by_k.pdf", width=20, height = 15)
 
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
@@ -61,7 +61,7 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::summarize(medianARI = median(ARI)) %>%
           ggplot(aes(x = reorder(method,medianARI, median , na.rm=FALSE), y = dataset, fill = medianARI))+
           geom_tile(color="white", size=0.5, na.rm =FALSE)+
-          facet_wrap(~ filtering) +
+          facet_wrap(~ filtering, ncol=1) +
           scale_fill_viridis(name="medianARI", direction=-1 )+
           theme_tufte(base_family="Helvetica")+
           labs(x=NULL, y=NULL, title="median ARI, k = truenclust") +
