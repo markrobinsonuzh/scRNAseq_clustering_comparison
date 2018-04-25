@@ -10,7 +10,7 @@ require(clue)
 require(multidplyr)
 require(ggplot2)
 })
-res <- readRDS(file="../../clustering_summary.rds")
+res <- readRDS(file="output/clustering_summary/clustering_summary.rds")
 
 # consensus function 
 # with clue
