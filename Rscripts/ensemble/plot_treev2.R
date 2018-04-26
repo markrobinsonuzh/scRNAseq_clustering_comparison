@@ -10,8 +10,7 @@ suppressPackageStartupMessages({
   library(viridis) 
   library(data.tree)
   library(ggtree)
-  library(networkD3)
-  
+
 })
 ## Read clustering results
 res_ensmbl <- readRDS(file="output/ensemble/clustering_ensemble_allmethods2.rds")
@@ -19,7 +18,7 @@ res_summary <- readRDS(file="output/clustering_summary/clustering_summary.rds")
 
 
 # ------------------------------------
-# compute ARI, no of unique clusters, no of estimated k, median time
+# compute ARI, no of unique clusters
 # ------------------------------------
 sum_ensmbl <- res_ensmbl %>% dplyr::group_by(dataset, method, run) %>%
   dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
@@ -55,13 +54,13 @@ colnames(sum_all) <- c("filtering",
 sum_all <- sum_all %>% mutate(ARIdiff=ARIone-ARIensmbl)
 
 # compute median
-
 res_median <- sum_all%>% group_by(dataset, filtering, method.ensmbl, k, truenclust, methone, methtwo, methtree ) %>% dplyr::summarize(ARIensmbl=median(ARIensmbl), ARIone=median(ARIone), ARIdiff=median(ARIdiff) )
+list <- vector("list",length( unique((res_median$dataset)) ))
 
-res_median.sub <- filter(res_median, k==truenclust, dataset=="Koh")
+for(i in unique(res_median$dataset) ){ 
+res_median.sub <- filter(res_median, k==truenclust, dataset==i)
 
 # work with one dataset
-
 res_median.sub$pathString <- paste("dataset", 
                                    res_median.sub$dataset,
                                    res_median.sub$filtering,
@@ -86,25 +85,31 @@ annotation <- ToDataFrameTypeCol(ARItree, "ARIdiff", "ARIensmbl", "ARIdiff")
 # format as phylo object
 gh <- as.phylo.Node(ARItree)
 # plot tree
-
-#add annotataion
+# add annotataion
 annotation <-  annotation%>%select("level_5", "ARIdiff")
-p <- ggtree(gh, layout = 'rectangular', branch.length = "branch.length") %<+% annotation
+p <- ggtree(gh, layout = 'unrooted', branch.length = "branch.length") %<+% annotation
 # change names for 2nd layer and 3rd layer
 p$data$label <- gsub('.*\\.',"", p$data$label)
+p$data$branch.length <- 10
 
-p <- p  +
-  geom_text(aes(color=ARIdiff, label=round( ARIdiff,2)), hjust=1,  size=3) +
-  geom_tiplab(hjust=0)+
-  geom_nodelab( vjust=1, hjust=2)
-
-print(p)
-
+p2 <- p  +
+  geom_text2(aes(color=ARIdiff, label=round( ARIdiff,2)), size=3, nudge_x = -2.0, na.rm = TRUE) +
+  geom_tiplab2(size=2, hjust=1.0 , geom='text', align=FALSE)+
+  geom_nodelab( size=2, hjust=1, geom='label')
+print(p2)
+list[[i]] <- p2
+}
+pdf("tree_ensemble_dataset.pdf")
+lapply(list, print)
+dev.off()
 
 
 # Stuff
+q()
+
 #________________________________________________________________________________________________
 #adjust branch length
+
 p.new <- p$data %>% filter(isTip==TRUE)
 p.new$label==annotation$level_5
 
@@ -132,7 +137,7 @@ ARItree <- as.Node(res_median.sub)
 return(ARItree)
 
 }
-
+# as facet
 list <- list(Koh="Koh", Kumar="Kumar")
 
 p.list <- lapply(list, plot.tree, res_median=res_median)
@@ -146,3 +151,9 @@ trees <- lapply(rep(c(10, 25, 50, 100), 3), rtree)
 class(trees) <- "multiPhylo"
 class(trees)
 ggtree(trees) + facet_wrap(~.id, scale="free", ncol=4) + ggtitle("Many trees. Such phylogenetics. Wow.")
+library("ape")
+data(chiroptera)
+groupInfo <- split(chiroptera$tip.label, gsub("_\\w+", "", chiroptera$tip.label))
+chiroptera <- groupOTU(chiroptera, groupInfo)
+ggtree(chiroptera, aes(color=group), layout='circular') + geom_tiplab(size=1, aes(angle=angle))
+
