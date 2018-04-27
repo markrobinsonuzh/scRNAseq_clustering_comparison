@@ -18,25 +18,29 @@ suppressPackageStartupMessages({
   
 })
 ###  Helperfunction for computing ensemble clusters
-# data: dataframe with variables method, k , dataset, cell, trueclass
-# method: character vector with method names for ensemble
+# data: dataframe with variables: method, k , dataset, cell, trueclass
+# method: character vector with method names for subsequent ensemble clustering
 # Out: tibble longformat with method cluster,ensemble cluster, trueclass, dataset
+# 
 #------------------------------------------------------------------
 
 # load files
 df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
 df.sub <- df%>%filter(!method %in% c("Seurat") )
 
-helper_ensemble <- function(methods, df){
+helper_ensemble_trueclass <- function(methods, df){
   
   l <- vector("list",length(unique(df$dataset)) )
   names(l) <- unique(df$dataset)
   
   for(i in unique( df$dataset ) ){
     print(i)
-    res <- df.sub %>% filter( dataset %in% i ) %>% filter( k==length(unique(trueclass)) ) 
-    # skip dataset if results for one method not exist
-    if ( sum( unique( res$method) %in% methods) != length(methods)  ) {next}
+    res <- df %>% filter( dataset %in% i ) %>% filter( k==length(unique(trueclass)) ) 
+    # remove methods with all NAs
+    isNA <- res%>%group_by(dataset, method)%>%summarise(isNA=all(is.na(cluster)) )%>%filter(isNA==TRUE)
+    res <- res%>%filter(!method %in% isNA$method)
+    # skip dataset if results for one method does not exist
+    if ( sum( unique( res$method) %in% methods) != length(methods) )  {next}
     else {
     # wide format
     res.w <- dcast(res%>%filter( method %in% methods), trueclass+cell ~ method + run, 
@@ -78,19 +82,12 @@ helper_ensemble <- function(methods, df){
   res.df <- reshape2::melt(data=res.df  , id.vars=c("dataset","trueclass","cell","method"), measure.vars=c("1","2","3","4","5"),value.name=c("cons_cluster"), variable.name=c("run") )
   return( res.df )
 }
-# which ensemble combinations
-
-
+# list of  ensemble combinations
 comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
+names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = "."))
 
-names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ""))
-
-ensembles <- list( methods= c("pcaReduce"  ,"CIDR"))
-
-
-system.time( out <- lapply(comb.ensmbl  , helper_ensemble, df=df.sub  ))
+# compute ensembles:
+out <- lapply(comb.ensmbl, helper_ensemble, df=df.sub  )
 out <- plyr::rbind.fill(out)
 # saVE
-
-
 saveRDS(out, file= paste0("output/ensemble/clustering_ensemble_allmethods2.rds" ) )
