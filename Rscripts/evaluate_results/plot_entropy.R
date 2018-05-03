@@ -9,7 +9,7 @@ suppressPackageStartupMessages({
   require(ggplot2)
 })
 
-res <-  readRDS(file="../../output/clustering_summary/clustering_summary.rds")
+res <-  readRDS(file="output/clustering_summary/clustering_summary.rds")
 
 entropy <- function(cluster, k){
   p <-c(table(cluster)) / length(cluster)
@@ -30,7 +30,7 @@ res_summary <- res %>% dplyr::group_by(dataset, method, run, k) %>% dplyr::filte
 # ------------------------------------
 # plot entropy per k
 # ------------------------------------
-pdf("../../plots/performance/plot_entropy.pdf", width = 12, height = 6)
+pdf("plots/performance/plot_entropy_by_k.pdf", width = 12, height = 6)
 
 print( ggplot(data = res_summary%>%filter(!method%in%c("Seurat"), !is.na(s)), aes(x = k, y = s, group=method, color=method))+       
          geom_smooth()+  
