@@ -11,6 +11,8 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(pheatmap)
   library(RColorBrewer)
+  library(viridis)
+  library(ggthemes)
   
 })
 # ----------------------------------------------
@@ -18,8 +20,8 @@ suppressPackageStartupMessages({
 # ----------------------------------------------
 
 ## Read clustering results
-res <- readRDS(file="../../output/consensus/consensus_clue.rds")
-pdf("../../plots/performance/res_performance_cons.pdf", width=20, height = 15)
+res <- readRDS(file="output/consensus/consensus_clue.rds")
+pdf("plots/performance/res_performance_cons.pdf", width=20, height = 15)
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
 # ------------------------------------
@@ -34,10 +36,10 @@ res_summary <- res %>% dplyr::group_by(dataset,method, run, k) %>%
 # --------------------------------------
 # remove the method Seurat in Zheng
 
-print(ggplot(res_summary%>%filter(!( method=="Seurat" & dataset %in% c("Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq") )), 
+print(ggplot(res_summary, 
         aes(x = k, y = ARI, group = method, color = method)) + 
         geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
-        geom_line(size=2) + 
+        geom_line(size=1) + 
         theme_bw() +
         scale_color_brewer(palette = "Set3" )  +
         facet_grid(filtering ~ dataset, scales = "free_x")
@@ -47,7 +49,7 @@ print(ggplot(res_summary%>%filter(!( method=="Seurat" & dataset %in% c("Zhengmix
 # ## Heatmap  ARI of truenclust, https://github.com/hrbrmstr/facetedcountryheatmaps
 # --------------------------------------
 
-# on true k ,  ARI, ordered by median
+# on true k , ARI, ordered by median
 print(  p1 <- res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
           ggplot(aes(x = reorder(method,ARI, median , na.rm=FALSE), y = dataset, fill = ARI))+
