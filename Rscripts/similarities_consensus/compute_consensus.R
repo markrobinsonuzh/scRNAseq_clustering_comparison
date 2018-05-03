@@ -107,27 +107,6 @@ saveRDS(res_consclue2, file="output/consensus/consensus_clue.rds")
 cluster_rm(cluster, c("cons.clue"))
 #_____________________________________________
 
-############
-cons.clue <- function(cluster, run, cell){
-  require(dplyr)
-  require(clue)
-  
-  tryCatch(m <-data.frame(cbind("cluster"=as.integer(cluster), "run"=as.integer(run), "id"=c(rep( 1:length(unique(cell)) , 5 ) ))) %>%
-    tidyr::spread( key=run, value=cluster) %>%
-    dplyr::select(c( -id)) %>%as.matrix, error=function(e) NA)
-  ifelse( all(is.na(m)), 
-        re <- rep(NA, 5*nrow(m) ) , 
-        { re <- plyr::alply(m,2, clue::as.cl_partition )
-        re <- lapply(re, function(x) { x <- as.matrix(x$.Data) # some Nas, replace Nas by zeros
-        x[is.na(x)] <- 0
-        return(x)}
-        ) 
-         re <- clue::as.cl_ensemble(re)
-         re <- clue::cl_consensus(re,method = "SE",  control = list(nruns=50))
-         re <- clue::cl_class_ids(re) 
-         re <- rep(re,5)%>%as.character  }
-        )
-  return(re) 
-}
+
 
 
