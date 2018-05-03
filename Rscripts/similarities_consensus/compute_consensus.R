@@ -20,11 +20,11 @@ cons.clue <- function(cluster, run, cell){
   
   tryCatch(m <-data.frame(cbind("cluster"=as.integer(cluster), "run"=as.integer(run), "id"=c(rep( 1:length(unique(cell)) , 5 ) ))) %>%
              tidyr::spread( key=run, value=cluster) %>%
-             dplyr::select(c( -id)) %>%as.matrix, error=function(e) NA)
+             dplyr::select(c( -id)) %>% as.matrix, error=function(e) NA)
   ifelse( all(is.na(m)), 
           re <- rep(NA, 5*nrow(m) ) , 
           { re <- plyr::alply(m,2, clue::as.cl_partition )
-          re <- lapply(re, function(x) { x <- as.matrix(x$.Data) # some Nas, replace Nas by zeros
+          re <- lapply(re, function(x) { x <- as.matrix(x$.Data) # some Nas in dataset, replace Nas by zeros
           x[is.na(x)] <- 0
           return(x)}
           ) 
