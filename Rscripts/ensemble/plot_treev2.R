@@ -87,7 +87,7 @@ gh <- as.phylo.Node(ARItree)
 # plot tree
 # add annotataion
 annotation <-  annotation%>%select("level_5", "ARIdiff")
-p <- ggtree(gh, layout = 'unrooted', branch.length = "branch.length") %<+% annotation
+p <- ggtree(gh, layout = 'rectangular', branch.length = "branch.length") %<+% annotation
 # change names for 2nd layer and 3rd layer
 p$data$label <- gsub('.*\\.',"", p$data$label)
 p$data$branch.length <- 10
@@ -99,7 +99,7 @@ p2 <- p  +
 print(p2)
 list[[i]] <- p2
 }
-pdf("tree_ensemble_dataset.pdf")
+pdf("plots/tree_ensemble_dataset.pdf", width=30,height=30)
 lapply(list, print)
 dev.off()
 
