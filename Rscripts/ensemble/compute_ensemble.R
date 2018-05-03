@@ -2,6 +2,7 @@
 # Ensemble between methods, per run 
 #_______________________________________
 suppressPackageStartupMessages({
+  
   require(plyr)
   require(dplyr)
   require(tidyr)
@@ -77,17 +78,30 @@ helper_ensemble_trueclass <- function(methods, df){
   
     }
   }
+  
   # collapse list
   res.df <-  plyr::rbind.fill(l)
-  res.df <- reshape2::melt(data=res.df  , id.vars=c("dataset","trueclass","cell","method"), measure.vars=c("1","2","3","4","5"),value.name=c("cons_cluster"), variable.name=c("run") )
+  res.df <- tryCatch(reshape2::melt(data=res.df, id.vars=c("dataset","trueclass","cell","method"), measure.vars=c("1","2","3","4","5"),value.name=c("cons_cluster"), variable.name=c("run") ),
+                     error=function(e) NULL)#
   return( res.df )
 }
-# list of  ensemble combinations
-comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
-names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = "."))
 
-# compute ensembles:
-out <- lapply(comb.ensmbl, helper_ensemble, df=df.sub  )
-out <- plyr::rbind.fill(out)
-# saVE
-saveRDS(out, file= paste0("output/ensemble/clustering_ensemble_allmethods2.rds" ) )
+
+
+# compute ensembles, 2 methods:
+# list of  ensemble combinations
+comb.ensmbl2 <- combn( unique(df.sub$method), 2 , simplify = FALSE)
+names(comb.ensmbl2) <- sapply(comb.ensmbl2, function(x) paste0(x, collapse = "."))
+out2 <- lapply(comb.ensmbl2, helper_ensemble_trueclass, df=df.sub  )
+out2 <- plyr::rbind.fill(out2)
+
+saveRDS(out2, file= paste0("output/ensemble/clustering_ensemble_allmethods2.rds" ) )
+
+# compute ensembles, 3 methods:
+comb.ensmbl3 <- combn( unique(df.sub$method), 3 , simplify = FALSE)
+names(comb.ensmbl3) <- sapply(comb.ensmbl3, function(x) paste0(x, collapse = "."))
+out3 <- lapply(comb.ensmbl3, helper_ensemble_trueclass, df=df.sub  )
+out3 <- plyr::rbind.fill(out3)
+saveRDS(out3, file= paste0("output/ensemble/clustering_ensemble_allmethods3.rds" ) )
+
+
