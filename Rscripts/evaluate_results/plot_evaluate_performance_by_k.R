@@ -20,7 +20,7 @@ suppressPackageStartupMessages({
 ## Read clustering results
 res <- readRDS(file="output/clustering_summary/clustering_summary.rds")
 
-pdf("plots/performance/res_performance_by_k.pdf", width=15, height = 8)
+pdf("plots/performance/res_performance_by_k.pdf", width=25, height = 15)
 
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
@@ -79,7 +79,7 @@ print(ggplot(res_summary, aes(x = k, y = timing, group = method, color = method)
         scale_color_discrete(name = "") + 
         scale_color_brewer(palette = "Set3")+
         scale_y_log10())
-# by rank, k = truenclust, NAs removed
+# alluvial by rank, k = truenclust, NAs removed
 print(ggplot(data = res_summary %>% dplyr::group_by(dataset, filtering, method) %>% 
          filter(k==truenclust) %>% 
          summarize(med.timing=median(timing, na.rm=TRUE)) %>% filter( !is.na(med.timing)) ,
@@ -89,7 +89,22 @@ print(ggplot(data = res_summary %>% dplyr::group_by(dataset, filtering, method) 
         scale_color_brewer(type = "qual", palette = "Set3") +
         facet_wrap(~ filtering, scales = "fixed", ncol=1)
 )
-# one line per method, normalized against maximum of Rtsnekmeans, max()
+# alluvial by rank, k==truenclust
+print(ggplot(data = res_summary %>%dplyr::group_by(dataset, filtering, method) %>% 
+               filter(k==truenclust, !method%in%c("RaceID", "CIDR") ) %>% 
+               summarize(med.timing=median(timing, na.rm=TRUE)) %>%mutate(rank=(rank(med.timing, na.last=TRUE)))%>%
+               mutate(rank=factor(rank, levels=c(1:12)) ),
+             aes(x=dataset,y=rank, stratum=rank, weight=med.timing ,alluvium=method, fill=method))+
+        geom_flow(aes(fill = method)) +
+        geom_stratum( aes(fill=method))+
+        geom_lode(aes(fill=method))+
+        scale_fill_brewer(type = "qual", palette = "Set3") +
+        scale_color_brewer(type = "qual", palette = "Set3") +
+        facet_wrap(~ filtering, scales = "fixed", ncol=1) +
+        geom_text(stat = "stratum", label.strata = TRUE)
+        
+)
+
 print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
              dplyr::mutate(normtime = (timing/ max(res_summary%>%
              filter(method=="RtsneKmeans")%>%select(timing)) ) ), 
@@ -97,6 +112,8 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
              scale_color_brewer(palette = "Set3")+
              geom_smooth()
 )
+
+
 # --------------------------------------
 # ## Heatmap median ARI of truenclust, from https://github.com/hrbrmstr/facetedcountryheatmaps
 # --------------------------------------
@@ -104,7 +121,7 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
 print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
           dplyr::summarize(medianARI = median(ARI)) %>%
-          ggplot(aes(x = reorder(method,medianARI, median , na.rm=FALSE), y = dataset, fill = medianARI))+
+          ggplot(aes(x = reorder(method, medianARI, median , na.rm=FALSE), y = dataset, fill = medianARI))+
           geom_tile(color="white", size=0.5, na.rm =FALSE)+
           facet_wrap(~ filtering) +
           scale_fill_viridis(name="medianARI", direction=-1 )+
@@ -121,6 +138,12 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           theme(legend.key.width=unit(0.5, "cm"))+
           theme(axis.ticks=element_blank())
 )
+# median ARI per method
+median <- res_summary %>% dplyr::filter(k == truenclust) %>%
+  dplyr::group_by(dataset, filtering, method) %>%
+  dplyr::summarize(medianARI = median(ARI)) %>% dplyr::group_by( method )%>%
+  summarise(median=median(medianARI, na.rm=TRUE) )%>%arrange(median)
+print(median)
 
 # on estimated k, median ARI
 
@@ -145,6 +168,24 @@ print(  res_summary %>% dplyr::filter(k == estnclust) %>%
         theme(legend.key.width=unit(0.5, "cm"))+
         theme(axis.ticks=element_blank())
 )
+# ----------------------------------------------------------------------------
+# ## alluvial digramm of the cluster sizes, by k and method, faceted by dataset
+# ----------------------------------------------------------------------------
+data = res %>% dplyr::group_by(dataset,method, run, k) %>% count(cluster) %>% filter(run==1, dataset=="sce_filteredExpr10_Kumar", method=="CIDR")
+
+ggplot( data ,
+       aes(x=k, weight=n, stratum=cluster, alluvium =cluster))+
+  geom_stratum(aes(fill=cluster))+
+  geom_alluvium(aes( fill=cluster) ) +
+  facet_wrap(~dataset, scales = "fixed")
+data = res %>% dplyr::group_by(dataset,method, run, k) %>% count(cluster) %>% filter(run==1, dataset=="sce_filteredExpr10_Kumar", method%in%c("CIDR", "FlowSOM"))
+
+ggplot( data ,
+        aes(x=k, weight=n, stratum=cluster, alluvium =cluster))+
+  geom_stratum(aes(fill=cluster))+
+  geom_alluvium(aes( fill=cluster) ) +
+  facet_wrap(~dataset, scales = "fixed")
+
 
 dev.off()
 
