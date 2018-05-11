@@ -11,11 +11,12 @@ suppressPackageStartupMessages({
 
 res <-  readRDS(file="output/clustering_summary/clustering_summary.rds")
 
-entropy <- function(cluster, k){
+entropy <- function(cluster){
   p <-c(table(cluster)) / length(cluster)
   s <- -1*sum(p*log2(p))
   return(s)
 }
+
 # ------------------------------------
 # compute entropy
 # ------------------------------------
@@ -32,7 +33,7 @@ res_summary <- res %>% dplyr::group_by(dataset, method, run, k) %>% dplyr::filte
 # ------------------------------------
 pdf("plots/performance/plot_entropy_by_k.pdf", width = 12, height = 6)
 
-print( ggplot(data = res_summary%>%filter(!method%in%c("Seurat"), !is.na(s)), aes(x = k, y = s, group=method, color=method))+       
+print( ggplot(data = res_summary%>%filter( !is.na(s)), aes(x = k, y = s, group=method, color=method))+       
          geom_smooth()+  
          facet_grid(filtering~dataset)+
          geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
