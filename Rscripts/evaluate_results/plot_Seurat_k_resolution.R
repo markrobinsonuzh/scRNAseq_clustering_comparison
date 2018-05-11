@@ -14,8 +14,8 @@ suppressPackageStartupMessages({
   library(viridis)
 })
 ## Read clustering results
-res <- readRDS( file="../../output/clustering_summary/clustering_summary_old.rds" )
-pdf("../../plots/performance/res_Seurat_k_resolution.pdf", width=15, height = 10)
+res <- readRDS( file="output/clustering_summary/clustering_summary.rds" )
+pdf("plots/performance/res_Seurat_k_resolution.pdf", width=15, height = 10)
 
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
@@ -32,8 +32,8 @@ res_summary <- res %>% dplyr::group_by(dataset,method, run, k, resolution) %>%
 # --------------------------------------
 # ## plot Seurat k vs. resolution
 # --------------------------------------
-print(ggplot(res_summary, 
-             aes(x = resolution, y = k ) ) + 
+print(ggplot( res_summary, 
+             aes(x = resolution, y = k ) ) +
         geom_smooth() + 
         facet_grid(filtering ~ dataset)+
         theme_bw()+
