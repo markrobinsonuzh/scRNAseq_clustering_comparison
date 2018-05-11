@@ -23,20 +23,18 @@ suppressPackageStartupMessages({
 #------------------------------------------------------------------
 # load files
 res <- readRDS(file = "output/consensus/consensus_clue.rds")
-# remove RaceID 
-res <- res%>%filter(!method %in% c("RaceID"))%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
 
-plot_crossmethod_concordance <- function(res){
+plot_crossmethod_concordance <- function(res, ncluster){
   # group data,choose k=truenclust
   res.cons <- res %>% dplyr::group_by(dataset, method, k) %>% 
-    dplyr::mutate( truenclust=  length( unique(trueclass) )) %>% 
-    dplyr::filter(k==truenclust, !method %in% c( "Seurat" ) ) %>% 
+    dplyr::mutate( truenclust =  length( unique(trueclass) )) %>% 
+    dplyr::filter(k == ifelse(ncluster==0, truenclust, ncluster) , !method %in% c( "Seurat" ) ) %>% 
     dplyr::select(dataset, method, consensus.clue,k, cell)
-  
+  # for Seurat, pick resolution param 
   res.cons.seurat <- res %>% dplyr::group_by(dataset, method, k) %>% 
     dplyr::filter(method %in% c( "Seurat" ) ) %>% 
     dplyr::mutate( truenclust=  length( unique(trueclass) )) %>% 
-    dplyr::filter(k==truenclust)%>%filter(resolution==sample(resolution,1) )%>% 
+    dplyr::filter(k== ifelse(ncluster==0, truenclust, ncluster) )%>%filter(resolution==sample(resolution,1) )%>% 
     dplyr::select(dataset, method, consensus.clue, k, cell)
   res.cons <- bind_rows(res.cons , res.cons.seurat )
   
@@ -70,7 +68,6 @@ plot_crossmethod_concordance <- function(res){
   
   df.median <- df%>%group_by(Var1, Var2)%>%dplyr::summarise(median=median(ARI, na.rm = TRUE))%>%ungroup()
   
-  
   ## Calculate average area under concordance curve across all data set
   ## instances, for each pair of methods
   
@@ -85,7 +82,7 @@ plot_crossmethod_concordance <- function(res){
            facet_grid(filtering ~ dataset, drop=FALSE)+
            scale_fill_viridis(name="ARI", direction=-1 )+
            theme_tufte(base_family="Helvetica")+
-           labs(x=NULL, y=NULL, title="Similarities between methods, per dataset and filtering, k==truenclust") +
+           labs(x=NULL, y=NULL, title="Similarities between methods, per dataset and filtering, k =", ncluster) +
            coord_equal() +
            theme(strip.text.x = element_text(size = 8))+
            theme(axis.text.x=element_text(size=8, angle=90))+
@@ -103,7 +100,7 @@ plot_crossmethod_concordance <- function(res){
            geom_tile(color="white", size=0.5, na.rm =FALSE)+
            scale_fill_viridis(name="ARI", direction=-1 )+
            theme_tufte(base_family="Helvetica")+
-           labs(x=NULL, y=NULL, title="Similarities between methods, median ARI, k = truenclust") +
+           labs(x=NULL, y=NULL, title=paste0("Similarities between methods, median ARI, k = ", ncluster)) +
            coord_equal() +
            theme(axis.text.x=element_text(size=8, angle=90))+
            theme(axis.text.y=element_text(size=8))+
@@ -165,7 +162,7 @@ plot_crossmethod_concordance <- function(res){
   for (m in seq_len(length(subcl))) {
     tryCatch({
       i <- MRCA(ggt, subcl[[m]])
-      if (stab[m] >= 0.001)
+      if ( stab[m] >= 0 )
         ggt$data[i, "label"] <- round(stab[m], 2)
     }, error = function(e) NULL)
   }
@@ -174,17 +171,31 @@ plot_crossmethod_concordance <- function(res){
     geom_tiplab(aes(angle = 90), hjust = 1) + 
     ggplot2::scale_x_reverse() + ggplot2::coord_flip() + 
     theme( plot.margin = unit(c(0, 0, 10, 0), "mm") ) + 
-    xlim_tree(0.85)
+    xlim_tree(0.85)+
+    ggtitle(paste0("number of cluster=",ncluster) )
   #tiporder <- ggt$data %>% dplyr::filter(isTip) %>% dplyr::arrange(y)
-  print(ggt)
+  return(ggt)
   
 }
 # plot 
-pdf("plots/consensus/method_similarities_nozheng.pdf", width=15, height=10)
-plot_crossmethod_concordance(res)
+
+
+# no Zheng
+res1 <- res%>%filter(!method %in% c("RaceID"))%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
+l<- as.list(c(0,3:10))
+list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res1, ncluster=x)} )
+pdf("plots/similarities_between_methods/method_similarities_nozheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = list.trees )
 dev.off()
 
-date()
-sessionInfo()
+# Zheng
+res2 <- res%>%filter(!method %in% c("RaceID"))%>%filter( dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
+l<- as.list(c(0,3:10))
+list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res2, ncluster=x)} )
+pdf("plots/similarities_between_methods/method_similarities_zheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = list.trees )
+dev.off()
+
+
 
 
