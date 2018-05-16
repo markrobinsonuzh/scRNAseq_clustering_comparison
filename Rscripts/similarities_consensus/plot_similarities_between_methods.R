@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
 res <- readRDS(file = "output/consensus/consensus_clue.rds")
 
 plot_crossmethod_concordance <- function(res, ncluster){
+
   # group data,choose k=truenclust
   res.cons <- res %>% dplyr::group_by(dataset, method, k) %>% 
     dplyr::mutate( truenclust =  length( unique(trueclass) )) %>% 
@@ -66,52 +67,54 @@ plot_crossmethod_concordance <- function(res, ncluster){
   # average ARI over datasets
   df <- reshape2::melt(l, value.name="ARI")
   
-  df.median <- df%>%group_by(Var1, Var2)%>%dplyr::summarise(median=median(ARI, na.rm = TRUE))%>%ungroup()
+  df.median <- df%>%group_by(Var1, Var2)%>%dplyr::summarise(median=median(ARI, na.rm = TRUE))%>%arrange(Var1, Var2)%>%
+    ungroup()
   
   ## Calculate average area under concordance curve across all data set
   ## instances, for each pair of methods
   
-  m.median <- reshape2::acast(df.median, Var1 ~ Var2, value.var = "median")
+  m.median <- reshape2::acast(df.median, Var1 ~ Var2, value.var = "median") 
   stopifnot(all(rownames( m.median ) == colnames( m.median )))
   
+  
   # plot all ARIs, facet by filter and dataset
-  print( ggplot( df %>% tidyr::separate(L1, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+  heatmap.dataset <-  ggplot( df %>% tidyr::separate(L1, sep = "_", into = c("sce", "filtering", "dataset")) %>%
                    dplyr::select(-sce),
                  aes(x = Var1, y = Var2, fill =ARI))+
            geom_tile(color="white", size=0.5, na.rm =FALSE)+
            facet_grid(filtering ~ dataset, drop=FALSE)+
            scale_fill_viridis(name="ARI", direction=-1 )+
            theme_tufte(base_family="Helvetica")+
-           labs(x=NULL, y=NULL, title="Similarities between methods, per dataset and filtering, k =", ncluster) +
+           labs(x=NULL, y=NULL, title=paste0("k =", ncluster) ) +
            coord_equal() +
            theme(strip.text.x = element_text(size = 8))+
-           theme(axis.text.x=element_text(size=8, angle=90))+
-           theme(axis.text.y=element_text(size=8))+
-           theme(legend.title=element_text(size=8))+
+           theme(axis.text.x=element_text(size=6, angle=90))+
+           theme(axis.text.y=element_text(size=6))+
+           theme(legend.title=element_text(size=6))+
            theme(legend.title.align=1)+
            theme(legend.text=element_text(size=6))+
            theme(legend.position="right")+
-           theme(legend.key.size=unit(2, "cm"))+
-           theme(legend.key.width=unit(0.5, "cm"))+
+           theme(legend.key.size=unit(0.5, "cm"))+
+           theme(legend.key.width=unit(0.2, "cm"))+
            theme(axis.ticks=element_blank())
-  )
+  
   # plot median ARIs from datasets
-  print( ggplot( df.median,aes(x = Var1, y = Var2, fill = median))+
-           geom_tile(color="white", size=0.5, na.rm =FALSE)+
+  heatmap.median <-  ggplot( df.median,aes(x = Var1, y = Var2, fill = median))+
+           geom_tile(color="white", size= 0.5, na.rm =FALSE)+
            scale_fill_viridis(name="ARI", direction=-1 )+
            theme_tufte(base_family="Helvetica")+
-           labs(x=NULL, y=NULL, title=paste0("Similarities between methods, median ARI, k = ", ncluster)) +
+           labs(x=NULL, y=NULL, title=paste0("median ARI, k = ", ncluster)) +
            coord_equal() +
-           theme(axis.text.x=element_text(size=8, angle=90))+
-           theme(axis.text.y=element_text(size=8))+
-           theme(legend.title=element_text(size=8))+
+           theme(axis.text.x=element_text(size=6, angle=90))+
+           theme(axis.text.y=element_text(size=6))+
+           theme(legend.title=element_text(size=6))+
            theme(legend.title.align=1)+
            theme(legend.text=element_text(size=6))+
            theme(legend.position="right")+
-           theme(legend.key.size=unit(2, "cm"))+
-           theme(legend.key.width=unit(0.5, "cm"))+
+           theme(legend.key.size=unit(0.5, "cm"))+
+           theme(legend.key.width=unit(0.2, "cm"))+
            theme(axis.ticks=element_blank())
-  )
+  
   #-------------------------------------------------------------------
   # print tree
   ## Get all subclusters from an hclust object, from  https://github.com/csoneson/conquer_comparison/blob/master/scripts/help_function_crossmethod_concordance.R
@@ -167,35 +170,48 @@ plot_crossmethod_concordance <- function(res, ncluster){
     }, error = function(e) NULL)
   }
   
-  ggt <- ggt + geom_label2(aes(subset = !isTip, label = label), size = 2) + 
+trees <- ggt + geom_label2(aes(subset = !isTip, label = label), size = 2) + 
     geom_tiplab(aes(angle = 90), hjust = 1) + 
     ggplot2::scale_x_reverse() + ggplot2::coord_flip() + 
     theme( plot.margin = unit(c(0, 0, 10, 0), "mm") ) + 
     xlim_tree(0.85)+
     ggtitle(paste0("number of cluster=",ncluster) )
-  #tiporder <- ggt$data %>% dplyr::filter(isTip) %>% dplyr::arrange(y)
-  return(ggt)
-  
+
+# store plots in plot.list 
+plot.list <- list()
+plot.list[[1]] <- heatmap.dataset
+plot.list[[2]] <- heatmap.median
+plot.list[[3]] <- trees
+return(plot.list)
 }
-# plot 
-
-
 # no Zheng
 res1 <- res%>%filter(!method %in% c("RaceID"))%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
 l<- as.list(c(0,3:10))
+# plot 
 list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res1, ncluster=x)} )
-pdf("plots/similarities_between_methods/method_similarities_nozheng.pdf", width=15, height=10)
-cowplot::plot_grid(plotlist = list.trees )
+pdf("plots/similarities_between_methods/similarities_median_nozheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',2))
 dev.off()
+pdf("plots/similarities_between_methods/similarities_dataset_nozheng.pdf", width=30, height=30)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',1), ncol=2)
+dev.off()
+pdf("plots/similarities_between_methods/similarities_tree_nozheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
+dev.off()
+
 
 # Zheng
 res2 <- res%>%filter(!method %in% c("RaceID"))%>%filter( dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
-l<- as.list(c(0,3:10))
+l<- as.list(c(0, 3:10))
+# plot 
 list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res2, ncluster=x)} )
-pdf("plots/similarities_between_methods/method_similarities_zheng.pdf", width=15, height=10)
-cowplot::plot_grid(plotlist = list.trees )
+pdf("plots/similarities_between_methods/similarities_median_zheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',2))
 dev.off()
-
-
-
+pdf("plots/similarities_between_methods/similarities_dataset_zheng.pdf", width=30, height=30)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',1), ncol=2)
+dev.off()
+pdf("plots/similarities_between_methods/similarities_tree_zheng.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
+dev.off()
 
