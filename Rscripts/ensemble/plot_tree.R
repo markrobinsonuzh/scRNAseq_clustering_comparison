@@ -1,5 +1,6 @@
 
 suppressPackageStartupMessages({
+  
   library(dplyr)
   library(tidyr)
   library(ggplot2)
@@ -10,129 +11,117 @@ suppressPackageStartupMessages({
   library(viridis) 
   library(data.tree)
   library(ggtree)
-  library(networkD3)
   
 })
 ## Read clustering results
-res_ensmbl <- readRDS(file="output/ensemble/clustering_ensemble_allmethods2.rds")
+res_ensmbl3 <- readRDS(file="output/ensemble/clustering_ensemble3_truenclust.rds")
+res_ensmbl2 <- readRDS(file="output/ensemble/clustering_ensemble2_truenclust.rds")
 res_summary <- readRDS(file="output/clustering_summary/clustering_summary.rds")
 
+# ------------------------------------
+# compute ARI, no of unique clusters
+# ------------------------------------
 
-# ------------------------------------
-# compute ARI, no of unique clusters, no of estimated k, median time
-# ------------------------------------
-sum_ensmbl <- res_ensmbl %>% dplyr::group_by(dataset, method, run) %>%
+sum_ensmbl2 <- res_ensmbl2 %>% dplyr::group_by(dataset, method, run) %>%
   dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
                    truenclust = length(unique(trueclass))) %>%
-  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-  dplyr::select(-sce)  %>%
+  tidyr::separate(method, sep="[[:punct:]]", into=c("methone","methtwo"), remove=FALSE) %>% 
+  dplyr::ungroup()
+
+sum_ensmbl3 <- res_ensmbl3 %>% dplyr::group_by(dataset, method, run) %>%
+  dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
+                   truenclust = length(unique(trueclass))) %>%
   tidyr::separate(method, sep="[[:punct:]]", into=c("methone","methtwo", "methtree"), remove=FALSE) %>% 
   dplyr::ungroup()
 
 sum_summary <- res_summary %>% dplyr::group_by(dataset, method, run,k) %>%
   dplyr::summarize(ARI = mclust::adjustedRandIndex(cluster, trueclass),
-                   truenclust = length(unique(trueclass))) %>%
-  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-  dplyr::select(-sce) %>% dplyr::ungroup()
-sum_ensmbl$run <- as.integer( sum_ensmbl$run )
-# join datasets
-sum_all<- left_join(sum_ensmbl , sum_summary, by=c("filtering", "dataset" ,"methone"="method", "run"))
-#
-#rename, compute difference
-colnames(sum_all) <- c("filtering",
-                       "dataset",
-                       "method.ensmbl",
-                       "methone",
-                       "methtwo",
-                       "methtree",
-                       "run",
-                       "ARIensmbl",
-                       "truenclust",
-                       "k",
-                       "ARIone",
-                       "truenclust.y")
+                   truenclust = length(unique(trueclass))) 
+sum_ensmbl2$run <- as.integer( sum_ensmbl2$run )
+sum_ensmbl3$run <- as.integer( sum_ensmbl3$run )
 
-sum_all <- sum_all %>% mutate(ARIdiff=ARIone-ARIensmbl)
-hist(sum_all$ARIdiff)
+# join datasets
+sum_all2 <- left_join(sum_ensmbl2 , sum_summary, by=c( "dataset" ,"methone"="method", "run"))
+colnames(sum_all2) <- c(
+  "dataset",
+  "method.ensmbl",
+  "methone",
+  "methtwo",
+  "run",
+  "ARIensmbl",
+  "truenclustz",
+  "k",
+  "ARIone",
+  "truenclust.y")
+sum_all3 <- left_join(sum_all2 , sum_ensmbl3, by=c( "dataset" ,"methone"="methone","methtwo"="methtwo", "run"))
+colnames(sum_all3) <- c(
+  "dataset",
+  "method.ensmbl2",
+  "methone",
+  "methtwo",
+  "run",
+  "ARIensmbl2",
+  "truenclustx",
+  "k",
+  "ARIone",
+  "truenclust",
+  "method.ensembl3",
+  "methtree",
+  "ARIensmbl3",
+  "truenclustyy")
+#rename, compute difference
+sum_all <- sum_all3 %>% mutate(ARIdiff1=ARIensmbl2-ARIone, ARIdiff2=ARIensmbl3-ARIensmbl2)
 
 # compute median
+res_median <- sum_all%>% group_by(dataset, method.ensmbl2,method.ensembl3, k, truenclust, methone, methtwo, methtree ) %>% 
+  dplyr::summarize(ARIensmbl2=median(ARIensmbl2), ARIensmbl3=median(ARIensmbl3),ARIone=median(ARIone), ARIdiff1=median(ARIdiff1), ARIdiff2=median(ARIdiff2) )
+list <- vector("list",length( unique((res_median$dataset)) ))
+names(list) <-  unique(names(res_median$dataset) )
 
-res_median <- sum_all%>% group_by(dataset, filtering, method.ensmbl, k, truenclust, methone, methtwo, methtree ) %>% dplyr::summarize(ARIensmbl=median(ARIensmbl), ARIone=median(ARIone), ARIdiff=median(ARIdiff) )
+for(i in unique(res_median$dataset) ){ 
+  print(i)
+  res_median.sub <- filter(res_median, k==truenclust, dataset==i)
+  
+  # work with one dataset
+  res_median.sub$pathString <- paste("dataset", 
+                                     res_median.sub$dataset,
+                                     res_median.sub$methone,
+                                     res_median.sub$method.ensmbl2,
+                                     res_median.sub$method.ensembl3,
+                                     sep="/")
+  # create tree using data.tree
+  ARItree <- as.Node(res_median.sub)
+  annotation <- ToDataFrameTypeCol(ARItree,"ARIone", "ARIdiff1","ARIdiff2")
+  # add layers
+  anno1 <- select(annotation, level_3, ARIone)
+  anno2 <- select(annotation, level_4, ARIdiff1)
+  anno3 <- select(annotation, level_5, ARIdiff2)
+  # format as phylo object
+  gh <- as.phylo.Node(ARItree)
+  p <- ggtree(gh, layout = 'rectangular')
+  
+  p <- p %<+% anno1
+  p <- p %<+% anno2
+  p <- p %<+% anno3
+  # plot tree
+  # change names for 2nd layer and 3rd layer
+  # p$data$label <- gsub('.*\\.',"", p$data$label)
+  p2 <- p+ geom_text(aes(color=ARIone , label=round( ARIone ,2) ), size=8, hjust=1, na.rm = TRUE)+ # median ARi
+    geom_text(size=8,hjust=-1,aes(label=round(ARIdiff2, 1)))+ # tip difference
+    geom_text(size=8,hjust=2,aes(label=round(ARIdiff1, 1)))+ # node difference
+    geom_nodelab(geom="label",aes(x=branch), size=8)+ #  node labels
+    geom_tiplab(geom="label",aes(x=branch), size=8) # tip labels
+    
+    list[[i]] <- p2
+  
+}
 
-res_median.sub <- filter(res_median, dataset=="Kumar", k==truenclust, filtering=='filteredExpr10')
-
-# work with one dataset
-
-res_median.sub$pathString <- paste("dataset", 
-                               res_median.sub$dataset,
-                               res_median.sub$filtering,
-                               res_median.sub$methone,
-                               res_median.sub$methtwo,
-                               sep="/")
-# create tree using data.tree
-ARItree <- as.Node(res_median.sub)
-#first simple tree
-
-#color=c("green","blue" )
-#useRtreeList <- ToListExplicit(ARItree, unname = TRUE)
-#radialNetwork( useRtreeList, opacity=0.74, nodeColour=color, nodeStroke = "blue")
-#?radialNetwork
-
-# convert to dataframes
-x <- ToDataFrameTree(ARItree , "ARIdiff")
-y <-  ToDataFrameTree(ARItree , "ARIone", "ARIensmbl", "ARIdiff")
-annotation <- ToDataFrameTypeCol(ARItree, "ARIdiff")
-
-# format as phylo object
-gh <- as.phylo.Node(ARItree)
-# plot first tree firat tree
-ggtree(gh)+
-  geom_tiplab(hjust=0)+
-  geom_nodelab( vjust=1, hjust=1)+
-  geom_text(aes(label=node))+
-  geom_tippoint()
-
-p$data
-annotation <-  annotation%>%select("level_5", "ARIdiff")
-p <- ggtree(gh)
-p %<+%annotation +
-  geom_text(aes(color=ARIdiff, label=ARIdiff), hjust=1, vjust=-0.4, size=3) +
-  geom_tiplab(hjust=0)+
-  geom_nodelab( vjust=1, hjust=1)
-
-
-# dataframe for annotation
-class(annotate)
-
-
-print(ARItree, "ARIensmbl")
-plot(as.dendrogram(ARItree ))
-
-
-
-class(ARItree)
-ARItree$leaves
+pdf("plots/ensemble/tree_ensemble.pdf", width=20,height=20)
+lapply(list, print)
+dev.off()
 
 
 
 
-gh %<+% x
-# plot with ggtree
-source('http://bioconductor.org/biocLite.R')
-biocLite('phyloseq')
-?plot_tree
-library("ggtree")
-class(gh)
-ggtree(as.phylo.Node(ARItree) ,layout = 'circular')
-?ggtree
-library("phyloseq")
-length(res_median.sub$ARIdiff)
-?ggtree
-vignette('applications', package = "data.tree")
-#plot with networkD3
-require("networkD3")
-
-phyloseq(sample_data(GP), otu_table(GP)
 
 
-?radialNetwork
