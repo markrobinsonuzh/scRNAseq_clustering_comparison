@@ -1,4 +1,6 @@
-
+#####################################
+# plot ensemble tree by method, not finished
+####################################
 suppressPackageStartupMessages({
   library(dplyr)
   library(tidyr)
@@ -134,10 +136,3 @@ p.list <- lapply(list, plot.tree, res_median=res_median)
 class(p.list) <- "multiPhylo"
 
 ggtree(p.list) + facet_wrap() + ggtitle("Many trees. Such phylogenetics. Wow.")
-
-
-set.seed(42)
-trees <- lapply(rep(c(10, 25, 50, 100), 3), rtree)
-class(trees) <- "multiPhylo"
-class(trees)
-ggtree(trees) + facet_wrap(~.id, scale="free", ncol=4) + ggtitle("Many trees. Such phylogenetics. Wow.")
