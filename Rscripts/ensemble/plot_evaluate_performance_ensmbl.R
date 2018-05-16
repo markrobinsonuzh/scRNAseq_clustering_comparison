@@ -11,9 +11,9 @@ suppressPackageStartupMessages({
   
 })
 ## Read clustering results
-res <- readRDS(file="../../output/ensemble/clustering_ensemble_allmethods2.rds")
+res <- readRDS(file="output/ensemble/clustering_ensemble_allmethods2.rds")
 
-pdf("../../plots/performance/res_performance_ensmbl2.pdf", width=20, height = 15)
+pdf("plots/ensemble/performance_ensmbl2_truenclust.pdf", width=20, height = 15)
 
 # ------------------------------------
 # compute ARI, no of unique clusters
