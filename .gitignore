@@ -1,3 +1,4 @@
+.*
 .Rproj.user
 .Rhistory
 .RData
@@ -6,3 +7,14 @@ clustering_duo.Rproj
 .DS_Store
 output/
 plots/
+Rout/
+Rscripts2/
+Rscripts/import_datasets/*.html
+Todo.md
+data/
+envs/
+old/
+parameter_settings/
+results/
+scRNAseq_clustering_comparison.Rproj
+
