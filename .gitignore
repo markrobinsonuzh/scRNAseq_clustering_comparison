@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+clustering_duo.Rproj
+.DS_Store
+output/
+plots/
