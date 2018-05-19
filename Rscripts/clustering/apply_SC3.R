@@ -10,17 +10,17 @@ apply_SC3 <- function(sce, params, k) {
   tryCatch({
     rowData(sce)$feature_symbol <- rownames(counts(sce))
     st1 <- system.time({
-      dat <- sc3_prepare(sce, gene_filter = TRUE, 
+      dat <- sc3_prepare(sce, gene_filter = params$gene_filter, 
                          pct_dropout_min = params$pct_dropout_min, 
                          pct_dropout_max = params$pct_dropout_max, 
-                         n_cores = 1, rand_seed = seed)
+                         svm_max = 1e6, n_cores = 1, rand_seed = seed)
     })
     est_k <- metadata(sc3_estimate_k(dat))$sc3$k_estimation
     st2 <- system.time({
       dat <- sc3(dat, ks = k, pct_dropout_min = params$pct_dropout_min,
                  pct_dropout_max = params$pct_dropout_max,
-                 gene_filter = TRUE, rand_seed = seed, n_cores = 1,
-                 biology = FALSE, k_estimator = FALSE)
+                 gene_filter = params$gene_filter, rand_seed = seed, n_cores = 1,
+                 biology = FALSE, k_estimator = FALSE, svm_max = 1e6)
       cluster <- as.numeric(colData(dat)[, paste0("sc3_", k, "_clusters")])
       names(cluster) <- rownames(colData(dat))
     })

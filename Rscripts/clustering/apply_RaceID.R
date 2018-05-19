@@ -8,7 +8,7 @@ apply_RaceID <- function(sce, params, k) {
     dat <- as.data.frame(counts(sce))
     st <- system.time({
       sc <- SCseq(dat)
-      sc <- filterdata(sc, mintotal = params$mintotal, minexpr = params$minexprs, 
+      sc <- filterdata(sc, mintotal = params$mintotal, minexpr = params$minexpr, 
                        minnumber = params$minnumber, maxexpr = params$maxexpr, 
                        downsample = FALSE, dsn = 1, rseed = seed)
 

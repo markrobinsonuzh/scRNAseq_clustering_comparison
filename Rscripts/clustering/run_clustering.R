@@ -16,12 +16,16 @@ source(paste0("Rscripts/clustering/apply_", method, ".R"))
 ## Load parameter files. General dataset and method parameters as well as
 ## dataset/method-specific parameters
 params <- c(fromJSON(file = paste0("parameter_settings/", 
-                                   gsub("\\.rds$", ".json", basename(scefile)))),
+                                   gsub("\\.rds$", "_", basename(scefile)), method, ".json")),
             fromJSON(file = paste0("parameter_settings/", method, ".json")), 
             fromJSON(file = paste0("parameter_settings/", 
-                                   gsub("\\.rds$", "_", basename(scefile)), method, ".json")))
-## Make sure that no parameter is repeated
-if (any(duplicated(names(params)))) stop("Possibly conflicting settings")
+                                   gsub("\\.rds$", ".json", basename(scefile))))
+            )
+## If any parameter is repeated, take the most specific
+if (any(duplicated(names(params)))) {
+  warning("Possibly conflicting settings")
+  params <- params[!duplicated(names(params))]
+}
 print(params)
 
 ## Set number of times to run clustering for each k

@@ -52,8 +52,13 @@ write(toJSON(list()), file = "parameter_settings/CIDR.json")
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list()), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_CIDR.json"))
+    if (f == "filteredExpr10" && d == "Zhengmix4uneq") {
+      write(toJSON(list(range_clusters = 2:9)),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_CIDR.json"))
+    } else {
+      write(toJSON(list()), 
+            file = paste0("parameter_settings/sce_", f, "_", d, "_CIDR.json"))
+    }
   }
 }
 
@@ -164,14 +169,14 @@ write(toJSON(list()), file = "parameter_settings/RaceID.json")
 ## Dataset-specific
 for (f in filterings) {
   for (d in setdiff(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
-    write(toJSON(list(mintotal = 3000, minexpr = 5, minnumber = 1, maxexpr = Inf)), 
+    write(toJSON(list(mintotal = 1, minexpr = 0, minnumber = 1, maxexpr = Inf)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID.json"))
   }
 }
 
 for (f in filterings) {
   for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
-    write(toJSON(list(mintotal = 200, minexpr = 1, minnumber = 1, maxexpr = Inf)), 
+    write(toJSON(list(mintotal = 1, minexpr = 0, minnumber = 1, maxexpr = Inf)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID.json"))
   }
 }
@@ -184,7 +189,8 @@ write(toJSON(list()), file = "parameter_settings/SC3.json")
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+    write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100, 
+                      gene_filter = FALSE)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_SC3.json"))
   }
 }
@@ -197,7 +203,8 @@ write(toJSON(list()), file = "parameter_settings/SC3svm.json")
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(pct_dropout_min = 10, pct_dropout_max = 90)), 
+    write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100,
+                      gene_filter = FALSE)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_SC3svm.json"))
   }
 }

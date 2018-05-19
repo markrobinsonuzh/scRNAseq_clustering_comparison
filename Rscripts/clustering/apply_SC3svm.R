@@ -10,7 +10,7 @@ apply_SC3svm <- function(sce, params, k) {
   tryCatch({
     rowData(sce)$feature_symbol <- rownames(counts(sce))
     st1 <- system.time({
-      dat <- sc3_prepare(sce, gene_filter = TRUE, 
+      dat <- sc3_prepare(sce, gene_filter = params$gene_filter, 
                          pct_dropout_min = params$pct_dropout_min, 
                          pct_dropout_max = params$pct_dropout_max, 
                          n_cores = 1, rand_seed = seed, svm_max = 1,
@@ -20,9 +20,10 @@ apply_SC3svm <- function(sce, params, k) {
     st2 <- system.time({
       dat <- sc3(dat, ks = k, pct_dropout_min = params$pct_dropout_min,
                  pct_dropout_max = params$pct_dropout_max,
-                 gene_filter = TRUE, rand_seed = seed, n_cores = 1,
+                 gene_filter = params$gene_filter, rand_seed = seed, n_cores = 1,
                  biology = FALSE, k_estimator = FALSE, svm_max = 1,
                  svm_num_cells = round(ncol(sce)/2))
+      dat <- sc3_run_svm(dat, ks = k)
       cluster <- as.numeric(colData(dat)[, paste0("sc3_", k, "_clusters")])
       names(cluster) <- rownames(colData(dat))
     })
