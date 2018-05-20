@@ -23,7 +23,7 @@ apply_SC3svm <- function(sce, params, k) {
                  gene_filter = params$gene_filter, rand_seed = seed, n_cores = 1,
                  biology = FALSE, k_estimator = FALSE, svm_max = 1,
                  svm_num_cells = round(ncol(sce)/2))
-      dat <- sc3_run_svm(dat, ks = k)
+      dat <- sc3_run_svm(dat)
       cluster <- as.numeric(colData(dat)[, paste0("sc3_", k, "_clusters")])
       names(cluster) <- rownames(colData(dat))
     })

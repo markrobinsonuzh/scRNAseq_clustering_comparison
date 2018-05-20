@@ -21,6 +21,9 @@ prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PC
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
 
+cluster2: $(foreach f,$(ALLFILTERINGS),$(foreach m,SC3svm,$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,SC3svm,$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
+
 plots: plots/performance/performance_by_k.rds
 
 ## ------------------------------------------------------------------------------------ ##
