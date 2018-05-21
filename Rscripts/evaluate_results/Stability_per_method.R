@@ -17,16 +17,20 @@ res <-  readRDS(file="output/clustering_summary/clustering_summary.rds")
 # ------------------------------------
 
 
-res_summary<- res  %>% dplyr::group_by(dataset, method, k) %>% nest() 
+res_summary <- res  %>% dplyr::group_by(dataset, method, k) %>% nest() 
 
+res_summary<- res_summary%>%mutate(truenclust=map_int(data, function(x){
+  y <- length(unique(x$trueclass))
+  return(y)
+}))
+  
 # wide format
-cast.x <-  function(x){
+cast.map <-  function(x){
   d <- reshape2::dcast(x,cell~run, value.var ="cluster")
   return(d)
 }
 
-# 
-res_nested <- res_summary  %>% mutate(data.wide  =  purrr::map( data, cast.x  )  ) 
+res_nested <- res_summary  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
 
 # function compute ARI 
 ARi_df <- function(x){
@@ -35,28 +39,64 @@ ARi_df <- function(x){
   
   x <- select(x, -cell)
   columns <- combn(ncol(x),2)
-  ari2 <-array(NA,ncol(columns) )
+  ari.nk <-array(NA,ncol(columns) )
   for (i in 1:10 ){
-  ari2[i] <- mclust::adjustedRandIndex(  x[,columns[1,i]], x[,columns[2,i]]  )
+  ari.nk[i] <- mclust::adjustedRandIndex(  x[,columns[1,i]], x[,columns[2,i]]  )
   }
-  return(ari2)
+  stab <- as.data.frame( cbind(ari.stab=ari.nk, run1=columns[1,], run2=columns[2,]) )
+  return(stab)
 }
-res_arrr <-res_nested  %>%  mutate(aririri  = purrr::map( data.wide, ARi_df   )  ) 
-
-
-res_arrr$aririri
-
+res_stab1 <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
+# unnest
+res_stab <- res_stab1 %>% select(dataset , method ,k, stability, truenclust)%>%unnest()  %>%
+  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+  dplyr::select(-sce) 
+res_stab$stability <- as.numeric(res_stab$stability ) 
+res_stab$k <- as.integer(res_stab$k)
 
 # ------------------------------------
 # PLot the values
 # ------------------------------------
 
-# unnest the data
+pdf("plots/performance/plot_stability.pdf", width=20)
+ggplot( res_stab,
+        aes(x = k, y = ari.stab, group = method, color = method))+ 
+  geom_smooth() + 
+  geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
+  theme_bw() +
+  scale_color_brewer(palette = "Set3" ) +
+  facet_grid(filtering~dataset)+
+  ylim(NA, 1)+
+  labs(y="Stability (ARI)")
+dev.off()
+ggplot( res_stab,
+        aes(x = k, y = ari.stab, group = method, color = method))+ 
+  geom_point() + 
+  theme_bw() +
+  scale_color_brewer(palette = "Set3" ) +
+  facet_grid(filtering~dataset)+
+  ylim(NA, 1)+
+  labs(y="Stability (ARI)")
+#___________________________________
+# for Seurat 
+##________________________________
 
-res_stab <- res_arrr %>% select(dataset ,  method ,k,aririri)%>%unnest()
-res_stab <- res_stab%>% filter(method=="PCAKmeans", dataset=="sce_filteredExpr10_Kumar")
+res_stab1 %>%filter(method=="Seurat") %>% select(dataset,method,k ,data, stability)%>%unnest()
 
-ggplot(res_stab , aes(k, aririri) ) +
+
+### Appendix
+ggplot(res_stab%>% filter(method=="PCAKmeans") , aes(k, ari.stab) ) +
   geom_point( )+
   facet_grid(dataset~method)
+ggplot(res_stab%>% filter(method=="CIDR") , aes(k, ari.stab) ) +
+  geom_point( )+
+  facet_grid(dataset~method)
+ggplot( res_stab%>% filter(method=="PCAKmeans"),
+        aes(x = k, y = ari.stab, group = method, color = method)) + 
+  geom_smooth() + 
+  theme_bw() +
+  scale_color_brewer(palette = "Set3" ) +
+  facet_grid(.~dataset)+
+  ylim(NA, 1)
+
 
