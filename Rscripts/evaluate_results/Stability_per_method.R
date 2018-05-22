@@ -13,13 +13,12 @@ suppressPackageStartupMessages({
 
 res <-  readRDS(file="output/clustering_summary/clustering_summary.rds")
 # ------------------------------------
-# Compute the ARis
+# Compute the stability, based on ARI
 # ------------------------------------
-
-
+# nest df
 res_summary <- res  %>% dplyr::group_by(dataset, method, k) %>% nest() 
 
-res_summary<- res_summary%>%mutate(truenclust=map_int(data, function(x){
+res_summary<- res_summary%>%mutate(truenclust=purrr::map_int(data, function(x){
   y <- length(unique(x$trueclass))
   return(y)
 }))
@@ -32,7 +31,7 @@ cast.map <-  function(x){
 
 res_nested <- res_summary  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
 
-# function compute ARI 
+# function for computing ARI 
 ARi_df <- function(x){
   stopifnot(class(x)=="data.frame")
   stopifnot(class(x[,1])=="character")
@@ -46,12 +45,12 @@ ARi_df <- function(x){
   stab <- as.data.frame( cbind(ari.stab=ari.nk, run1=columns[1,], run2=columns[2,]) )
   return(stab)
 }
-res_stab1 <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
+# compute ARI
+res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
 # unnest
-res_stab <- res_stab1 %>% select(dataset , method ,k, stability, truenclust)%>%unnest()  %>%
+res_stab <- res_stab.tmp %>% select(dataset , method ,k,  stability, truenclust)%>%unnest()  %>%
   tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
   dplyr::select(-sce) 
-res_stab$stability <- as.numeric(res_stab$stability ) 
 res_stab$k <- as.integer(res_stab$k)
 
 # ------------------------------------
@@ -65,7 +64,7 @@ ggplot( res_stab,
   geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
   theme_bw() +
   scale_color_brewer(palette = "Set3" ) +
-  facet_grid(filtering~dataset)+
+  facet_grid(filtering~dataset, scales = "free_x" )+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
 #___________________________________
@@ -76,13 +75,15 @@ ggplot( res_stab %>% filter(k==truenclust),
   geom_boxplot() + 
   theme_bw() +
   scale_color_brewer(palette = "Set3" ) +
-  facet_grid(filtering~dataset)+
+  facet_grid(filtering~dataset, scales = "free_x")+
   ylim(NA, 1)+
   labs(y="Stability (ARI)", title="k==truenclust")+
   theme( axis.text.x=element_text(size=10, angle=90))
 
 dev.off()
-
+# ------------------------------------
+# PLot stability by k, as points
+# ------------------------------------
 
 ggplot( res_stab,
         aes(x = k, y = ari.stab, group = method, color = method))+ 
@@ -95,23 +96,28 @@ ggplot( res_stab,
 #___________________________________
 # for Seurat 
 ##________________________________
+res_summary_seurat <- res  %>% filter(method=="Seurat")%>%dplyr::group_by(dataset, method, resolution) %>% nest() 
 
-res_stab1 %>%filter(method=="Seurat") %>% select(dataset,method,k ,data, stability)%>%unnest()
+res_summary_seurat<- res_summary_seurat%>%mutate(truenclust=purrr::map_int(data, function(x){
+  y <- length(unique(x$trueclass))
+  return(y)
+}))
 
-
-### Appendix
-ggplot(res_stab%>% filter(method=="PCAKmeans") , aes(k, ari.stab) ) +
-  geom_point( )+
-  facet_grid(dataset~method)
-ggplot(res_stab%>% filter(method=="CIDR") , aes(k, ari.stab) ) +
-  geom_point( )+
-  facet_grid(dataset~method)
-ggplot( res_stab%>% filter(method=="PCAKmeans"),
-        aes(x = k, y = ari.stab, group = method, color = method)) + 
-  geom_smooth() + 
+# compute ARi
+res_nested <-res_summary_seurat  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
+# compute ARI
+res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
+# unnest
+res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, truenclust)%>%unnest()  %>%
+  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+  dplyr::select(-sce)
+ggplot( res_stab,
+        aes(x = resolution, y = ari.stab, group = method, color = method))+ 
+  geom_line() + 
   theme_bw() +
   scale_color_brewer(palette = "Set3" ) +
-  facet_grid(.~dataset)+
-  ylim(NA, 1)
+  facet_grid(filtering~dataset)+
+  ylim(NA, 1)+
+  labs(y="Stability (ARI)")
 
 
