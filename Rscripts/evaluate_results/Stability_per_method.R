@@ -55,7 +55,7 @@ res_stab$stability <- as.numeric(res_stab$stability )
 res_stab$k <- as.integer(res_stab$k)
 
 # ------------------------------------
-# PLot the values
+# PLot stability by k
 # ------------------------------------
 
 pdf("plots/performance/plot_stability.pdf", width=20)
@@ -68,7 +68,22 @@ ggplot( res_stab,
   facet_grid(filtering~dataset)+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
+#___________________________________
+# stability at truenclust
+##________________________________
+ggplot( res_stab %>% filter(k==truenclust),
+        aes(x = method, y = ari.stab, group = method, color = method))+ 
+  geom_boxplot() + 
+  theme_bw() +
+  scale_color_brewer(palette = "Set3" ) +
+  facet_grid(filtering~dataset)+
+  ylim(NA, 1)+
+  labs(y="Stability (ARI)", title="k==truenclust")+
+  theme( axis.text.x=element_text(size=10, angle=90))
+
 dev.off()
+
+
 ggplot( res_stab,
         aes(x = k, y = ari.stab, group = method, color = method))+ 
   geom_point() + 
