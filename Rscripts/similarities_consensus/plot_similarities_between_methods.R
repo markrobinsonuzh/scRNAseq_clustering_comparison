@@ -1,4 +1,3 @@
-# TODO: in x either change column length or change entry to TRUE
 #------------------------------------------------------------
 # Method similarities; based on the consensus, k=truenclust
 #____________________________________________________________
@@ -117,6 +116,7 @@ plot_crossmethod_concordance <- function(res, ncluster){
     theme(axis.ticks=element_blank())
   
   #-------------------------------------------------------------------
+  
   # print tree
   ## Get all subclusters from an hclust object, from  https://github.com/csoneson/conquer_comparison/blob/master/scripts/help_function_crossmethod_concordance.R
   get_subclusters <- function(hcl) {
@@ -218,8 +218,15 @@ plot_crossmethod_concordance <- function(res, ncluster){
   colors <- list(
     dimension = c(PCA = "#C10359", tSNE = "#E0B1C6"),
     clustering = c(hc = "#01368C", graph = "#2F6CCE", kmeans = "#93B8F2", svm = "#D6E4F9"),
-    counts = c(counts = "#2EA801", logcounts = "#96E878")
+    counts = c(raw = "#2EA801", lognorm = "#96E878")
   )
+  
+  ggplot(dat, aes(x=factor(num), y=day)) + 
+    geom_tile(aes(ymin=day, ymax=day+1, fill=value), color="white", linetype=5) + 
+    scale_fill_gradient2(low = "red",high = "steelblue") + 
+    coord_flip() + 
+    facet_grid(zid~.) + 
+    theme(panel.margin = unit(0, "null")). 
   
   g1 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = dimension)) + 
     geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
@@ -251,6 +258,7 @@ plot_crossmethod_concordance <- function(res, ncluster){
           axis.line = element_blank(),
           axis.title = element_blank(),
           plot.margin = unit(c(0, 7, 0, 7), "mm"))
+  # legends
   
   gds <- plot_grid(get_legend(g1 + 
                                 theme(legend.position = "left") + 
@@ -307,6 +315,7 @@ plot_crossmethod_concordance <- function(res, ncluster){
 # no Zheng
 res1 <- res%>%filter(!method %in% c("RaceID"))%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
 l<- as.list(c(0,3:10))
+
 # plot 
 list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res1, ncluster=x)} )
 pdf("plots/similarities_between_methods/similarities_median_nozheng.pdf", width=15, height=10)
@@ -318,8 +327,6 @@ dev.off()
 pdf("plots/similarities_between_methods/similarities_tree_nozheng.pdf", width=15, height=10)
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
 dev.off()
-
-
 # Zheng
 res2 <- res%>%filter(!method %in% c("RaceID"))%>%filter( dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
 l<- as.list(c(0, 3:10))
@@ -333,7 +340,7 @@ pdf("plots/similarities_between_methods/similarities_dataset_zheng.pdf", width=3
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',1), ncol=2)
 dev.off()
 
-pdf("plots/similarities_between_methods/similarities_tree_zheng.pdf", width=15, height=10)
+pdf("plots/similarities_between_methods/similarities_tree_zheng_truenclust.pdf", width=15, height=10)
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
 dev.off()
 
