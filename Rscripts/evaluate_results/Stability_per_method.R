@@ -10,6 +10,8 @@ suppressPackageStartupMessages({
   require(purrr)
   require(reshape2)
 })
+# load colors
+source("Rscripts/Colorscheme.R")  
 
 res <-  readRDS(file="output/clustering_summary/clustering_summary.rds")
 # ------------------------------------
@@ -63,7 +65,7 @@ ggplot( res_stab,
   geom_smooth() + 
   geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
   theme_bw() +
-  scale_color_brewer(palette = "Set3" ) +
+  manual.scale+
   facet_grid(filtering~dataset, scales = "free_x" )+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
@@ -74,7 +76,7 @@ ggplot( res_stab %>% filter(k==truenclust),
         aes(x = method, y = ari.stab, group = method, color = method))+ 
   geom_boxplot() + 
   theme_bw() +
-  scale_color_brewer(palette = "Set3" ) +
+  manual.scale+
   facet_grid(filtering~dataset, scales = "free_x")+
   ylim(NA, 1)+
   labs(y="Stability (ARI)", title="k==truenclust")+
@@ -89,7 +91,7 @@ ggplot( res_stab,
         aes(x = k, y = ari.stab, group = method, color = method))+ 
   geom_point() + 
   theme_bw() +
-  scale_color_brewer(palette = "Set3" ) +
+  manual.scale +
   facet_grid(filtering~dataset)+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
@@ -113,11 +115,11 @@ res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, tr
   dplyr::select(-sce)
 ggplot( res_stab,
         aes(x = resolution, y = ari.stab, group = method, color = method))+ 
-  geom_line() + 
-  theme_bw() +
-  scale_color_brewer(palette = "Set3" ) +
-  facet_grid(filtering~dataset)+
-  ylim(NA, 1)+
-  labs(y="Stability (ARI)")
+        geom_line() + 
+        theme_bw() +
+        manual.scale +
+        facet_grid(filtering~dataset)+
+        ylim(NA, 1)+
+        labs(y="Stability (ARI)")
 
 
