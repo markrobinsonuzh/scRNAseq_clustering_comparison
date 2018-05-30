@@ -60,6 +60,7 @@ res_stab$k <- as.integer(res_stab$k)
 # ------------------------------------
 
 pdf("plots/performance/plot_stability.pdf", width=20)
+# methods combined
 ggplot( res_stab,
         aes(x = k, y = ari.stab, group = method, color = method))+ 
   geom_smooth() + 
@@ -67,6 +68,16 @@ ggplot( res_stab,
   theme_bw() +
   manual.scale+
   facet_grid(filtering~dataset, scales = "free_x" )+
+  ylim(NA, 1)+
+  labs(y="Stability (ARI)")
+# methods seperated
+ggplot( res_stab,
+        aes(x = k, y = ari.stab, group = method, color = method))+ 
+  geom_smooth() + 
+  geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
+  theme_bw() +
+  manual.scale+
+  facet_grid(dataset+filtering~method, scales = "free_x" )+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
 #___________________________________
@@ -83,6 +94,11 @@ ggplot( res_stab %>% filter(k==truenclust),
   theme( axis.text.x=element_text(size=10, angle=90))
 
 dev.off()
+
+
+
+
+# appendix
 # ------------------------------------
 # PLot stability by k, as points
 # ------------------------------------
@@ -95,31 +111,26 @@ ggplot( res_stab,
   facet_grid(filtering~dataset)+
   ylim(NA, 1)+
   labs(y="Stability (ARI)")
+
 #___________________________________
 # for Seurat 
 ##________________________________
-res_summary_seurat <- res  %>% filter(method=="Seurat")%>%dplyr::group_by(dataset, method, resolution) %>% nest() 
+#res_summary_seurat <- res  %>% filter(method=="Seurat")%>%dplyr::group_by(dataset, method, resolution) %>% nest() 
 
-res_summary_seurat<- res_summary_seurat%>%mutate(truenclust=purrr::map_int(data, function(x){
-  y <- length(unique(x$trueclass))
-  return(y)
-}))
+#res_summary_seurat<- res_summary_seurat%>%mutate(truenclust=purrr::map_int(data, function(x){
+#  y <- length(unique(x$trueclass))
+#  return(y)
+#}))
 
 # compute ARi
-res_nested <-res_summary_seurat  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
+#res_nested <-res_summary_seurat  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
 # compute ARI
-res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
+#res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
 # unnest
-res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, truenclust)%>%unnest()  %>%
-  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-  dplyr::select(-sce)
-ggplot( res_stab,
-        aes(x = resolution, y = ari.stab, group = method, color = method))+ 
-        geom_line() + 
-        theme_bw() +
-        manual.scale +
-        facet_grid(filtering~dataset)+
-        ylim(NA, 1)+
-        labs(y="Stability (ARI)")
+#res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, truenclust)%>%unnest()  %>%
+#  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+#  dplyr::select(-sce)
+
+
 
 
