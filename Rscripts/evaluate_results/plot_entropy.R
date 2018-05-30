@@ -20,10 +20,11 @@ shanon_entropy <- function(cluster){
 }
 
 # ------------------------------------
-# compute Entropy, 
+# compute Entropy and ARi 
 # ------------------------------------
-res_summary <- res %>% dplyr::group_by( dataset, method, run, k) %>% dplyr::filter(!is.na(cluster), !method %in% c("Seurat")) %>% 
+res_summary <- res %>% dplyr::group_by( dataset, method, run, k) %>% dplyr::filter(!is.na(cluster)) %>% 
   dplyr::summarize(s = shanon_entropy(cluster),
+                   ARI = mclust::adjustedRandIndex(cluster, trueclass),
                    s.true=  shanon_entropy(trueclass),
                    truenclust = length(unique(trueclass)),
                    estnclust = unique(est_k)
@@ -44,8 +45,18 @@ print( ggplot(data = res_summary%>%filter( !is.na(s)), aes(x = k, y = s, group=m
          theme_bw()+
          labs(x="method", y="entropy") 
 )
+print( ggplot(data = res_summary%>%filter(  k==truenclust), 
+              aes(x = ARI, y = s, group=method, color=method))+       
+         geom_point()+  
+         facet_grid(filtering~dataset, scale="free")+
+         geom_hline(aes(yintercept = s.true), linetype = "dashed")+ 
+         #geom_point(aes( x=truenclust , y=s.true ), color=1, shape=4)+
+         manual.scale+
+         theme_bw()+
+         labs(x="ARI", y="entropy") 
+)
+
 dev.off()
 date()
 sessionInfo()
-
 
