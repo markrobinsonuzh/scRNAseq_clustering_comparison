@@ -93,43 +93,37 @@ ggplot( res_stab %>% filter(k==truenclust),
   labs(y="Stability (ARI)", title="k==truenclust")+
   theme( axis.text.x=element_text(size=10, angle=90))
 
+#___________________________________
+# plot heat map on median stability with truenclust
+##________________________________
+ggplot( res_stab %>% filter(k==truenclust)%>%group_by(filtering, dataset, method, k)%>%
+          dplyr::summarise( median.stability = median(ari.stab) ),
+          aes(x = reorder( method,median.stability, FUN=median, na.rm=TRUE  ),
+              y = reorder(dataset,median.stability, FUN=median, na.rm=TRUE  ),
+              fill = median.stability ))+
+          geom_tile(color="white", size=0.1)+
+          facet_wrap(~ filtering)+
+          scale_fill_viridis(name="median stability (ARI)", direction=-1, na.value = "grey")+
+          theme_tufte(base_family="Helvetica")+
+          labs(x=NULL, y=NULL, title="median stability (ARI), k = truenclust") +
+          coord_equal()+
+          theme(axis.text.x=element_text(size=10, angle=90))+
+          theme(axis.text.y=element_text(size=10))+
+          theme(panel.border=element_blank())+
+          theme(legend.title=element_text(size=12))+
+          theme(legend.title.align=1)+
+          theme(legend.text=element_text(size=10))+
+          theme(legend.position="right")+
+          theme(legend.key.size=unit(2, "cm"))+
+          theme(legend.key.width=unit(0.5, "cm"))+
+          theme(axis.ticks=element_blank()) 
+
+
 dev.off()
 
 
 
 
-# appendix
-# ------------------------------------
-# PLot stability by k, as points
-# ------------------------------------
-
-ggplot( res_stab,
-        aes(x = k, y = ari.stab, group = method, color = method))+ 
-  geom_point() + 
-  theme_bw() +
-  manual.scale +
-  facet_grid(filtering~dataset)+
-  ylim(NA, 1)+
-  labs(y="Stability (ARI)")
-
-#___________________________________
-# for Seurat 
-##________________________________
-#res_summary_seurat <- res  %>% filter(method=="Seurat")%>%dplyr::group_by(dataset, method, resolution) %>% nest() 
-
-#res_summary_seurat<- res_summary_seurat%>%mutate(truenclust=purrr::map_int(data, function(x){
-#  y <- length(unique(x$trueclass))
-#  return(y)
-#}))
-
-# compute ARi
-#res_nested <-res_summary_seurat  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
-# compute ARI
-#res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
-# unnest
-#res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, truenclust)%>%unnest()  %>%
-#  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-#  dplyr::select(-sce)
 
 
 
