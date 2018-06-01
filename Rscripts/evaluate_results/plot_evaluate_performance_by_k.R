@@ -104,14 +104,14 @@ print(ggplot(res_summary, aes(x = k, y = timing, group = method, color = method)
       )
   
 # time by rank, k = truenclust, NAs removed
-print( ggplot(data = res_summary%>% dplyr::group_by(dataset, filtering, method) %>% 
+print( ggplot(data = res_summary%>% dplyr::group_by(dataset,  method) %>% 
          filter(k==truenclust) %>% 
          dplyr::summarize(med.timing=median(timing, na.rm=TRUE)) %>% filter( !is.na(med.timing)),
          aes(x=dataset, weight=med.timing, stratum=dataset, alluvium = method,  na.rm=TRUE))+
          geom_alluvium(aes(fill = method, colour = method ), alpha = .75, decreasing = TRUE, na.rm = TRUE, reverse=TRUE) +
          scale_fill_brewer(type = "qual", palette = "Set3") +
          scale_color_brewer(type = "qual", palette = "Set3") +
-         facet_wrap(~ filtering, scales = "fixed", ncol=2) +
+         #facet_wrap(~ filtering, scales = "fixed", ncol=2) +
          theme( axis.ticks = element_blank(),
                 axis.text.x=element_text(size=10, angle=90))+
          labs(title="Runtime by rank")
@@ -120,7 +120,7 @@ print( ggplot(data = res_summary%>% dplyr::group_by(dataset, filtering, method) 
 
 
 # time by rank, k==truenclust
-print(ggplot(data = res_summary %>%dplyr::group_by(dataset, filtering, method) %>% 
+print(ggplot(data = res_summary %>%dplyr::group_by(dataset, method) %>% 
                filter(k==truenclust, !method%in%c("RaceID", "CIDR") ) %>% 
                dplyr::summarize(med.timing=median(timing, na.rm=TRUE)) %>%dplyr::mutate(rank=(rank(med.timing, na.last=TRUE)))%>%
                dplyr::mutate(rank=factor(rank, levels=c(1:12)) ),
@@ -130,7 +130,7 @@ print(ggplot(data = res_summary %>%dplyr::group_by(dataset, filtering, method) %
         geom_lode(aes(fill=method))+
         scale_fill_brewer(type = "qual", palette = "Set3") +
         scale_color_brewer(type = "qual", palette = "Set3") +
-        facet_wrap(~ filtering, scales = "fixed", ncol=2)+
+        #facet_wrap(~ filtering, scales = "fixed", ncol=2)+
         geom_text(stat = "stratum", label.strata = TRUE)+
         theme( axis.ticks = element_blank(),
                axis.text.y = element_blank(),
@@ -144,10 +144,28 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
              dplyr::mutate(normtime = (timing/ max(res_summary%>%
              filter(method=="RtsneKmeans")%>%select(timing)) ) ), 
              aes(x = k, y = normtime, group = method, color = method)) +
-             manual.scale  +
+             manual.scale+
              geom_smooth()+
-             labs(title="Runtime, normalized by Rtsnekmeans")
+             scale_y_log10()+
+             labs(title="Runtime, normalized by the method Rtsnekmeans")
         
+)
+# ---------------
+# normalized by median Rtsnekmeans , time combined
+median.tsne <- res_summary%>%select(filtering, dataset, method, k, run, truenclust, timing)%>%dplyr::group_by( dataset, filtering , k)%>%
+  filter(method=="RtsneKmeans")%>%dplyr::summarise(med.t=median(  timing ))%>%ungroup()
+res <- res_summary %>% group_by(filtering, dataset, method, k) %>% dplyr::summarise(median.timing= median(timing) )%>%ungroup()
+
+res <-full_join(res, median.tsne, by=c("dataset", "filtering", "k" )  ) %>% 
+  dplyr::mutate(norm.time=median.timing/med.t)
+
+print(ggplot(res, 
+             aes(x =reorder(method, norm.time, FUN=median, order=TRUE, na.rm=TRUE) , y = norm.time, group = method, color = method)) +
+        manual.scale+
+        geom_boxplot()+
+        scale_y_log10()+
+        labs(y= "log normalised time ", x="method")+
+        labs(title="Runtime, normalized by the method Rtsnekmeans")
 )
 
 
@@ -155,14 +173,39 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
 # ## Heatmap median ARI of truenclust, from https://github.com/hrbrmstr/facetedcountryheatmaps
 # --------------------------------------
 # on true k , median ARI, ordered by median
-meth <- as.factor(unique(res_summary$method) )
-library(plotly)
-library(reshape2)
 
 print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
           dplyr::summarize(medianARI = median(ARI)) %>% 
-          ggplot2::ggplot(aes(x = reorder(method, medianARI, na.rm=FALSE), y = dataset, fill = medianARI))+
+          ggplot2::ggplot(
+            aes(x = reorder(method,  medianARI, FUN=median, na.rm=TRUE), 
+                y = reorder(dataset, medianARI, FUN=median, na.rm=TRUE), 
+                fill = medianARI))+
+          geom_tile(color="white", size=0.5, na.rm =FALSE)+
+          facet_wrap(~ filtering) +
+          scale_fill_viridis(name="medianARI", direction=-1 )+
+          theme_tufte(base_family="Helvetica")+
+          labs(x=NULL, y=NULL, title="median ARI, k = truenclust") +
+          coord_equal() +
+          theme(axis.text.x=element_text(size=8, angle=90))+
+          theme(axis.text.y=element_text(size=8))+
+          theme(legend.title=element_text(size=8))+
+          theme(legend.title.align=1)+
+          theme(legend.text=element_text(size=6))+
+          theme(legend.position="right")+
+          theme(legend.key.size=unit(2, "cm"))+
+          theme(legend.key.width=unit(0.5, "cm"))+
+          theme(axis.ticks=element_blank())+
+          geom_text(aes(label = round(medianARI, 1)))
+)
+
+print(  res_summary %>% dplyr::filter(k == truenclust) %>%
+          dplyr::group_by(dataset, filtering, method, k) %>%
+          dplyr::summarize(medianARI = median(ARI)) %>% mutate(order=rank(medianARI ))%>%
+          ggplot2::ggplot(
+            aes(x = reorder(method, medianARI, na.rm=FALSE), 
+                y = reorder(dataset,medianARI, na.rm=FALSE), 
+                fill = medianARI))+
           geom_tile(color="white", size=0.5, na.rm =FALSE)+
           facet_wrap(~ filtering) +
           scale_fill_viridis(name="medianARI", direction=-1 )+
@@ -181,12 +224,14 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           geom_text(aes(label = round(medianARI, 1)))+
           xlim( (levels(meth) )  )
 )
-
 # on estimated k, median ARI
 print(  res_summary %>% dplyr::filter(k == estnclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
         dplyr::summarize(medianARI = median(ARI)) %>%
-        ggplot(aes(x = reorder(method,medianARI), y = dataset, fill = medianARI))+
+        ggplot(
+          aes(x = reorder(method,medianARI, FUN=median, na.rm=TRUE),
+              y = reorder(dataset, medianARI, FUN=median, na.rm=TRUE),
+              fill = medianARI))+
         geom_tile(color="white", size=0.1)+
         facet_wrap(~ filtering) +
         scale_fill_viridis(name="medianARI", direction=-1, na.value = "grey")+
@@ -209,10 +254,9 @@ print(  res_summary %>% dplyr::filter(k == estnclust) %>%
 dev.off()
 
 
-
 date()
 sessionInfo()
-
+#_____________________________________________________________________________________________________
 # appendix
 # peformance  by rank, not workin anymore
 pdf("plots/performance/rank_by_k.pdf", width=20, height = 15)
@@ -234,6 +278,8 @@ ggplot( data = res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>
 
 
 dev.off()
+
+
 
 
 
