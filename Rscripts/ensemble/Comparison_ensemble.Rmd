@@ -86,9 +86,6 @@ colnames(sum_all3) <- c(
 #rename, compute difference
 sum_all <- sum_all3 %>% mutate(ARIdiff1=ARIensmbl2-ARIone, ARIdiff2=ARIensmbl3-ARIone)
 
-#plot(sum_all$ARIone, sum_all$ARIensmbl2 )
-
-
 
 # compute median
 res_median <- sum_all%>% group_by(dataset, method.ensmbl2,method.ensembl3, k, truenclust, methone, methtwo, methtree ) %>% 
@@ -124,11 +121,21 @@ res_median %>% group_by(methtwo) %>% dplyr::summarise(median.ARIdiff1=median(ARI
 
 Differences in ARI for ensemble with two methods, facet with the ensemble methods.
 ```{r performance differences for two methods, echo=FALSE}
-# differences in ARI, for two methods        
+# differences in ARI, for two methods  
+pdf("plot_diff_ensemble.pdf", width = 12, height = 12)
 ggplot( res_median , aes(ARIdiff1))+
   geom_histogram() +
-  facet_grid(methone~ methtwo)+
-  geom_vline(xintercept = 0, linetype = "dashed", colour=2) 
+  facet_grid(methone~ methtwo, scales = "free")+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
+  theme(axis.text.x = element_text(size=6)) 
+dev.off()
+pdf("plot_diff_ensemble_truenclust.pdf", width = 12, height = 12)
+ggplot( res_median%>%filter(k==truenclust) , aes(ARIdiff1))+
+  geom_histogram() +
+  facet_grid(methone~ methtwo, scales = "free")+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
+  theme(axis.text.x = element_text(size=6)) 
+dev.off()
 
 ```
 
