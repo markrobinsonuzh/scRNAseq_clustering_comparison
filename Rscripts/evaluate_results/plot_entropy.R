@@ -71,7 +71,7 @@ print( ggplot(data = res_entropy%>%filter(  k==truenclust),
 print( ggplot(data = res_entropy%>%filter( k==truenclust), 
               aes(x = method, y = s.norm, group=method, color=method))+       
          geom_boxplot()+  
-         facet_grid(dataset~., scale="free")+
+         facet_grid(.~dataset, scale="free")+
          geom_hline(aes(yintercept = s.true.norm), linetype = "dashed")+ 
          #geom_point(aes( x=truenclust , y=s.true ), color=1, shape=4)+
          manual.scale+
@@ -101,6 +101,7 @@ print( ggplot(data = res_entropy,
          theme_bw()+
          labs(x="method", y="norm.entropy", title= "normalised entropy all datasets, by k" ) 
 )
+
 print( ggplot(data = res_entropy, 
               aes(x = reorder(method, s.norm, FUN=median, na.rm=TRUE),
                   y = s.norm, group=method, color=method))+       
@@ -110,7 +111,10 @@ print( ggplot(data = res_entropy,
          #geom_point(aes( x=truenclust , y=s.true ), color=1, shape=4)+
          manual.scale+
          theme_bw()+
-         labs(x="method", y="norm.entropy", title= "normalised entropy all datasets, all k" ) 
+         theme(axis.text.x = element_text(angle=90, size=15))+
+         theme(axis.text.y = element_text( size=15))+
+         theme(legend.position = "none")+
+         labs(x="method", y=expression("normalised entropy" *" "* frac(H,H[max]) ), title= "normalised entropy all datasets, all k" ) 
 )
 
 dev.off()
