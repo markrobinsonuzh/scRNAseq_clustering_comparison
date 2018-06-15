@@ -59,7 +59,8 @@ sum_all <- sum_all %>% mutate(ARIdiff=ARIone-ARIensmbl)
 
 # compute median
 
-res_median <- sum_all%>% group_by(dataset, filtering, method.ensmbl, k, truenclust, methone, methtwo, methtree ) %>% dplyr::summarize(ARIensmbl=median(ARIensmbl), ARIone=median(ARIone), ARIdiff=median(ARIdiff) )
+res_median <- sum_all%>% group_by(dataset, filtering, method.ensmbl, k, truenclust, methone, methtwo, methtree ) %>% 
+  dplyr::summarize(ARIensmbl=median(ARIensmbl), ARIone=median(ARIone), ARIdiff=median(ARIdiff) )
 
 res_median.sub <- filter(res_median, k==truenclust, methone=="PCAKmeans")
 
@@ -106,8 +107,6 @@ p %<+%annotation +
             nudge_y = 5) +
   #geom_tiplab(hjust=0)+
   geom_nodelab( vjust=1, hjust=1, nudge_x = 0, nudge_y = 0)
-?geom_text
-?geom_nodelab
 
 #-------------------------------------------------------------------------------------
 
@@ -130,9 +129,4 @@ plot.tree <- function(dataset, res_median){
   
 }
 
-list <- list(Koh="Koh", Kumar="Kumar")
 
-p.list <- lapply(list, plot.tree, res_median=res_median)
-class(p.list) <- "multiPhylo"
-
-ggtree(p.list) + facet_wrap() + ggtitle("Many trees. Such phylogenetics. Wow.")
