@@ -26,7 +26,7 @@ suppressPackageStartupMessages({
 
 # load files
 df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
-df.sub <- df%>%filter( !method %in% c("Seurat","SIMLRlargescale", "RaceID") ) 
+df.sub <- df%>%filter( !method %in% c("SIMLRlargescale") ) 
 
 helper_ensemble <- function(methods, df){
   
@@ -84,13 +84,13 @@ helper_ensemble <- function(methods, df){
   return( res.df )
 }
 # which ensemble combinations
-
-
-comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
+#comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
+comb.ensmbl<- list(l1=unique(df.sub$method),l2=unique(df.sub$method) ) %>%cross()%>%
+map(lift(paste))
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = "."))
 
-system.time( out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  ))
+out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  )
 out <- plyr::rbind.fill(out)
 # saVE
 saveRDS(out, file= paste0("output/ensemble/clustering_ensemble_allmethods2_by_k.rds" ) )

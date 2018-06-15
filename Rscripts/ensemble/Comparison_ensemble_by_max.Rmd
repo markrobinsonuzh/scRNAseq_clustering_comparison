@@ -1,0 +1,271 @@
+---
+title: "Ensemble Clustering"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+rm(list=ls()) ### To clear namespace
+library(knitr)
+opts_chunk$set(fig.width=15, fig.height=10, fig.path='Figs/',
+               echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r setup, include=FALSE, cache.comments=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+
+suppressPackageStartupMessages({
+  
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(cowplot)
+  library(pheatmap)
+  library(RColorBrewer)
+  library(ggthemes)
+  library(viridis) 
+  library(data.tree)
+  library(ggtree)
+  
+})
+## Read clustering results
+res_ensmbl3 <- readRDS(file="output/ensemble/clustering_ensemble_allmethods3_by_k.rds")
+res_ensmbl2 <- readRDS(file="output/ensemble/clustering_ensemble_allmethods2_by_k.rds")
+res_summary <- readRDS(file="output/clustering_summary/clustering_summary.rds")
+
+# ------------------------------------
+# compute ARI, no of unique clusters
+# ------------------------------------
+
+sum_ensmbl2 <- res_ensmbl2 %>% dplyr::group_by(dataset, method, run,k) %>%
+  dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
+                   truenclust = length(unique(trueclass))) %>%
+  tidyr::separate(method, sep="[[:punct:]]", into=c("methone","methtwo"), remove=FALSE) %>% 
+  dplyr::ungroup()
+
+sum_ensmbl3 <- res_ensmbl3 %>% dplyr::group_by(dataset, method, run,k) %>%
+  dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
+                   truenclust = length(unique(trueclass))) %>%
+  tidyr::separate(method, sep="[[:punct:]]", into=c("methone","methtwo", "methtree"), remove=FALSE) %>% 
+  dplyr::ungroup()
+
+sum_summary <- res_summary %>% dplyr::group_by(dataset, method, run,k) %>%
+  dplyr::summarize(ARI = mclust::adjustedRandIndex(cluster, trueclass),
+                   truenclust = length(unique(trueclass))) 
+sum_ensmbl2$run <- as.integer( sum_ensmbl2$run )
+sum_ensmbl3$run <- as.integer( sum_ensmbl3$run )
+sum_summary$k <- as.factor(sum_summary$k )
+# join datasets
+sum_all2 <-  left_join(sum_ensmbl2 , sum_summary, by=c( "dataset" ,"methone"="method", "run", "k"))
+colnames(sum_all2) <- c(
+  "dataset",
+  "method.ensmbl",
+  "methone",
+  "methtwo",
+  "run",
+  "k",
+  "ARIensmbl",
+  "truenclustz",
+  "ARIone",
+  "truenclust.y")
+sum_all3 <- left_join(sum_all2 , sum_ensmbl3, by=c( "dataset" ,"methone"="methone","methtwo"="methtwo", "run", "k"))
+colnames(sum_all3) <- c(
+  "dataset",
+  "method.ensmbl2",
+  "methone",
+  "methtwo",
+  "run",
+  "k",
+  "ARIensmbl2",
+  "truenclustx",
+  "ARIone",
+  "truenclust",
+  "method.ensembl3",
+  "methtree",
+  "ARIensmbl3",
+  "truenclustyy")
+#rename, compute difference 1 based on the best method(best method defined as method with max in median per run per k) per dataset
+# difference 2 based on the max in the ensmble
+sum_all <-  sum_all3 %>% group_by( dataset, methone) %>% mutate(ARIdiff1=ARIensmbl2- max(median(ARIone)),
+                                                                ARIdiff2=ARIensmbl3-max(median(ARIone)) ) %>% ungroup()
+
+# compute median
+res_median <- sum_all%>% group_by(dataset, method.ensmbl2,method.ensembl3, k, truenclust, methone, methtwo, methtree ) %>% 
+  dplyr::summarize(ARIensmbl2=median(ARIensmbl2), 
+                   ARIensmbl3=median(ARIensmbl3),
+                   ARIone=median(ARIone), 
+                   ARIdiff1=median(ARIdiff1),
+                   ARIdiff2=median(ARIdiff2) )
+```
+
+## Median ARI, consensus with with two and three methods, for all k
+Does the consensus with second and third method improve results: Yes!
+```{r overall, echo=FALSE}
+ggplot( res_median%>% ungroup()%>%
+          select(methone ,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% 
+          reshape2::melt(id.vars=c("methone" ,"methtwo", "methtree") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_violin(aes(fill=variable),  alpha=0.5)+
+          labs(x="ensemble", y="ARI")
+
+ggplot(res_median)+
+  geom_density(aes(ARIone), alpha=0.4, fill="red") +
+  geom_density(aes(ARIensmbl2), alpha=0.4,fill="green")+
+  geom_density( aes(ARIensmbl3), alpha=0.4, fill="blue")+
+  labs(x="ARI")
+```
+
+## Differences in ARI for the ensembles with two methods, for all k
+Ensemble with tho methods: Which specific methods have impact on the performances?
+Median and variance of difference in ARI with second method: SC3
+
+```{r median difference, echo=FALSE}
+res_median %>% group_by(methtwo) %>% dplyr::summarise(median.ARIdiff1=median(ARIdiff1, na.rm=TRUE), variance=var(ARIdiff1, na.rm=TRUE)) 
+ 
+```
+
+
+Differences in ARI for ensemble with two methods, facet with the ensemble methods.
+```{r performance differences for two methods, echo=FALSE}
+# differences in ARI, for two methods        
+ggplot( res_median , aes(ARIdiff1))+
+  geom_histogram() +
+  facet_grid(methone~ methtwo)+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) 
+
+```
+# Difference in ARI 
+```{r performance differences for three methods, echo=FALSE}
+ggplot( res_median , aes(ARIdiff1))+
+  geom_histogram() +
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2)+
+  labs(title="ARI difference: ARI of one method - ensemble with 2 ")
+ggplot( res_median , aes(ARIdiff2))+
+  geom_histogram() +
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2)+
+  labs(title="ARI difference: ARI of one method - ensemble with 3 ")
+
+```
+
+
+## Dependence of performance on original ARI:
+Differences on performances for ARI between -0.2 to 0
+
+```{r performance differences difference on ARI, echo=FALSE}
+
+ggplot( res_median%>%dplyr::mutate(ARIone=cut(ARIone, seq(-0.2, 1, 0.2))) , 
+        aes(y=ARIdiff1, x=ARIone)  )+
+  geom_violin(aes(y=ARIdiff1,x=ARIone, fill=ARIone), size=1, alpha=0.5)+
+  scale_fill_discrete()+
+   labs(title="ARIdiff1")+
+   geom_hline(yintercept = 0, linetype="dashed")
+
+
+
+ggplot( res_median%>%dplyr::mutate(ARIone=cut(ARIone, seq(-0.2, 1, 0.2))) , 
+        aes(y=ARIdiff2, x=ARIone)  )+
+  geom_violin(aes(y=ARIdiff2,x=ARIone, fill=ARIone), size=1, alpha=0.5)+
+  scale_fill_discrete()+
+   labs(title="ARIdiff2")+
+   geom_hline(yintercept = 0, linetype="dashed")
+```
+
+Differences in ARI by dataset: improvemts in Kumar, easy Simulations and Trapnell data for the ensemble3.
+
+```{r performance differences by dataset, echo=FALSE}
+# by dataset, improvements for Koh, Kumar, easysims and trapnell. 
+res_median <- res_median%>% tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+          dplyr::select(-sce) %>% dplyr::ungroup()
+
+ggplot( res_median, 
+        aes(ARIdiff1, fill=dataset) )+
+  #geom_density(aes(ARIdiff1, fill=dataset), size=1, alpha=0.5)+
+  geom_histogram(aes(ARIdiff1, fill=dataset)) +
+  scale_fill_discrete()+
+  facet_grid(dataset~filtering)+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=1)+
+  labs(title="Difference in ARI: ensemble2")
+
+ggplot( res_median , 
+        aes(ARIdiff2, fill=dataset) )+
+  #geom_density(aes(ARIdiff1, fill=dataset), size=1, alpha=0.5)+
+  geom_histogram(aes(ARIdiff2, fill=dataset)) +
+  scale_fill_discrete()+
+  facet_grid(dataset~filtering)+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=1)+
+    labs(title="Difference in ARI: ensemble3")
+
+```
+
+
+# Median ARI for the ensembles for specific number of clusters
+For the range in number of clusters:
+
+```{r by k}
+res_median$k <-as.integer(res_median$k)
+ggplot( res_median %>% ungroup()%>%
+          select(k ,methone,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% 
+          reshape2::melt(id.vars=c("k","methone" ,"methtwo", "methtree") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_boxplot(aes(fill=variable),  alpha=0.5)+
+          facet_grid(.~k)+
+          labs(x="ensemble", y="ARI")
+```
+
+For the range in number of clusters, by dataset:
+
+```{r by k and daatset}
+ggplot( res_median %>% ungroup()%>%
+          select(k ,methone,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3, dataset)%>% 
+          reshape2::melt(id.vars=c("k","methone" ,"methtwo", "methtree", "dataset") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_boxplot(aes(fill=variable),  alpha=0.5)+
+          facet_grid(dataset~k)+
+          labs(x="ensemble", y="ARI")
+```
+
+#for the true number of clusters: 
+
+```{r for truenclust}
+ggplot( res_median%>% ungroup()%>%
+          select(k,truenclust,methone,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% filter(k==truenclust)%>%
+          reshape2::melt(id.vars=c("k","truenclust","methone" ,"methtwo", "methtree") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_boxplot(aes(fill=variable),  alpha=0.5)+
+          labs(x="ensemble", y="ARI")
+```
+
+by dataset: 
+
+```{r by dataset}
+ggplot( res_median%>% 
+          select(dataset,k,truenclust,methone,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% filter(k==truenclust)%>%
+          reshape2::melt(id.vars=c("dataset","k","truenclust","methone" ,"methtwo", "methtree") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_boxplot(aes(fill=variable),  alpha=0.5)+
+          facet_grid(.~dataset)+
+          labs(x="ensemble", y="ARI")
+
+```
+
+by datasets and methods:
+
+```{r by dataset and method}
+
+ggplot( res_median%>%
+          select(dataset,k,truenclust,methone,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% filter(k==truenclust)%>%
+          reshape2::melt(id.vars=c("dataset","k","truenclust","methone" ,"methtwo", "methtree") ),
+          aes(y=value,x=variable, group=variable) )+
+          geom_boxplot(aes( fill=variable) )+
+          facet_grid(methone~dataset)+
+          labs(title="Facet by method one",x="ensemble", y="ARI")
+
+ggplot( res_median %>%filter(k==truenclust)%>% dplyr::ungroup()
+        , aes(ARIdiff1, fill=dataset))+
+  geom_dotplot() +
+  facet_grid(methone~ methtwo)+
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) 
+```
+
+
+
+
