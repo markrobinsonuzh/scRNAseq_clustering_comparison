@@ -35,6 +35,7 @@ res_summary <- res %>% dplyr::group_by(dataset,method, run, k, resolution) %>%
 print(ggplot( res_summary, 
              aes(x = resolution, y = k ) ) +
         geom_smooth() + 
+        geom_hline(aes(yintercept = truenclust), linetype = "dashed") + 
         facet_grid(filtering ~ dataset)+
         theme_bw()+
         scale_color_brewer(palette = "Set3" )
