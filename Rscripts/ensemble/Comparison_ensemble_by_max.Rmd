@@ -1,5 +1,5 @@
 ---
-title: "Ensemble Clustering"
+title: "Ensemble Clustering by max"
 output: html_document
 ---
 
@@ -85,22 +85,25 @@ colnames(sum_all3) <- c(
   "truenclustyy")
 #rename, compute difference 1 based on the best method(best method defined as method with max in median per run per k) per dataset
 # difference 2 based on the max in the ensmble
-sum_all <-  sum_all3 %>% group_by( dataset, methone) %>% mutate(ARIdiff1=ARIensmbl2- max(median(ARIone)),
-                                                                ARIdiff2=ARIensmbl3-max(median(ARIone)) ) %>% ungroup()
 
-# compute median
-res_median <- sum_all%>% group_by(dataset, method.ensmbl2,method.ensembl3, k, truenclust, methone, methtwo, methtree ) %>% 
-  dplyr::summarize(ARIensmbl2=median(ARIensmbl2), 
-                   ARIensmbl3=median(ARIensmbl3),
-                   ARIone=median(ARIone), 
-                   ARIdiff1=median(ARIdiff1),
-                   ARIdiff2=median(ARIdiff2) )
+
+
+# check
+sum_max <-  sum_all3 %>% group_by( dataset, k) %>% 
+  mutate( max.ARI= max(median(ARIone, na.rm=TRUE)) )%>% ungroup()
+
+sum_all <-  sum_max %>% group_by( dataset, methone,k) %>% 
+  mutate(ARIdiff1=ARIensmbl2-max.ARI,
+         ARIdiff2=ARIensmbl3-max.ARI) %>% 
+  ungroup()
+res_median<- sum_all
+
 ```
 
 ## Median ARI, consensus with with two and three methods, for all k
-Does the consensus with second and third method improve results: Yes!
+Does the consensus with second and third method improve results: 
 ```{r overall, echo=FALSE}
-ggplot( res_median%>% ungroup()%>%
+ggplot( res_median%>% 
           select(methone ,methtwo, methtree,ARIone,ARIensmbl2, ARIensmbl3)%>% 
           reshape2::melt(id.vars=c("methone" ,"methtwo", "methtree") ),
           aes(y=value,x=variable, group=variable) )+
