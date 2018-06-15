@@ -14,11 +14,8 @@ apply_Seurat <- function(sce, params, resolution) {
                                  display.progress = FALSE) 
       data <- NormalizeData(object = data, normalization.method = "LogNormalize", 
                             scale.factor = 1e4, display.progress = FALSE)
-      data <- FindVariableGenes(object = data, mean.function = ExpMean, 
-                                dispersion.function = LogVMR, do.plot = FALSE, 
-                                display.progress = FALSE)
       data <- ScaleData(object = data, display.progress = FALSE)
-      data <- RunPCA(object = data, pc.genes = data@var.genes, do.print = FALSE, 
+      data <- RunPCA(object = data, pc.genes = rownames(data@data), do.print = FALSE, 
                      pcs.compute = max(params$dims.use), seed.use = seed)
       data <- FindClusters(object = data, reduction.type = "pca", save.SNN = TRUE, 
                            dims.use = params$dims.use, k.param = 30,
@@ -27,10 +24,14 @@ apply_Seurat <- function(sce, params, resolution) {
       cluster <- data@ident
     })
     
-    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
+    st <- c(user.self = st[["user.self"]], sys.self = st[["sys.self"]], 
+            user.child = st[["user.child"]], sys.child = st[["sys.child"]],
+            elapsed = st[["elapsed"]])
     list(st = st, cluster = cluster, est_k = NA)
   }, error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
+    list(st = c(user.self = NA, sys.self = NA, user.child = NA, sys.child = NA,
+                elapsed = NA), 
+         cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
          est_k = NA)
   })
 }

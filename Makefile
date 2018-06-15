@@ -1,7 +1,8 @@
 ## Define the versions of R and the paths to the libraries
-R := R_LIBS=/home/Shared/Rlib/release-3.6-lib/ /usr/local/R/R-3.4.2/bin/R CMD BATCH --no-restore --no-save
-Rd := R_LIBS=/home/Shared/Rlib/devel-lib/ /usr/local/R/R-devel/bin/R CMD BATCH --no-restore --no-save
+#R := R_LIBS=/home/Shared/Rlib/release-3.6-lib/ /usr/local/R/R-3.4.2/bin/R CMD BATCH --no-restore --no-save
+#Rd := R_LIBS=/home/Shared/Rlib/devel-lib/ /usr/local/R/R-devel/bin/R CMD BATCH --no-restore --no-save
 Rscript := /usr/local/R/R-3.4.2/src/unix/Rscript --no-restore --no-save
+R := R_LIBS=Rlibrary3.5 /usr/local/R/R-3.5.0/bin/R CMD BATCH --no-restore --no-save
 
 ## Include lists of methods, data sets and gene filtering approaches to use
 include include_methods.mk
@@ -16,15 +17,22 @@ all: cluster
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
 
-#$(foreach d,$(DATASETS),plots/qc_data/$(d).rds)
-
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
 
-cluster2: $(foreach f,$(ALLFILTERINGS),$(foreach m,SC3svm,$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,SC3svm,$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
+cluster1: $(foreach f,$(ALLFILTERINGS),$(foreach m,TSCAN,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
+cluster2: $(foreach f,$(ALLFILTERINGS),$(foreach m,SC3,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
+cluster3: $(foreach f,$(ALLFILTERINGS),$(foreach m,SC3svm,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
+cluster4: $(foreach f,$(ALLFILTERINGS),$(foreach m,Seurat,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
+cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
 plots: plots/performance/performance_by_k.rds
+
+memoryusage: plots/memory_usage/memory_usage.rds
 
 ## ------------------------------------------------------------------------------------ ##
 ## Setup
@@ -145,7 +153,7 @@ $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),$(eval 
 ## ------------------------------------------------------------------------------------ ##
 ## Apply clustering methods
 ## ------------------------------------------------------------------------------------ ##
-define clusterrule ## $(1) - sce_full, sce_filteredExpr. $(2) - dataset. $(3) - clustering method
+define clusterrule ## $(1) - sce_full, sce_filteredExpr, sce_filteredHVG, sce_filteredM3Drop. $(2) - dataset. $(3) - clustering method
 results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds parameter_settings/$(1)_$(2).json \
 parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
 Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
@@ -153,8 +161,8 @@ Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
 endef
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.4),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.4),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.5),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.5),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
+#$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.5),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
+#$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.5),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Summarize clustering performance
@@ -170,6 +178,15 @@ $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig
 plots/performance/performance_by_k.rds: output/clustering_summary/clustering_summary.rds \
 Rscripts/evaluate_results/plot_performance_by_k.R
 	$(R) "--args summaryrds='$<' outrds='$@'" Rscripts/evaluate_results/plot_performance_by_k.R Rout/plot_performance_by_k.Rout
+
+## ------------------------------------------------------------------------------------ ##
+## Plot memory usage
+## ------------------------------------------------------------------------------------ ##
+plots/memory_usage/memory_usage.rds: Rscripts/plot_memory_usage.R \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds))) \
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds)))
+	grep "Ncells|Vcells" Rout/* > memory_usage.txt
+	$(R) "--args memusetxt='memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Investigate parameter range for certain methods

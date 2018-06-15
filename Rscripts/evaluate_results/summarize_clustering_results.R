@@ -35,7 +35,13 @@ res <- do.call(rbind, lapply(datasets, function(d) {
     do.call(rbind, lapply(methods, function(m) {
       if ((m %in% methodssmall && d %in% datasetssmall) || 
           (m %in% methodsbig && d %in% datasetsbig)) {
-        x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
+        if (m %in% c("Seurat", "pcaReduce", "TSCAN")) {
+          x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
+          x$timings$timing <- rowSums(x$timings[, c("user.self", "sys.self", 
+                                                    "user.child", "sys.child")])
+        } else {
+          x <- readRDS(paste0("results3.4/sce_", f, "_", d, "_", m, ".rds"))
+        }
         dplyr::full_join(x$assignments %>%
                            dplyr::select(dataset, method, cell, run, k, resolution, cluster, trueclass),
                          x$k_estimates %>%
