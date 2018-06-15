@@ -6,9 +6,8 @@ suppressPackageStartupMessages({
   require(plyr)
   require(dplyr)
   require(tidyr)
-  require(clusterExperiment)
+  require(purrr)
   require(clue)
-  require(multidplyr)
   require(ggplot2)
   require(viridis)
   require(ggthemes)
@@ -26,14 +25,13 @@ suppressPackageStartupMessages({
 
 # load files
 df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
-df.sub <- df%>%filter( !method %in% c("SIMLRlargescale") ) 
+df.sub <- df%>%filter( !method %in% c("SIMLRlargescale", "RaceID", "Seurat") ) 
 
 helper_ensemble <- function(methods, df){
   
   l <- vector("list",length(unique(df$dataset)) )
   names(l) <- unique(df$dataset)
-  
-  for(i in unique( df$dataset ) ){
+  for( i in unique( df$dataset ) ){
   print(i)
   res <- df %>% filter( dataset %in% i ) 
   # skip dataset if results for one method not exist
@@ -85,10 +83,12 @@ helper_ensemble <- function(methods, df){
 }
 # which ensemble combinations
 #comb.ensmbl <- combn( unique(df.sub$method), 2 , simplify = FALSE)
-comb.ensmbl<- list(l1=unique(df.sub$method),l2=unique(df.sub$method) ) %>%cross()%>%
-map(lift(paste))
+comb.ensmbl <- list(l1=unique(df.sub$method),l2=unique(df.sub$method) )%>%cross()%>%purrr::map((paste))
 
-names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = "."))
+names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ".") )
+# remove identical ensembles
+comb.ensmbl <- comb.ensmbl %>%discard(function(x) x[1]==x[2] )
+
 
 out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  )
 out <- plyr::rbind.fill(out)
