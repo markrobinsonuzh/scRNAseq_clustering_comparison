@@ -201,10 +201,10 @@ plot_crossmethod_concordance <- function(res, ncluster){
     }, error = function(e) NULL)
   }
   
-  trees <- ggt + geom_label2(aes(subset = !isTip, label = label), size = 2) + 
-    geom_tiplab(aes(angle = 90), hjust = 1) + 
+  trees <- ggt + geom_label2(aes(subset = !isTip, label = label), size = 8) + 
+    geom_tiplab(aes(angle = 90), hjust = 1, size=10) + 
     ggplot2::scale_x_reverse() + ggplot2::coord_flip() + 
-    theme( plot.margin = unit(c(0, 0, 10, 0), "mm") ) + 
+    theme( plot.margin = unit(c(1, 1, 12, 1), "mm") ) + 
     xlim_tree(0.85)+
     ggtitle(paste0("number of cluster=",ncluster) )
   
@@ -220,13 +220,6 @@ plot_crossmethod_concordance <- function(res, ncluster){
     clustering = c(hc = "#01368C", graph = "#2F6CCE", kmeans = "#93B8F2", svm = "#D6E4F9"),
     counts = c(raw = "#2EA801", lognorm = "#96E878")
   )
-  
-  ggplot(dat, aes(x=factor(num), y=day)) + 
-    geom_tile(aes(ymin=day, ymax=day+1, fill=value), color="white", linetype=5) + 
-    scale_fill_gradient2(low = "red",high = "steelblue") + 
-    coord_flip() + 
-    facet_grid(zid~.) + 
-    theme(panel.margin = unit(0, "null")). 
   
   g1 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = dimension)) + 
     geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
@@ -313,8 +306,8 @@ plot_crossmethod_concordance <- function(res, ncluster){
   
 }
 # no Zheng
-res1 <- res%>%filter(!method %in% c("RaceID"))%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
-l<- as.list(c(0,3:10))
+res1 <- res%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
+l<- as.list(c(0))
 
 # plot 
 list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res1, ncluster=x)} )
@@ -327,6 +320,10 @@ dev.off()
 pdf("plots/similarities_between_methods/similarities_tree_nozheng.pdf", width=15, height=10)
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
 dev.off()
+pdf("plots/similarities_between_methods/similarities_tree_nozheng_truenclust.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees[1] ,'[',3))
+dev.off()
+
 # Zheng
 res2 <- res%>%filter(!method %in% c("RaceID"))%>%filter( dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
 l<- as.list(c(0, 3:10))
@@ -340,7 +337,11 @@ pdf("plots/similarities_between_methods/similarities_dataset_zheng.pdf", width=3
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',1), ncol=2)
 dev.off()
 
-pdf("plots/similarities_between_methods/similarities_tree_zheng_truenclust.pdf", width=15, height=10)
+pdf("plots/similarities_between_methods/similarities_tree_zheng.pdf", width=15, height=10)
 cowplot::plot_grid(plotlist = sapply(list.trees ,'[',3))
 dev.off()
+pdf("plots/similarities_between_methods/similarities_tree_zheng_truenclust.pdf", width=15, height=10)
+cowplot::plot_grid(plotlist = sapply(list.trees[1] ,'[',3))
+dev.off()
+
 
