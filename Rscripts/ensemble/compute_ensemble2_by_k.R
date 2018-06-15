@@ -25,8 +25,14 @@ suppressPackageStartupMessages({
 
 # load files
 df <- readRDS(file = "output/clustering_summary/clustering_summary.rds")
-df.sub <- df%>%filter( !method %in% c("SIMLRlargescale", "RaceID", "Seurat") ) 
 
+# sample seurat 
+df.sub <- df%>%filter( !method %in% c("Seurat") ) 
+df.seurat <- df%>%filter(method=="Seurat")%>%
+  group_by(dataset, method,k)%>%filter( resolution==sample(unique(resolution),1) )
+df.sub <- plyr::rbind.fill(df.sub , df.seurat)
+
+# helper for computing ensembles
 helper_ensemble <- function(methods, df){
   
   l <- vector("list",length(unique(df$dataset)) )
@@ -43,7 +49,7 @@ helper_ensemble <- function(methods, df){
       else {
       
       # wide format
-      res.w <- dcast(res.k%>%filter(!method %in% c("Seurat"), method %in% methods), trueclass+cell ~ method + run, 
+      res.w <- dcast(res.k%>%filter(method %in% methods), trueclass+cell ~ method + run, 
                    value.var = c("cluster"))
       res2 <- res.w%>%select(-trueclass)%>% tibble::column_to_rownames('cell')%>%as.matrix # name data.frame
       # all NAs
@@ -87,9 +93,7 @@ comb.ensmbl <- list(l1=unique(df.sub$method),l2=unique(df.sub$method) )%>%cross(
 
 names(comb.ensmbl) <- sapply(comb.ensmbl, function(x) paste0(x, collapse = ".") )
 # remove identical ensembles
-comb.ensmbl <- comb.ensmbl %>%discard(function(x) x[1]==x[2] )
-
-
+comb.ensmbl <- comb.ensmbl %>% discard(function(x) x[1] == x[2] )
 out <- lapply( comb.ensmbl , helper_ensemble, df=df.sub  )
 out <- plyr::rbind.fill(out)
 # saVE
