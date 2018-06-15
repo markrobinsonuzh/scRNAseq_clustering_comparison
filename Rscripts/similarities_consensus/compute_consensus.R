@@ -99,7 +99,7 @@ cluster_get(cluster, "cons.clue")
     do( dplyr::mutate(.,consensus.clue = cons.clue(cluster, run, cell) )) %>%collect()
   
   
-  res_consclue2 <- bind_rows(res_consclue2,res_consclue.seurat  )
+  res_consclue2 <- bind_rows(res_consclue,res_consclue.seurat  )
   
 
 saveRDS(res_consclue2, file="output/consensus/consensus_clue.rds")
@@ -108,5 +108,7 @@ cluster_rm(cluster, c("cons.clue"))
 #_____________________________________________
 
 
+date()
+sessionInfo()
 
 
