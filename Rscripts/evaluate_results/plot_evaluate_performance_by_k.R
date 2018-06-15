@@ -1,7 +1,4 @@
-args <- (commandArgs(trailingOnly = TRUE))
-for (i in 1:length(args)) {
-  eval(parse(text = args[[i]]))
-}
+
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -36,7 +33,7 @@ res_summary <- res %>%
 # --------------------------------------
 # ## Calculate performance indices for each method and clustering run
 # --------------------------------------
-# remove the method Seurat in Zheng, as of high # of k
+# by k
 
 print(ggplot(res_summary,
              aes(x = k, y = ARI, group = method, color = method)) + 
@@ -47,6 +44,7 @@ print(ggplot(res_summary,
         facet_grid(filtering ~ dataset, scales = "free_x")+
         labs(title="ARI by k")
 )
+
 # without seurat
 print(ggplot(res_summary %>%
                filter(!( method=="Seurat" & dataset %in% c("Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq") )),
@@ -58,6 +56,7 @@ print(ggplot(res_summary %>%
         facet_grid(filtering ~ dataset, scales = "free_x")+
         labs(title="ARI by k, Seurat excluded")
 )
+# by median ARI
 
 print( ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
               dplyr::summarize(medianARI = median(ARI), truenclust = unique(truenclust))%>%
@@ -72,7 +71,17 @@ print( ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
          
 )
 
+# only Seurat
 
+print(ggplot(res_summary%>%filter(method=="Seurat"),
+             aes(x = k, y = ARI, group = method, color = method)) + 
+        geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
+        geom_point() + 
+        theme_bw() +
+        manual.scale  +
+        facet_grid(filtering ~ dataset, scales = "free_x")+
+        labs(title="ARI by k")
+)
 
 # --------------------------------------
 # ## Plot timing one boxplot per dataset, over all ks and runs as they are similar
@@ -147,27 +156,41 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering)%>%
              manual.scale+
              geom_smooth()+
              scale_y_log10()+
-             labs(title="Runtime, normalized by the method Rtsnekmeans")
+             labs(title="Runtime, normalized by the method Rtsnekmeans", size=16)
         
 )
 # ---------------
 # normalized by median Rtsnekmeans , time combined
-median.tsne <- res_summary%>%select(filtering, dataset, method, k, run, truenclust, timing)%>%dplyr::group_by( dataset, filtering , k)%>%
-  filter(method=="RtsneKmeans")%>%dplyr::summarise(med.t=median(  timing ))%>%ungroup()
-res <- res_summary %>% group_by(filtering, dataset, method, k) %>% dplyr::summarise(median.timing= median(timing) )%>%ungroup()
+median.tsne <- res_summary%>%select(filtering, dataset, method, k, run, truenclust, timing)%>%
+  dplyr::group_by( dataset, filtering , k)%>%
+  filter(method=="RtsneKmeans")%>%dplyr::summarise(med.t=median(  timing ))%>%
+  ungroup()
+res.time <- res_summary %>% 
+  group_by(filtering, dataset, method, k) %>% 
+  dplyr::summarise(median.timing= median(timing) )%>%
+  ungroup()
 
-res <-full_join(res, median.tsne, by=c("dataset", "filtering", "k" )  ) %>% 
+res.time <-full_join(res.time, median.tsne, by=c("dataset", "filtering", "k" )  ) %>% 
   dplyr::mutate(norm.time=median.timing/med.t)
-
-print(ggplot(res, 
-             aes(x =reorder(method, norm.time, FUN=median, order=TRUE, na.rm=TRUE) , y = norm.time, group = method, color = method)) +
+pdf("plots/performance/res_performance_time_normalised.pdf", width=15)
+print(ggplot(res.time, 
+             aes(x =reorder(method, norm.time, FUN=median, order=TRUE, na.rm=TRUE) , 
+                 y = norm.time, group = method, color = method)) +
         manual.scale+
         geom_boxplot()+
         scale_y_log10()+
         labs(y= "log normalised time ", x="method")+
-        labs(title="Runtime, normalized by the method Rtsnekmeans")
-)
+        theme_bw()+
+        labs(title="Runtime, normalized by the method Rtsnekmeans", size=16)+
+        theme(axis.text.x=element_text( size=15, angle=90) )+
+        theme(legend.position = "none")+
+        theme(axis.title = element_text(size=15))+
+        theme(legend.text = element_text(size=15))+
+        theme(legend.position = "none")+
+        theme(strip.text = element_text(size=16))
+     )
 
+dev.off()
 
 # --------------------------------------
 # ## Heatmap median ARI of truenclust, from https://github.com/hrbrmstr/facetedcountryheatmaps
@@ -178,8 +201,8 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
           dplyr::summarize(medianARI = median(ARI)) %>% 
           ggplot2::ggplot(
-            aes(x = reorder(method,  medianARI, FUN=median, na.rm=TRUE), 
-                y = reorder(dataset, medianARI, FUN=median, na.rm=TRUE), 
+            aes(x = reorder(method,  medianARI, FUN=mean, na.rm=TRUE), 
+                y = reorder(dataset, medianARI, FUN=mean, na.rm=TRUE), 
                 fill = medianARI))+
           geom_tile(color="white", size=0.5, na.rm =FALSE)+
           facet_wrap(~ filtering) +
@@ -187,50 +210,27 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           theme_tufte(base_family="Helvetica")+
           labs(x=NULL, y=NULL, title="median ARI, k = truenclust") +
           coord_equal() +
-          theme(axis.text.x=element_text(size=8, angle=90))+
-          theme(axis.text.y=element_text(size=8))+
-          theme(legend.title=element_text(size=8))+
+          theme(axis.text.x=element_text(size=15, angle=90))+
+          theme(axis.text.y=element_text(size=15))+
+          theme(legend.title=element_text(size=15))+
           theme(legend.title.align=1)+
-          theme(legend.text=element_text(size=6))+
+          theme(legend.text=element_text(size=15))+
           theme(legend.position="right")+
           theme(legend.key.size=unit(2, "cm"))+
           theme(legend.key.width=unit(0.5, "cm"))+
           theme(axis.ticks=element_blank())+
-          geom_text(aes(label = round(medianARI, 1)))
+          #xlim( (levels(meth) )  )+
+          #geom_text(aes(label = round(medianARI, 1)))+
+          theme(strip.text = element_text(size=16))
 )
 
-print(  res_summary %>% dplyr::filter(k == truenclust) %>%
-          dplyr::group_by(dataset, filtering, method, k) %>%
-          dplyr::summarize(medianARI = median(ARI)) %>% mutate(order=rank(medianARI ))%>%
-          ggplot2::ggplot(
-            aes(x = reorder(method, medianARI, na.rm=FALSE), 
-                y = reorder(dataset,medianARI, na.rm=FALSE), 
-                fill = medianARI))+
-          geom_tile(color="white", size=0.5, na.rm =FALSE)+
-          facet_wrap(~ filtering) +
-          scale_fill_viridis(name="medianARI", direction=-1 )+
-          theme_tufte(base_family="Helvetica")+
-          labs(x=NULL, y=NULL, title="median ARI, k = truenclust") +
-          coord_equal() +
-          theme(axis.text.x=element_text(size=8, angle=90))+
-          theme(axis.text.y=element_text(size=8))+
-          theme(legend.title=element_text(size=8))+
-          theme(legend.title.align=1)+
-          theme(legend.text=element_text(size=6))+
-          theme(legend.position="right")+
-          theme(legend.key.size=unit(2, "cm"))+
-          theme(legend.key.width=unit(0.5, "cm"))+
-          theme(axis.ticks=element_blank())+
-          geom_text(aes(label = round(medianARI, 1)))+
-          xlim( (levels(meth) )  )
-)
 # on estimated k, median ARI
 print(  res_summary %>% dplyr::filter(k == estnclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
         dplyr::summarize(medianARI = median(ARI)) %>%
         ggplot(
-          aes(x = reorder(method,medianARI, FUN=median, na.rm=TRUE),
-              y = reorder(dataset, medianARI, FUN=median, na.rm=TRUE),
+          aes(x = reorder(method, medianARI, FUN=mean, na.rm=TRUE),
+              y = reorder(dataset, medianARI, FUN=mean, na.rm=TRUE),
               fill = medianARI))+
         geom_tile(color="white", size=0.1)+
         facet_wrap(~ filtering) +
@@ -238,24 +238,84 @@ print(  res_summary %>% dplyr::filter(k == estnclust) %>%
         theme_tufte(base_family="Helvetica")+
         labs(x=NULL, y=NULL, title="median ARI, k = estnclust") +
         coord_equal() +
-        theme(axis.text.x=element_text(size=10, angle=90))+
-        theme(axis.text.y=element_text(size=10))+
+        theme(axis.text.x=element_text(size=15, angle=90))+
+        theme(axis.text.y=element_text(size=15))+
         theme(panel.border=element_blank())+
-        theme(legend.title=element_text(size=12))+
+        theme(legend.title=element_text(size=15))+
         theme(legend.title.align=1)+
-        theme(legend.text=element_text(size=10))+
+        theme(legend.text=element_text(size=15))+
         theme(legend.position="right")+
         theme(legend.key.size=unit(2, "cm"))+
         theme(legend.key.width=unit(0.5, "cm"))+
-        theme(axis.ticks=element_blank())
+        theme(axis.ticks=element_blank())+
+        theme(strip.text = element_text(size=16))
 )
 
 
 dev.off()
 
 
+## Excerpts
+pdf("plots/performance/res_performance_excerpt.pdf", width=15)
+
+
+# excerpt Range of k,  Koh and Zhengmix4eq filtered10Expr
+print(ggplot(res_summary%>% filter(dataset %in% c("Koh","Zhengmix4eq"), filtering %in% c("filteredExpr10")),
+             aes(x = k, y = ARI, group = method, color = method)) + 
+        geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
+        geom_smooth() + 
+        theme_bw() +
+        manual.scale  +
+        facet_grid( ~dataset, scales = "free_x")+
+        labs(title="ARI by k")+
+        theme(axis.text = element_text(size=15))+
+        theme(axis.title = element_text(size=15))+
+        theme(legend.text = element_text(size=15))+
+        theme(strip.text = element_text(size=16))
+)
+# timings, excerpt for Ko and Zheng
+print(ggplot(res_summary%>% filter(dataset %in% c("Koh","Zhengmix4eq"), filtering %in% c("filteredExpr10")), 
+             aes(x = reorder(method, timing, FUN = mean, na.rm=TRUE), 
+                 y = timing, group = method, color = method)) + 
+        geom_boxplot() + 
+        facet_grid(filtering ~ dataset, scales = "free") + 
+        scale_y_log10()+
+        theme_bw() +
+        manual.scale+
+        theme(axis.text.x = element_text(size=15,angle = 90, hjust = 1, vjust = 1))+
+        labs(title="Runtime per method", y="timing (seconds)", x="method")+
+        theme(axis.title = element_text(size=15))+
+        theme(legend.text = element_text(size=15))+
+        theme(legend.position = "none")+
+        theme(strip.text = element_text(size=16))
+      
+      
+)
+print( ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
+                dplyr::summarize(medianARI = median(ARI), truenclust = unique(truenclust))%>%
+                filter(dataset %in% c("Kumar","Trapnell"), filtering %in% c("filteredExpr10"))%>%
+                ungroup() ,
+              aes(x = k, y = medianARI, group = method, color = method)) + 
+         geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
+         geom_line(size=1) + 
+         theme_bw() +
+         manual.scale +
+         facet_grid(filtering ~ dataset, scales = "free_x")+
+         labs(title="median ARI by k")+
+        theme(axis.text = element_text(size=15))+
+         theme(axis.title = element_text(size=15))+
+         theme(legend.text = element_text(size=15))+
+         theme(strip.text = element_text(size=16))
+       
+)
+
+dev.off()
+
 date()
 sessionInfo()
+
+
+
 #_____________________________________________________________________________________________________
 # appendix
 # peformance  by rank, not workin anymore
