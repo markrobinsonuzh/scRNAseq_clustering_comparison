@@ -23,17 +23,21 @@ apply_SC3svm <- function(sce, params, k) {
                  gene_filter = params$gene_filter, rand_seed = seed, n_cores = 1,
                  biology = FALSE, k_estimator = FALSE, svm_max = 1,
                  svm_num_cells = round(ncol(sce)/2))
-      dat <- sc3_run_svm(dat)
+      dat <- sc3_run_svm(dat, ks = k)
       cluster <- as.numeric(colData(dat)[, paste0("sc3_", k, "_clusters")])
       names(cluster) <- rownames(colData(dat))
     })
     
     st <- st1 + st2
-    st <- st["user.self"] + st["sys.self"] + st["user.child"] + st["sys.child"]
+    st <- c(user.self = st[["user.self"]], sys.self = st[["sys.self"]], 
+            user.child = st[["user.child"]], sys.child = st[["sys.child"]],
+            elapsed = st[["elapsed"]])
     list(st = st, cluster = cluster, est_k = est_k)
   },
   error = function(e) {
-    list(st = NA, cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
+    list(st = c(user.self = NA, sys.self = NA, user.child = NA, sys.child = NA,
+                elapsed = NA), 
+         cluster = structure(rep(NA, ncol(sce)), names = colnames(sce)),
          est_k = NA)
   })
 }

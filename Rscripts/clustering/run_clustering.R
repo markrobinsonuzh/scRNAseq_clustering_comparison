@@ -58,7 +58,11 @@ L <- lapply(seq_len(n_rep), function(i) {  ## For each run
                        run = i, 
                        k = length(unique(res$cluster)),
                        resolution = resolution,
-                       timing = res$st,
+                       user.self = res$st[["user.self"]],
+                       sys.self = res$st[["sys.self"]],
+                       user.child = res$st[["user.child"]],
+                       sys.child = res$st[["sys.child"]],
+                       elapsed = res$st[["elapsed"]],
                        stringsAsFactors = FALSE, row.names = NULL)
       kest <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
                          method = method,
@@ -89,7 +93,11 @@ L <- lapply(seq_len(n_rep), function(i) {  ## For each run
                        run = i, 
                        k = k,
                        resolution = NA,
-                       timing = res$st,
+                       user.self = res$st[["user.self"]],
+                       sys.self = res$st[["sys.self"]],
+                       user.child = res$st[["user.child"]],
+                       sys.child = res$st[["sys.child"]],
+                       elapsed = res$st[["elapsed"]],
                        stringsAsFactors = FALSE, row.names = NULL)
       kest <- data.frame(dataset = gsub("\\.rds$", "", basename(scefile)), 
                          method = method,
@@ -124,4 +132,5 @@ assignments$trueclass <- truth$trueclass[match(assignments$cell, truth$cell)]
 saveRDS(list(assignments = assignments, timings = timings,
              k_estimates = k_estimates), file = outrds)
 
+gc()
 sessionInfo()

@@ -9,8 +9,7 @@ suppressPackageStartupMessages({
   library(rjson)
 })
 
-filterings <- c("full", "filteredExpr50", "filteredExpr10", "filteredHVG50", 
-                "filteredHVG10", "filteredM3Drop50", "filteredM3Drop10")
+filterings <- c("filteredExpr10", "filteredHVG10", "filteredM3Drop10")
 datasets <- c("Kumar", "Trapnell", "Koh", "Zhengmix4eq", "Zhengmix4uneq", 
               "Zhengmix8eq", "SimKumar4easy", "SimKumar4hard", "SimKumar8hard",
               "KohTCC", "KumarTCC", "TrapnellTCC")
@@ -104,14 +103,43 @@ for (f in filterings) {
 ## Seurat parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(range_resolutions = seq(0.3, 1.5, by = 0.1))), 
+write(toJSON(list(range_resolutions = seq(0.3, 1.5, by = 0.1),
+                  min.cells = 0, min.genes = 0, dims.use = 1:30)), 
       file = "parameter_settings/Seurat.json")
 
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(min.cells = 0, min.genes = 0, dims.use = 1:30)), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    if (f == "filteredExpr10" && d == "Zhengmix8eq") {
+      write(toJSON(list(range_resolutions = c(0.01, 0.3, 0.35, 0.4, 0.5, 1.3, 1.4, 1.6, 1.7, 1.8))),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    } else if (f == "filteredHVG10" && d == "Zhengmix8eq") {
+      write(toJSON(list(range_resolutions = c(0.1, 0.3, 1, 1.1, 1.3, 1.4, 1.6, 2))),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    } else if (f == "filteredM3Drop10" && d == "Zhengmix8eq") {
+      write(toJSON(list(range_resolutions = c(0.1, 0.7, 1, 1.3, 1.6, 2.5, 3))),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    } else if (d %in% c("Zhengmix4eq", "Zhengmix4uneq")) {
+      write(toJSON(list(range_resolutions = c(0.05, 0.1, 0.2, seq(0.3, 1.5, by = 0.1)))),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    } else if (f == "filteredM3Drop10" && d == "SimKumar8hard") {
+      write(toJSON(list(range_resolutions = sort(c(1.13, 1.15, 1.18, seq(0.3, 1.5, by = 0.1))))),
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    } else if (d %in% c("Koh", "KohTCC")) {
+      if (d == "Koh" && f == "filteredM3Drop10") {
+        write(toJSON(list(range_resolutions = seq(0.3, 3.6, by = 0.1))),
+              file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+      } else if (d == "KohTCC" && f == "filteredExpr10") {
+        write(toJSON(list(range_resolutions = sort(c(1.73, 1.76, seq(0.3, 2.1, by = 0.1))))),
+              file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+      } else {
+        write(toJSON(list(range_resolutions = seq(0.3, 2.1, by = 0.1))),
+              file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+      }
+    } else {
+      write(toJSON(list()), 
+            file = paste0("parameter_settings/sce_", f, "_", d, "_Seurat.json"))
+    }
   }
 }
 
@@ -141,25 +169,25 @@ for (f in filterings) {
   }
 }
 
-## Linnorm parameters
-## -------------------------------------------------------------------------- ##
-## General
-write(toJSON(list()), file = "parameter_settings/Linnorm.json")
-
-## Dataset-specific
-for (f in filterings) {
-  for (d in setdiff(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
-    write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_Linnorm.json"))
-  }
-}
-
-for (f in filterings) {
-  for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
-    write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_Linnorm.json"))
-  }
-}
+# ## Linnorm parameters
+# ## -------------------------------------------------------------------------- ##
+# ## General
+# write(toJSON(list()), file = "parameter_settings/Linnorm.json")
+# 
+# ## Dataset-specific
+# for (f in filterings) {
+#   for (d in setdiff(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
+#     write(toJSON(list(minNonZeroPortion = 0.75, num_PC = 3)), 
+#           file = paste0("parameter_settings/sce_", f, "_", d, "_Linnorm.json"))
+#   }
+# }
+# 
+# for (f in filterings) {
+#   for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
+#     write(toJSON(list(minNonZeroPortion = 0.1, num_PC = 3)), 
+#           file = paste0("parameter_settings/sce_", f, "_", d, "_Linnorm.json"))
+#   }
+# }
 
 ## RaceID parameters
 ## -------------------------------------------------------------------------- ##
@@ -168,29 +196,35 @@ write(toJSON(list()), file = "parameter_settings/RaceID.json")
 
 ## Dataset-specific
 for (f in filterings) {
-  for (d in setdiff(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
+  for (d in datasets) {
     write(toJSON(list(mintotal = 1, minexpr = 0, minnumber = 1, maxexpr = Inf)), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID.json"))
   }
 }
 
+## RaceID2 parameters
+## -------------------------------------------------------------------------- ##
+## General
+write(toJSON(list()), file = "parameter_settings/RaceID2.json")
+
+## Dataset-specific
 for (f in filterings) {
-  for (d in intersect(datasets, c("Zhengmix4eq", "Zhengmix4uneq", "Zhengmix8eq"))) {
+  for (d in datasets) {
     write(toJSON(list(mintotal = 1, minexpr = 0, minnumber = 1, maxexpr = Inf)), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID.json"))
+          file = paste0("parameter_settings/sce_", f, "_", d, "_RaceID2.json"))
   }
 }
 
 ## SC3 parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list()), file = "parameter_settings/SC3.json")
+write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100, 
+                  gene_filter = FALSE)), file = "parameter_settings/SC3.json")
 
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100, 
-                      gene_filter = FALSE)), 
+    write(toJSON(list()), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_SC3.json"))
   }
 }
@@ -198,13 +232,13 @@ for (f in filterings) {
 ## SC3svm parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list()), file = "parameter_settings/SC3svm.json")
+write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100,
+                  gene_filter = FALSE)), file = "parameter_settings/SC3svm.json")
 
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(pct_dropout_min = 0, pct_dropout_max = 100,
-                      gene_filter = FALSE)), 
+    write(toJSON(list()), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_SC3svm.json"))
   }
 }
@@ -212,12 +246,12 @@ for (f in filterings) {
 ## FlowSOM parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(nPC = 50)), file = "parameter_settings/FlowSOM.json")
+write(toJSON(list(nPC = 50, xdim = 15, ydim = 15)), file = "parameter_settings/FlowSOM.json")
 
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list(xdim = 10, ydim = 10)), 
+    write(toJSON(list()), 
           file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
   }
 }
@@ -225,7 +259,7 @@ for (f in filterings) {
 ## PCAKmeans parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(nPC = 10)), file = "parameter_settings/PCAKmeans.json")
+write(toJSON(list(nPC = 30)), file = "parameter_settings/PCAKmeans.json")
 
 ## Dataset-specific
 for (f in filterings) {
@@ -235,10 +269,23 @@ for (f in filterings) {
   }
 }
 
+## ascend parameters
+## -------------------------------------------------------------------------- ##
+## General
+write(toJSON(list(nPC = 30)), file = "parameter_settings/ascend.json")
+
+## Dataset-specific
+for (f in filterings) {
+  for (d in datasets) {
+    write(toJSON(list()), 
+          file = paste0("parameter_settings/sce_", f, "_", d, "_ascend.json"))
+  }
+}
+
 ## PCAHC parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(nPC = 10)), file = "parameter_settings/PCAHC.json")
+write(toJSON(list(nPC = 30)), file = "parameter_settings/PCAHC.json")
 
 ## Dataset-specific
 for (f in filterings) {
