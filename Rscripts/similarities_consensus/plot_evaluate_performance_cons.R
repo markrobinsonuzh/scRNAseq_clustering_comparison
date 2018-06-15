@@ -15,6 +15,7 @@ suppressPackageStartupMessages({
   library(ggthemes)
   
 })
+source("Colorscheme.R")
 # ----------------------------------------------
 # Plot summary of consensus clusterin, for control
 # ----------------------------------------------
