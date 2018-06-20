@@ -307,7 +307,7 @@ plot_crossmethod_concordance <- function(res, ncluster){
 }
 # no Zheng
 res1 <- res%>%filter( !dataset %in% grep("Zheng",unique(dataset), value=TRUE) )
-l<- as.list(c(0))
+l<- as.list(c(0, 3:10))
 
 # plot 
 list.trees <- lapply(l, function(x) {plot_crossmethod_concordance(res1, ncluster=x)} )
