@@ -20,7 +20,7 @@ shanon_entropy <- function(cluster){
 }
 
 # ------------------------------------
-# compute Entropy and ARi 
+# compute Entropy and ARI
 # ------------------------------------
 res_entropy <- res %>% 
   dplyr::group_by( dataset, method, run, k) %>% 
@@ -53,7 +53,6 @@ print( ggplot(data = res_entropy%>%filter(  k==truenclust),
          geom_point()+  
          facet_grid(filtering~dataset, scale="free")+
          geom_hline(aes(yintercept = s.true), linetype = "dashed")+ 
-         #geom_point(aes( x=truenclust , y=s.true ), color=1, shape=4)+
          manual.scale+
          theme_bw()+
          labs(x="ARI", y="entropy") 
@@ -63,7 +62,6 @@ print( ggplot(data = res_entropy%>%filter(  k==truenclust),
          geom_point()+  
          facet_grid(filtering~dataset, scale="free")+
          geom_hline(aes(yintercept = s.true), linetype = "dashed")+ 
-         #geom_point(aes( x=truenclust , y=s.true ), color=1, shape=4)+
          manual.scale+
          theme_bw()+
          labs(x="ARI", y="entropy") 

@@ -92,13 +92,14 @@ res_median <-  sum_max %>% group_by( dataset, methone,k) %>%
 # ------------------------------------
 # PLot
 # ------------------------------------
-pdf("plots/ensemble/plot_comparison_ensemble2.pdf", width=15,height=8)
+pdf("plots/ensemble/plot_comparison_ensemble_max.pdf", width=15,height=8)
 
 # plot histo of differences in ARI, by the two methods 
 ggplot( res_median , aes(ARIdiff1))+
   geom_histogram() +
   facet_grid(methone~ methtwo)+
-  geom_vline(xintercept = 0, linetype = "dashed", colour=2) 
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
+  labs(title="Difference ensemble to best performing method, all k")
 
 # plot histo of differences in ARI, by filtering
 
@@ -110,13 +111,15 @@ ggplot( res_median %>%
   scale_fill_discrete()+
   facet_grid(dataset~filtering)+
   geom_vline(xintercept = 0, linetype = "dashed", colour=1)+
-  labs(title="Difference in ARI: ensemble2")
+  labs(title="Difference ensemble to best performing method, by dataset")
+dev.off()
+
 # plot histo of differences in ARI, seperated by datasets
 
 ggplot( res_median %>%filter(k==truenclust)%>% dplyr::ungroup()
         , aes(ARIdiff1, fill=dataset))+
   geom_dotplot() +
   facet_grid(methone~ methtwo)+
-  geom_vline(xintercept = 0, linetype = "dashed", colour=2) 
+  geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
+  labs(title="Difference ensemble to best performing method, by dataset")
 
-dev.off()

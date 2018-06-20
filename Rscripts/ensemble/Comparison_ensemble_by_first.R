@@ -77,17 +77,20 @@ res_median <- sum_all%>% group_by(dataset, method.ensmbl2,method.ensembl3, k, tr
   dplyr::summarize(ARIensmbl2=median(ARIensmbl2), ARIensmbl3=median(ARIensmbl3),ARIone=median(ARIone), ARIdiff1=median(ARIdiff1), ARIdiff2=median(ARIdiff2) )
 
 
-pdf("plot_diff_ensemble_allk.pdf", width = 12, height = 12)
+pdf("plots/ensemble/plot_diff_ensemble_allk.pdf", width = 12, height = 12)
 ggplot( res_median , aes(ARIdiff1))+
   geom_histogram() +
   facet_grid(methone~ methtwo, scales = "free")+
   geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
-  theme(axis.text.x = element_text(size=6)) 
+  theme(axis.text.x = element_text(size=6)) +
+  labs(title="Difference single method vs ensemble, all k")
 dev.off()
-pdf("plot_diff_ensemble_truenclust.pdf", width = 12, height = 12)
+pdf("plots/ensemble/plot_diff_ensemble_truenclust.pdf", width = 12, height = 12)
 ggplot( res_median%>%filter(k==truenclust) , aes(ARIdiff1))+
   geom_histogram() +
   facet_grid(methone~ methtwo, scales = "free")+
   geom_vline(xintercept = 0, linetype = "dashed", colour=2) +
-  theme(axis.text.x = element_text(size=6)) 
+  theme(axis.text.x = element_text(size=6)) +
+  labs(title="Difference single method vs ensemble, truenclust")
 dev.off()
+

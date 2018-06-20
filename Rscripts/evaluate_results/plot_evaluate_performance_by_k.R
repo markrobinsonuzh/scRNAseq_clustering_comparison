@@ -80,7 +80,7 @@ print(ggplot(res_summary%>%filter(method=="Seurat"),
         theme_bw() +
         manual.scale  +
         facet_grid(filtering ~ dataset, scales = "free_x")+
-        labs(title="ARI by k")
+        labs(title="ARI by k for Seurat")
 )
 
 # --------------------------------------
@@ -172,7 +172,6 @@ res.time <- res_summary %>%
 
 res.time <-full_join(res.time, median.tsne, by=c("dataset", "filtering", "k" )  ) %>% 
   dplyr::mutate(norm.time=median.timing/med.t)
-pdf("plots/performance/res_performance_time_normalised.pdf", width=15)
 print(ggplot(res.time, 
              aes(x =reorder(method, norm.time, FUN=median, order=TRUE, na.rm=TRUE) , 
                  y = norm.time, group = method, color = method)) +
@@ -190,13 +189,11 @@ print(ggplot(res.time,
         theme(strip.text = element_text(size=16))
      )
 
-dev.off()
 
 # --------------------------------------
 # ## Heatmap median ARI of truenclust, from https://github.com/hrbrmstr/facetedcountryheatmaps
 # --------------------------------------
 # on true k , median ARI, ordered by median
-
 print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           dplyr::group_by(dataset, filtering, method, k) %>%
           dplyr::summarize(medianARI = median(ARI)) %>% 
@@ -210,18 +207,16 @@ print(  res_summary %>% dplyr::filter(k == truenclust) %>%
           theme_tufte(base_family="Helvetica")+
           labs(x=NULL, y=NULL, title="median ARI, k = truenclust") +
           coord_equal() +
-          theme(axis.text.x=element_text(size=15, angle=90))+
-          theme(axis.text.y=element_text(size=15))+
-          theme(legend.title=element_text(size=15))+
+          theme(axis.text.x=element_text(size=18, angle=90, hjust=1,vjust=0.5))+
+          theme(axis.text.y=element_text(size=16))+
+          theme(legend.title=element_text(size=16))+
           theme(legend.title.align=1)+
-          theme(legend.text=element_text(size=15))+
+          theme(legend.text=element_text(size=16))+
           theme(legend.position="right")+
           theme(legend.key.size=unit(2, "cm"))+
           theme(legend.key.width=unit(0.5, "cm"))+
           theme(axis.ticks=element_blank())+
-          #xlim( (levels(meth) )  )+
-          #geom_text(aes(label = round(medianARI, 1)))+
-          theme(strip.text = element_text(size=16))
+          theme(strip.text = element_text(size=20))
 )
 
 # on estimated k, median ARI
@@ -238,26 +233,20 @@ print(  res_summary %>% dplyr::filter(k == estnclust) %>%
         theme_tufte(base_family="Helvetica")+
         labs(x=NULL, y=NULL, title="median ARI, k = estnclust") +
         coord_equal() +
-        theme(axis.text.x=element_text(size=15, angle=90))+
-        theme(axis.text.y=element_text(size=15))+
+        theme(axis.text.x=element_text(size=18, angle=90))+
+        theme(axis.text.y=element_text(size=16))+
         theme(panel.border=element_blank())+
-        theme(legend.title=element_text(size=15))+
+        theme(legend.title=element_text(size=16))+
         theme(legend.title.align=1)+
-        theme(legend.text=element_text(size=15))+
+        theme(legend.text=element_text(size=16))+
         theme(legend.position="right")+
         theme(legend.key.size=unit(2, "cm"))+
         theme(legend.key.width=unit(0.5, "cm"))+
         theme(axis.ticks=element_blank())+
-        theme(strip.text = element_text(size=16))
+        theme(strip.text = element_text(size=18))
 )
 
-
-dev.off()
-
-
 ## Excerpts
-pdf("plots/performance/res_performance_excerpt.pdf", width=15)
-
 
 # excerpt Range of k,  Koh and Zhengmix4eq filtered10Expr
 print(ggplot(res_summary%>% filter(dataset %in% c("Koh","Zhengmix4eq"), filtering %in% c("filteredExpr10")),
@@ -283,7 +272,7 @@ print(ggplot(res_summary%>% filter(dataset %in% c("Koh","Zhengmix4eq"), filterin
         theme_bw() +
         manual.scale+
         theme(axis.text.x = element_text(size=15,angle = 90, hjust = 1, vjust = 1))+
-        labs(title="Runtime per method", y="timing (seconds)", x="method")+
+        labs(title="Runtime per method for Koh and Zheng", y="timing (seconds)", x="method")+
         theme(axis.title = element_text(size=15))+
         theme(legend.text = element_text(size=15))+
         theme(legend.position = "none")+
@@ -301,7 +290,7 @@ print( ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
          theme_bw() +
          manual.scale +
          facet_grid(filtering ~ dataset, scales = "free_x")+
-         labs(title="median ARI by k")+
+         labs(title="median ARI by k for Kumar and Trapnell")+
         theme(axis.text = element_text(size=15))+
          theme(axis.title = element_text(size=15))+
          theme(legend.text = element_text(size=15))+
@@ -310,36 +299,5 @@ print( ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
 )
 
 dev.off()
-
 date()
 sessionInfo()
-
-
-
-#_____________________________________________________________________________________________________
-# appendix
-# peformance  by rank, not workin anymore
-pdf("plots/performance/rank_by_k.pdf", width=20, height = 15)
-
-ggplot( data = res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>% 
-          filter(!method%in%c("RaceID" ))%>%
-          dplyr::summarize(medianARI=median(ARI, na.rm=TRUE), truenclust=unique(truenclust))%>%
-          dplyr::mutate(rank=(rank(-medianARI, na.last=TRUE, ties.method = "average")))%>%
-          ungroup() ,
-        aes(x=k,  stratum=rank, alluvium=method))+
-  geom_vline(aes(xintercept = truenclust), linetype = "dashed")+
-  geom_stratum(aes(fill=method))+
-  geom_lode(aes(fill=method))+
-  geom_flow(aes(fill = method)) +
-  geom_text(stat = "stratum", label.strata = TRUE)+
-  theme_bw()+
-  scale_color_brewer( palette = "Set3")+
-  facet_grid(dataset ~ filtering)
-
-
-dev.off()
-
-
-
-
-

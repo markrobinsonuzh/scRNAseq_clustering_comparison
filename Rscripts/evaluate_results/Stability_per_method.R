@@ -107,7 +107,7 @@ ggplot( res_stab %>% filter(k==truenclust)%>%group_by(filtering, dataset, method
           theme_tufte(base_family="Helvetica")+
           labs(x=NULL, y=NULL, title="median stability (ARI), k = truenclust") +
           coord_equal()+
-          theme(axis.text.x=element_text(size=15, angle=90))+
+          theme(axis.text.x=element_text(size=15, angle=90, hjust = 1, vjust = 1))+
           theme(axis.text.y=element_text(size=15))+
           theme(panel.border=element_blank())+
           theme(legend.title=element_text(size=15))+
@@ -133,77 +133,8 @@ ggplot( res_stab%>%filter(dataset %in% c("Koh","Zhengmix4eq"), filtering %in% c(
   theme(legend.text = element_text(size=15))+
   theme(strip.text = element_text(size=16))
 
-
-
-
-
-
-
 dev.off()
 
 
-# ------------------------------------
-# for seurat
-# ------------------------------------
-res_summary <- res  %>%filter(method=="Seurat")%>% dplyr::group_by(dataset, method, resolution) %>% nest() 
-
-res_summary<- res_summary%>%mutate(truenclust=purrr::map_int(data, function(x){
-  y <- length(unique(x$trueclass))
-  return(y)
-}))
-
-# wide format
-cast.map <-  function(x){
-  d <- reshape2::dcast(x,cell~run, value.var ="cluster")
-  return(d)
-}
-
-res_nested <- res_summary  %>% mutate(data.wide  =  purrr::map( data, cast.map  )  ) 
-x <- res_nested%>% filter(dataset=="sce_filteredHVG10_Zhengmix4uneq", resolution==1.40)
-
-y <- x$data.wide[[1]]
-x$data[[1]]
-
-# function for computing ARI 
-ARi_df <- function(x){
-  stopifnot(class(x)=="data.frame")
-  stopifnot(class(x[,1])=="character")
-  
-  x <- select(x, -cell)
-  columns <- combn(ncol(x),2)
-  ari.nk <-array(NA,ncol(columns) )
-  for (i in 1:10 ){
-    ari.nk[i] <- mclust::adjustedRandIndex(  x[,columns[1,i]], x[,columns[2,i]]  )
-  }
-  stab <- as.data.frame( cbind(ari.stab=ari.nk, run1=columns[1,], run2=columns[2,]) )
-  return(stab)
-}
-# compute ARI
-res_stab.tmp <-res_nested  %>%  mutate(stability  = purrr::map( data.wide, ARi_df   )  ) 
-# unnest
-res_stab <- res_stab.tmp %>% select(dataset , method ,resolution,  stability, truenclust)%>%unnest()  %>%
-  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-  dplyr::select(-sce) 
-res_stab$k <- as.integer(res_stab$resolution)
-# plot
-ggplot( res_stab,
-        aes(x = k, y = ari.stab, group = method, color = method))+ 
-  geom_smooth() + 
-  geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
-  theme_bw() +
-  manual.scale+
-  facet_grid(filtering~dataset, scales = "free_x" )+
-  ylim(NA, 1)+
-  labs(y="Stability (ARI)")
-ggplot( res_stab %>% filter(k==truenclust),
-        aes(x = method, y = ari.stab, group = method, color = method))+ 
-  geom_boxplot() + 
-  theme_bw() +
-  manual.scale+
-  facet_grid(filtering~dataset, scales = "free_x")+
-  ylim(NA, 1)+
-  labs(y="Stability (ARI)", title="k==truenclust")+
-  theme( axis.text.x=element_text(size=10, angle=90))
-x <- res_stab%>% filter(dataset== "Zhengmix8eq")
 
 
