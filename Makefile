@@ -9,7 +9,7 @@ include include_methods.mk
 include include_datasets.mk
 include include_filterings.mk
 
-ncores := 24
+ncores := 12
 
 .PHONY: all prepare_data cluster
 
@@ -19,8 +19,7 @@ all: cluster
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
 
-cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds))) \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds)))
+cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
 cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
@@ -155,18 +154,14 @@ parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
 Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
 	$(4) "--args scefile='data/$(1)/$(1)_$(2).rds' method='$(3)' outrds='results/$(1)_$(2)_$(3).rds'" Rscripts/clustering/run_clustering.R Rout/run_clustering_$(1)_$(2)_$(3).Rout
 endef
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.4),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.4),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
-#$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall3.5),$(foreach d,$(DATASETSsmall),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
-#$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig3.5),$(foreach d,$(DATASETSbig),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(Rd))))))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(eval $(call clusterrule,sce_$(f),$(d),$(m),$(R))))))
 
 ## ------------------------------------------------------------------------------------ ##
 ## Summarize clustering performance
 ## ------------------------------------------------------------------------------------ ##
 output/clustering_summary/clustering_summary.rds: Rscripts/evaluate_results/summarize_clustering_results.R \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds))) \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds)))
-	$(R) "--args datasetssmall='$(DATASETSsmallc)' datasetsbig='$(DATASETSbigc)' filterings='$(ALLFILTERINGSc)' methodssmall='$(METHODSsmallc)' methodsbig='$(METHODSbigc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Compute consensus
@@ -201,8 +196,7 @@ Rscripts/evaluate_results/plot_performance_by_k.R
 ## Plot memory usage
 ## ------------------------------------------------------------------------------------ ##
 plots/memory_usage/memory_usage.rds: Rscripts/plot_memory_usage.R \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSsmall),$(foreach d,$(DATASETSsmall),results/sce_$(f)_$(d)_$(m).rds))) \
-$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODSbig),$(foreach d,$(DATASETSbig),results/sce_$(f)_$(d)_$(m).rds)))
+$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 	grep "Ncells|Vcells" Rout/* > memory_usage.txt
 	$(R) "--args memusetxt='memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
