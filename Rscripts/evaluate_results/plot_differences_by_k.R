@@ -7,7 +7,6 @@ print(clusteringsummary)
 print(outrds)
 
 # differences between k at max ARI and k == truth
-
 suppressPackageStartupMessages({
   library(dplyr)
   library(tidyr)
