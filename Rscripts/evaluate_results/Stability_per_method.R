@@ -152,6 +152,7 @@ ggplot(res_stab %>% filter(dataset %in% c("Koh", "Zhengmix4eq"),
 
 dev.off()
 
+saveRDS(NULL, outrds)
 date()
 sessionInfo()
 

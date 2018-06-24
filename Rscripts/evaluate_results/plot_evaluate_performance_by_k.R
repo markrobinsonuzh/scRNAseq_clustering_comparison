@@ -265,5 +265,6 @@ print(ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
 
 dev.off()
 
+saveRDS(NULL, outrds)
 date()
 sessionInfo()

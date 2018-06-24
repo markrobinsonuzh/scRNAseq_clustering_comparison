@@ -115,6 +115,7 @@ print(ggplot(data = res_entropy,
 
 dev.off()
 
+saveRDS(NULL, outrds)
 date()
 sessionInfo()
 
