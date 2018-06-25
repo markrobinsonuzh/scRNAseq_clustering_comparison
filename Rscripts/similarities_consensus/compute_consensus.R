@@ -27,7 +27,8 @@ res <- readRDS(file = clusteringsummary)
 ## Input: data frame with columns cell, cluster, run
 cons.clue <- function(df) {
   m <- tryCatch({
-    df %>% tidyr::spread(key = run, value = cluster) %>%
+    df %>% dplyr::select(cell, run, cluster) %>%
+      tidyr::spread(key = run, value = cluster) %>%
       as.data.frame() %>% 
       tibble::column_to_rownames("cell") %>% as.matrix()
     }, error = function(e) NA)

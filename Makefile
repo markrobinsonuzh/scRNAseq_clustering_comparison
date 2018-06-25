@@ -26,7 +26,7 @@ cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASET
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
-plots/performance/seurat_diagnostics.rds
+plots/performance/seurat_diagnostics.rds plots/similarities_between_methods/similarities.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -214,6 +214,12 @@ Rscripts/evaluate_results/plot_Seurat_k_resolution.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_Seurat_k_resolution.R Rout/plot_Seurat_k_resolution.Rout
 
+plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
+Rscripts/similarities_consensus/plot_similarities_between_methods2.R 
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
+
+
 
 ## ------------------------------------------------------------------------------------ ##
 ## Manuscript figures
@@ -246,11 +252,6 @@ plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
 Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colorscheme.R
 	mkdir -p $(@D)
 	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rout/plot_evaluate_performance_cons.Rout
-
-plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
-Rscripts/similarities_consensus/plot_similarities_between_methods2.R 
-	mkdir -p $(@D)
-	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
 
 
 
