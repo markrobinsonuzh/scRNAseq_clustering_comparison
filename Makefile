@@ -26,7 +26,8 @@ cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASET
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
-plots/performance/seurat_diagnostics.rds plots/similarities_between_methods/similarities.rds
+plots/performance/seurat_diagnostics.rds plots/similarities_between_methods/similarities.rds \
+plots/performance/res_performance_cons.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -209,16 +210,23 @@ Rscripts/evaluate_results/plot_k_differences.R Rscripts/Colorscheme.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_k_differences.R Rout/plot_k_differences.Rout
 
+## Seurat k vs resolution
 plots/performance/seurat_diagnostics.rds: output/clustering_summary/clustering_summary.rds \
 Rscripts/evaluate_results/plot_Seurat_k_resolution.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_Seurat_k_resolution.R Rout/plot_Seurat_k_resolution.Rout
 
+## similarities between methods
 plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
 Rscripts/similarities_consensus/plot_similarities_between_methods2.R 
 	mkdir -p $(@D)
 	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
 
+## performance for consensus clusters
+plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
+Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rout/plot_evaluate_performance_cons.Rout
 
 
 ## ------------------------------------------------------------------------------------ ##
@@ -248,10 +256,6 @@ output/ensemble/ensemble.rds Rscripts/ensemble/Comparison_ensemble_by_first.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/Comparison_ensemble_by_first.R Rout/Comparison_ensemble_by_first.Rout
 
-plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
-Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colorscheme.R
-	mkdir -p $(@D)
-	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rout/plot_evaluate_performance_cons.Rout
 
 
 
@@ -268,14 +272,7 @@ Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colors
 ## ------------------------------------------------------------------------------------ ##
 plots/memory_usage/memory_usage.rds: Rscripts/plot_memory_usage.R \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
-	grep "Ncells|Vcells" Rout/* > memory_usage.txt
+	mkdir -p $(@D)
+	grep "Ncells|Vcells" Rout/* > $(@D)/memory_usage.txt
 	$(R) "--args memusetxt='memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
-
-## ------------------------------------------------------------------------------------ ##
-## Investigate parameter range for certain methods
-## ------------------------------------------------------------------------------------ ##
-output/parameter_range_investigation/parameter_range_investigation_Linnorm_Kumar.rds: \
-data/sce_filteredExpr10/sce_filteredExpr10_Kumar.rds \
-Rscripts/investigate_parameter_range/investigate_parameter_range_Linnorm.R
-	$(R) "--args scefile='$<' k=3 outrds='$@'" Rscripts/investigate_parameter_range/investigate_parameter_range_Linnorm.R Rout/investigate_parameter_range_Linnorm.R
 

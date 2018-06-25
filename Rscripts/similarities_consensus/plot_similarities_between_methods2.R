@@ -6,30 +6,26 @@ for (i in 1:length(args)) {
 print(consensusrds)
 print(outrds)
 
-#------------------------------------------------------------
-# Method similarities; based on the consensus, k=truenclust
-#____________________________________________________________
-
 suppressPackageStartupMessages({
-  require(plyr)
-  require(dplyr)
-  require(tidyr)
-  require(clusterExperiment)
-  require(clue)
-  require(multidplyr)
-  require(ggplot2)
-  require(viridis)
-  require(ggthemes)
-  require(pheatmap)
-  require(reshape2)
-  require(mclust)
-  require(RColorBrewer)
-  require(ggtree)
-  require(purrr)
-  require(cowplot)
+  library(plyr)
+  library(dplyr)
+  library(tidyr)
+  library(clusterExperiment)
+  library(clue)
+  library(multidplyr)
+  library(ggplot2)
+  library(viridis)
+  library(ggthemes)
+  library(pheatmap)
+  library(reshape2)
+  library(mclust)
+  library(RColorBrewer)
+  library(ggtree)
+  library(purrr)
+  library(cowplot)
 })
 
-# load files
+# Load files
 res <- readRDS(file = consensusrds)
 
 ### Compare clustering between methods by consensus ARI, k = truenclust
@@ -295,10 +291,9 @@ plot_crossmethod_concordance <- function(res, ncluster) {
                    nrow = 1, rel_widths = c(1.25, 1, 1, 1))
   
   ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
-                        g1 + theme(legend.position = "none"), 
-                        g2 + theme(legend.position = "none"), 
-                        g3 + theme(legend.position = "none"), 
-                        
+                        g1 + theme(legend.position = "none"),
+                        g2 + theme(legend.position = "none"),
+                        g3 + theme(legend.position = "none"),
                         gds + theme(plot.margin = unit(c(0, 0, 0, 15), "mm")), 
                         rel_heights = c(6, 0.75, 0.75 ,0.75 ,0.75, 2), ncol = 1)
   
@@ -314,25 +309,25 @@ plot_crossmethod_concordance <- function(res, ncluster) {
 list.k <- as.list(c(0, 3:11))
 
 # plot 
-list.trees <- lapply(list.k, function(x) {plot_crossmethod_concordance(res, ncluster = x)})
+plots <- lapply(list.k, function(x) {plot_crossmethod_concordance(res, ncluster = x)})
 
 pdf(gsub("\\.rds$", "_median_all.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(list.trees , '[', 2))
+cowplot::plot_grid(plotlist = sapply(plots , '[', 2))
 dev.off()
 
 pdf(gsub("\\.rds$", "_dataset_all.pdf", outrds), width = 50, height = 10)
-cowplot::plot_grid(plotlist = sapply(list.trees , '[', 1), ncol = 2)
+cowplot::plot_grid(plotlist = sapply(plots , '[', 1), ncol = 2)
 dev.off()
 
 pdf(gsub("\\.rds$", "_tree_all.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(list.trees , '[', 3))
+cowplot::plot_grid(plotlist = sapply(plots , '[', 3))
 dev.off()
 
 pdf(gsub("\\.rds$", "_tree_all_truenclust.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(list.trees[1], '[', 3))
+cowplot::plot_grid(plotlist = sapply(plots[1], '[', 3))
 dev.off()
 
-saveRDS(NULL, file = outrds)
+saveRDS(plots, file = outrds)
 date()
 sessionInfo()
 
