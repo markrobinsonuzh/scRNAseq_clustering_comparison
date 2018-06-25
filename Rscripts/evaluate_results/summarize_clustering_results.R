@@ -3,25 +3,16 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
-datasetssmall <- strsplit(datasetssmall, ",")[[1]]
-names(datasetssmall) <- datasetssmall
-datasetsbig <- strsplit(datasetsbig, ",")[[1]]
-names(datasetsbig) <- datasetsbig
+datasets <- strsplit(datasets, ",")[[1]]
+names(datasets) <- datasets
 filterings <- strsplit(filterings, ",")[[1]]
 names(filterings) <- filterings
-methodssmall <- strsplit(methodssmall, ",")[[1]]
-names(methodssmall) <- methodssmall
-methodsbig <- strsplit(methodsbig, ",")[[1]]
-names(methodsbig) <- methodsbig
+methods <- strsplit(methods, ",")[[1]]
+names(methods) <- methods
 
-methods <- union(methodssmall, methodsbig)
-datasets <- union(datasetssmall, datasetsbig)
-
-print(datasetssmall)
-print(datasetsbig)
+print(datasets)
 print(filterings)
-print(methodssmall)
-print(methodsbig)
+print(methods)
 print(outrds)
 
 suppressPackageStartupMessages({
@@ -33,25 +24,25 @@ suppressPackageStartupMessages({
 res <- do.call(rbind, lapply(datasets, function(d) {
   do.call(rbind, lapply(filterings, function(f) {
     do.call(rbind, lapply(methods, function(m) {
-      if ((m %in% methodssmall && d %in% datasetssmall) || 
-          (m %in% methodsbig && d %in% datasetsbig)) {
-        if (m %in% c("Seurat", "pcaReduce", "TSCAN")) {
-          x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
-          x$timings$timing <- rowSums(x$timings[, c("user.self", "sys.self", 
-                                                    "user.child", "sys.child")])
-        } else {
-          x <- readRDS(paste0("results3.4/sce_", f, "_", d, "_", m, ".rds"))
-        }
-        dplyr::full_join(x$assignments %>%
-                           dplyr::select(dataset, method, cell, run, k, resolution, cluster, trueclass),
-                         x$k_estimates %>%
-                           dplyr::select(dataset, method, run, k, resolution, est_k)
-        ) %>%
-          dplyr::full_join(x$timings %>% dplyr::select(dataset, method, run, k, resolution, timing))
-      }
+      message(paste0(f, "_", d, "_", m))
+      x <- readRDS(paste0("results/sce_", f, "_", d, "_", m, ".rds"))
+      dplyr::full_join(x$assignments %>%
+                         dplyr::select(dataset, method, cell, run, k, resolution, cluster, trueclass),
+                       x$k_estimates %>%
+                         dplyr::select(dataset, method, run, k, resolution, est_k)
+      ) %>%
+        dplyr::full_join(x$timings %>% dplyr::select(dataset, method, run, k, resolution, elapsed))
     }))
   }))
 }))
+
+## Save individual results (for each dataset/filtering)
+for (d in datasets) {
+  for (f in filterings) {
+    saveRDS(res %>% dplyr::filter(dataset == paste0("sce_", f, "_", d)),
+            file = gsub("\\.rds$", paste0("_", f, "_", d, ".rds"), outrds))
+  }
+}
 
 saveRDS(res, file = outrds)
 
