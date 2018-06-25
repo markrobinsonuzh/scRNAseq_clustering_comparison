@@ -50,13 +50,14 @@ plots[["diff_kmax_ktrue"]] <-
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.2, stackratio = 1) +
   theme_bw() +
   manual.scale +
-  labs(title = "Difference between k giving maximal performance and true k") +
+  labs(title = "Difference between k giving maximal performance and true k", x="", y="Difference in k") +
   theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 1)) +
   facet_grid(~ filtering, scales = "free") +
   theme(axis.text = element_text(size = 15),
         axis.title = element_text(size = 15),
         legend.text = element_text(size = 15),
-        strip.text = element_text(size = 16))
+        strip.text = element_text(size = 16),
+        legend.position = "none")
 
 ## Calculate the difference between the estimated and true number of clusters
 diff_estnclust <- res_summary %>%  
@@ -71,15 +72,15 @@ plots[["diff_kest_ktrue"]] <-
   geom_boxplot() + 
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.1, stackratio = 1) +
   theme_bw() +
-  labs(title = "Difference between estimated and true k", 
-       xlab = "method", ylab = "Difference in k") +
+  labs(title = "Difference between estimated and true k", x="", y="Difference in k") +
   manual.scale +
   facet_wrap(~filtering, scales="free_x")+
   theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 1),
         axis.text = element_text(size = 15),
         axis.title = element_text(size = 15),
         legend.text = element_text(size = 15),
-        strip.text = element_text(size = 16))
+        strip.text = element_text(size = 16),
+        legend.position = "none")
 
 pdf(gsub("rds$", "pdf", outrds), width = 12, height = 7)
 print(plots[["diff_kmax_ktrue"]])
