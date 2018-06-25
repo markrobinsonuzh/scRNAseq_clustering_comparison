@@ -29,7 +29,7 @@ plots <- list()
 # ------------------------------------
 # compute ARI, no of unique clusters, no of estimated k, median time
 # ------------------------------------
-res_summary <- res %>% dplyr::group_by(dataset, method, run, k) %>%
+res_summary <- res %>% dplyr::group_by(dataset, method, k) %>%
   dplyr::summarize(ARI = mclust::adjustedRandIndex(consensus, trueclass),
                    truenclust = length(unique(trueclass)),
                    estnclust = unique(est_k)) %>%
@@ -37,13 +37,13 @@ res_summary <- res %>% dplyr::group_by(dataset, method, run, k) %>%
   dplyr::select(-sce) %>% dplyr::ungroup()
 
 # --------------------------------------
-# ## Calculate performance indices for each method and clustering run
+# ## Calculate performance indices for each method
 # --------------------------------------
 plots[["consensus_ari"]] <- 
   ggplot(res_summary, 
          aes(x = k, y = ARI, group = method, color = method)) + 
   geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
-  geom_line(size=1) + 
+  geom_line(size = 1) + 
   theme_bw() +
   scale_color_brewer(palette = "Set3" )  +
   facet_grid(filtering ~ dataset, scales = "free_x")

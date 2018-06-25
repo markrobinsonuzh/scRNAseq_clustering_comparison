@@ -65,7 +65,10 @@ res_consclue <- do.call(rbind, mclapply(ds, function(d) {
       if (nrow(tmp) > 0)
         tmp %>% dplyr::select(dataset, method, cell, k, resolution, 
                               trueclass, est_k, elapsed) %>% 
-        dplyr::left_join(cons.clue(tmp), by = "cell")
+        dplyr::left_join(cons.clue(tmp), by = "cell") %>% 
+        dplyr::mutate(elapsed = median(elapsed),
+                      est_k = median(est_k)) %>%
+        dplyr::distinct()  ## only need to keep one of the five rows corresponding to the different runs
     }))
   }))
 }, mc.preschedule = FALSE, mc.cores = ncores))
@@ -76,7 +79,10 @@ res_consclue_seurat <- do.call(rbind, mclapply(ds, function(d) {
     if (nrow(tmp) > 0)
       tmp %>% dplyr::select(dataset, method, cell, k, resolution, 
                             trueclass, est_k, elapsed) %>% 
-      dplyr::left_join(cons.clue(tmp), by = "cell")
+      dplyr::left_join(cons.clue(tmp), by = "cell") %>% 
+      dplyr::mutate(elapsed = median(elapsed),
+                    est_k = median(est_k)) %>%
+      dplyr::distinct()  ## only need to keep one of the five rows corresponding to the different runs
   }))
 }, mc.preschedule = FALSE, mc.cores = ncores))
 

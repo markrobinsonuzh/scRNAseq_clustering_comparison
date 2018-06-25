@@ -23,6 +23,7 @@ suppressPackageStartupMessages({
   library(ggtree)
   library(purrr)
   library(cowplot)
+  library(ape)
 })
 
 # Load files
@@ -306,7 +307,7 @@ plot_crossmethod_concordance <- function(res, ncluster) {
 }
 
 # all
-list.k <- as.list(c(0, 3:11))
+list.k <- as.list(c(0, 3:10))
 
 # plot 
 plots <- lapply(list.k, function(x) {plot_crossmethod_concordance(res, ncluster = x)})

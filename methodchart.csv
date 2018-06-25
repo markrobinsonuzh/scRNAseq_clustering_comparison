@@ -1,0 +1,14 @@
+method;dimension;clustering;counts
+PCAHC;PCA;hc;lognorm
+pcaReduce;PCA;kmeans;lognorm
+CIDR;PCA;hc;raw
+FlowSOM;PCA;graph;lognorm
+PCAKmeans;PCA;kmeans;lognorm
+RtsneKmeans;tSNE;kmeans;lognorm
+SC3;PCA;kmeans;lognorm
+SC3svm;PCA;svm;lognorm
+SIMLR;;kmeans;lognorm
+TSCAN;;;lognorm
+Seurat;PCA;graph;raw
+RaceID2;;kmeans;raw
+ascend;;;

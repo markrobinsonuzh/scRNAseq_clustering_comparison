@@ -7,11 +7,6 @@ print(ensemblerds)
 print(clusteringsummary)
 print(outrds)
 
-# ------------------------------------------------------------------------
-# Comparing ensemble clusterings, 
-# against best performing method per dataset and k
-# ------------------------------------------------------------------------
-
 suppressPackageStartupMessages({
   library(dplyr)
   library(tidyr)
@@ -25,9 +20,12 @@ suppressPackageStartupMessages({
   library(ggtree)
 })
 
-## Read clustering and ensemble results
+## Read clustering results
 res_ensmbl2 <- readRDS(file = ensemblerds)
 res_summary <- readRDS(file = clusteringsummary)
+
+## Initialize list to hold plots
+plots <- list()
 
 # ------------------------------------
 # compute ARI, no of unique clusters
@@ -35,55 +33,52 @@ res_summary <- readRDS(file = clusteringsummary)
 sum_ensmbl2 <- res_ensmbl2 %>% dplyr::group_by(dataset, method, run, k) %>%
   dplyr::summarize(ARIensmbl = mclust::adjustedRandIndex(cons_cluster, trueclass),
                    truenclust = length(unique(trueclass))) %>%
-  tidyr::separate(method, sep="[[:punct:]]", into = c("methone", "methtwo"), remove = FALSE) %>% 
+  tidyr::separate(method, sep = "[[:punct:]]", into = c("methone", "methtwo"), remove = FALSE) %>% 
   dplyr::ungroup()
 
 sum_summary <- res_summary %>% dplyr::group_by(dataset, method, run, k) %>%
-               dplyr::summarize(ARI = mclust::adjustedRandIndex(cluster, trueclass), 
-                                truenclust = length(unique(trueclass))) 
-
-# format
+  dplyr::summarize(ARI = mclust::adjustedRandIndex(cluster, trueclass),
+                   truenclust = length(unique(trueclass))) 
 sum_ensmbl2$run <- as.integer(sum_ensmbl2$run)
-sum_summary$k <- as.factor(sum_summary$k)
 
 # join datasets
-sum_all2 <- left_join(sum_ensmbl2, sum_summary, by = c( "dataset", "methone" = "method", "run", "k"))
-colnames(sum_all2) <- c(
-  "dataset",
-  "method.ensmbl",
-  "methone",
-  "methtwo",
-  "run",
-  "k",
-  "ARIensmbl",
-  "truenclustz",
-  "ARIone",
-  "truenclust.y")
-sum_all3 <-  left_join(sum_all2, sum_summary, by = c("dataset", "methtwo" = "method", "run", "k"))
-colnames(sum_all3) <- c(
-  "dataset",
-  "method.ensmbl",
-  "methone",
-  "methtwo",
-  "run",
-  "k",
-  "ARIensmbl",
-  "truenclustz",
-  "ARIone",
-  "truenclust.y",
-  "ARItwo")
-sum_all3 <- select(sum_all3, 1:11)
+sum_all <- left_join(sum_ensmbl2, sum_summary, 
+                      by = c("dataset", "methone" = "method", "run", "k", "truenclust")) %>%
+  dplyr::rename(method.ensmbl = method, ARIone = ARI) %>% 
+  mutate(ARIdiff1 = ARIensmbl - ARIone)
+sum_all2 <- left_join(sum_all, sum_summary, 
+                      by = c("dataset", "methtwo" = "method", "run", "k", "truenclust")) %>% 
+  dplyr::rename(ARItwo = ARI)
 
-#rename, compute difference 1 based on the best method (best method defined as method with max in median per run per k) per dataset
-# median ARI of method one
+# compute median
+res_median <- sum_all %>% dplyr::group_by(dataset, method.ensmbl, 
+                                          k, truenclust, methone, methtwo) %>% 
+  dplyr::summarize(ARIensmbl = median(ARIensmbl), 
+                   ARIone = median(ARIone), ARIdiff1 = median(ARIdiff1))
 
-sum_max <- sum_all3 %>% select(dataset, methone, methtwo, k, ARIensmbl,run,
-                               ARIone, ARItwo, truenclust.y) %>%
+plots[["ensembl_vs_first_allk"]] <- 
+  ggplot(res_median, aes(ARIdiff1)) +
+  geom_histogram() +
+  facet_grid(methone ~ methtwo, scales = "free") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = 2) +
+  theme(axis.text.x = element_text(size = 6)) +
+  labs(title = "Difference single method vs ensemble, all k")
+
+plots[["ensembl_vs_first_truek"]] <- 
+  ggplot(res_median %>% filter(k == truenclust), aes(ARIdiff1)) +
+  geom_histogram() +
+  facet_grid(methone ~ methtwo, scales = "free") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = 2) +
+  theme(axis.text.x = element_text(size = 6)) +
+  labs(title = "Difference single method vs ensemble, truenclust")
+
+sum_max <- sum_all2 %>% select(dataset, methone, methtwo, k, ARIensmbl, run,
+                               ARIone, ARItwo, truenclust) %>%
   group_by(dataset, methone, methtwo, k) %>% 
   summarise(med.ARIone = median(ARIone, na.rm = TRUE),
             med.ARItwo = median(ARItwo, na.rm = TRUE),
             med.ensemble = median(ARIensmbl, na.rm = TRUE),
-            truenclust = unique(truenclust.y)) %>% ungroup()
+            truenclust = unique(truenclust)) %>% ungroup()
 
 # best method per ensemble
 # diff
@@ -96,15 +91,10 @@ df.long <- reshape2::melt(sum_max2, id = c("dataset", "methone", "methtwo",
                                            "med.ARItwo", "med.ensemble", "best", "worst"))
 df.long2 <- df.long %>% mutate(ARI = case_when(variable == "diff.best" ~ best,
                                                variable == "diff.worst" ~ worst))
-# best method per k and dataset 
-
-# ------------------------------------
-# Plot
-# ------------------------------------
-pdf(gsub("rds$", "pdf", outrds), width = 10, height = 7)
 
 # plot histo of differences in ARI, by the two methods 
-ggplot(df.long2 %>% filter() , aes(variable, value)) +
+plots[["ensembl_vs_bestworst_allk"]] <- 
+  ggplot(df.long2 %>% filter() , aes(variable, value)) +
   geom_point(position = "jitter", alpha = 0.2, aes(color = ARI)) +
   geom_boxplot(alpha = 0.5) +
   theme_bw() +
@@ -117,7 +107,8 @@ ggplot(df.long2 %>% filter() , aes(variable, value)) +
         axis.title = element_text(size = 15)) +
   scale_x_discrete(labels = c("diff.best" = "ensemble-best", "diff.worst" = "ensemble-worst"))
 
-ggplot(df.long2 %>% filter(k == truenclust), aes(variable, value)) +
+plots[["ensembl_vs_bestworst_truek"]] <- 
+  ggplot(df.long2 %>% filter(k == truenclust), aes(variable, value)) +
   geom_point(position = "jitter", alpha = 0.2, aes(color = ARI)) +
   geom_boxplot(alpha = 0.5) +
   geom_hline(yintercept = 0, linetype = "dashed") +
@@ -130,8 +121,14 @@ ggplot(df.long2 %>% filter(k == truenclust), aes(variable, value)) +
         axis.title = element_text(size = 15)) +
   scale_x_discrete(labels = c("diff.best" = "ensemble-best", "diff.worst" = "ensemble-worst"))
 
+pdf(gsub("rds$", "pdf", outrds), width = 12, height = 12)
+plots[["ensembl_vs_first_allk"]]
+plots[["ensembl_vs_first_truek"]]
+plots[["ensembl_vs_bestworst_allk"]]
+plots[["ensembl_vs_bestworst_truek"]]
 dev.off()
 
-saveRDS(NULL, outrds)
+saveRDS(plots, file = outrds)
+
 date()
 sessionInfo()

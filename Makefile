@@ -26,8 +26,9 @@ cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASET
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
-plots/performance/seurat_diagnostics.rds plots/similarities_between_methods/similarities.rds \
-plots/performance/res_performance_cons.rds
+plots/performance/seurat_diagnostics.rds \
+plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
+plots/similarities_between_methods/similarities.rds 
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -228,6 +229,12 @@ Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colors
 	mkdir -p $(@D)
 	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rout/plot_evaluate_performance_cons.Rout
 
+## ensembles vs individual methods
+plots/ensemble/ensemble_vs_individual.rds: output/clustering_summary/clustering_summary.rds \
+output/ensemble/ensemble.rds Rscripts/ensemble/plot_ensemble_vs_individual.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/plot_ensemble_vs_individual.R Rout/plot_ensemble_vs_individual.Rout
+
 
 ## ------------------------------------------------------------------------------------ ##
 ## Manuscript figures
@@ -246,15 +253,7 @@ plots/performance/difference_in_k.rds plots/runtime/runtime.rds Rscripts/manuscr
 
 
 
-plots/ensemble/plot_ensembles_differences_bestworst.rds: output/clustering_summary/clustering_summary.rds \
-output/ensemble/ensemble.rds Rscripts/ensemble/Comparison_ensemble_by_bestworst.R 
-	mkdir -p $(@D)
-	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/Comparison_ensemble_by_bestworst.R Rout/Comparison_ensemble_by_bestworst.Rout
 
-plots/ensemble/plot_diff_ensemble.rds: output/clustering_summary/clustering_summary.rds \
-output/ensemble/ensemble.rds Rscripts/ensemble/Comparison_ensemble_by_first.R
-	mkdir -p $(@D)
-	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/Comparison_ensemble_by_first.R Rout/Comparison_ensemble_by_first.Rout
 
 
 
