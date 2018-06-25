@@ -25,7 +25,8 @@ cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASET
 
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
 
-plots: plots/performance/performance_by_k.rds
+figs: plots/performance/res_performance_by_k.rds \
+plots/performance/plot_stability.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -178,19 +179,60 @@ output/ensemble/ensemble.rds: output/clustering_summary/clustering_summary.rds R
 ## ------------------------------------------------------------------------------------ ##
 ## Plot performance
 ## ------------------------------------------------------------------------------------ ##
-figures/performance_by_k.rds: output/clustering_summary/clustering_summary.rds Rscripts/evaluate_results/plot_evaluate_performance_by_k.R
+plots/performance/res_performance_by_k.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_evaluate_performance_by_k.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_evaluate_performance_by_k.R Rout/plot_evaluate_performance_by_k.Rout
 
+plots/performance/plot_stability.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/Stability_per_method.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/Stability_per_method.R Rout/Stability_per_method.Rout
+
+plots/performance/plot_entropy_by_k.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_entropy.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_entropy.R Rout/plot_entropy.Rout
+
+plots/performance/difference_in_k1.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_differences_by_k.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_differences_by_k.R Rout/plot_differences_by_k.Rout
+
+plots/performance/res_Seurat_k_resolution.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_Seurat_k_resolution.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_Seurat_k_resolution.R Rout/plot_Seurat_k_resolution.Rout
+
+plots/ensemble/plot_ensembles_differences_bestworst.rds: output/clustering_summary/clustering_summary.rds \
+output/ensemble/ensemble.rds Rscripts/ensemble/Comparison_ensemble_by_bestworst.R 
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/Comparison_ensemble_by_bestworst.R Rout/Comparison_ensemble_by_bestworst.Rout
+
+plots/ensemble/plot_diff_ensemble.rds: output/clustering_summary/clustering_summary.rds \
+output/ensemble/ensemble.rds Rscripts/ensemble/Comparison_ensemble_by_first.R
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/Comparison_ensemble_by_first.R Rout/Comparison_ensemble_by_first.Rout
+
+plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
+Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_evaluate_performance_cons.R Rout/plot_evaluate_performance_cons.Rout
+
+plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
+Rscripts/similarities_consensus/plot_similarities_between_methods2.R 
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
 
 
 
 
-## ------------------------------------------------------------------------------------ ##
-## Plot performance
-## ------------------------------------------------------------------------------------ ##
-plots/performance/performance_by_k.rds: output/clustering_summary/clustering_summary.rds \
-Rscripts/evaluate_results/plot_performance_by_k.R
-	$(R) "--args summaryrds='$<' outrds='$@'" Rscripts/evaluate_results/plot_performance_by_k.R Rout/plot_performance_by_k.Rout
+
+
+
+
+
+
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plot memory usage
