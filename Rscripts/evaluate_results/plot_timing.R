@@ -78,9 +78,19 @@ plots[["time_normalized_by_tsne"]] <-
   theme(legend.position = "none") +
   theme(strip.text = element_text(size = 16))
 
+plots[["time_by_k"]] <- 
+  ggplot(res_summary, aes(x = k, y = elapsed, group = method, color = method)) + 
+  geom_smooth() + 
+  facet_grid(filtering ~ dataset, scales = "free") + 
+  manual.scale +
+  scale_y_log10() +
+  labs(title="Elapsed runtime by k", y="elapsed time (s)")
+
+
 pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
 print(plots[["time_boxplot_perds"]])
 print(plots[["time_normalized_by_tsne"]])
+print(plots[["time_by_k"]])
 dev.off()
 
 saveRDS(plots, file = outrds)

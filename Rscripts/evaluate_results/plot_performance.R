@@ -77,9 +77,34 @@ plots[["median_ari_heatmap_truek"]] <-
         axis.ticks = element_blank(),
         strip.text = element_text(size = 20))
 
+plots[["median_ari_heatmap_estnclust"]] <- 
+  ggplot(res_summary %>% dplyr::filter(k == estnclust) %>%
+           dplyr::group_by(dataset, filtering, method, k) %>%
+           dplyr::summarize(medianARI = median(ARI)),
+         aes(x = reorder(method, medianARI, FUN = mean, na.rm = TRUE), 
+             y = reorder(dataset, medianARI, FUN = mean, na.rm = TRUE), 
+             fill = medianARI)) +
+  geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
+  facet_wrap(~ filtering) +
+  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  theme_tufte(base_family = "Helvetica") +
+  labs(x = NULL, y = NULL, title = "") +
+  coord_equal() +
+  theme(axis.text.x = element_text(size = 18, angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.title.align = 1,
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        legend.key.size = unit(2, "cm"),
+        legend.key.width = unit(0.5, "cm"),
+        axis.ticks = element_blank(),
+        strip.text = element_text(size = 20))
+
 pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
 print(plots[["median_ari_vs_k"]])
 print(plots[["median_ari_heatmap_truek"]])
+print(plots[["median_ari_heatmap_estnclust"]])
 dev.off()
 
 saveRDS(plots, file = outrds)
