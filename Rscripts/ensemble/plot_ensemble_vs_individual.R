@@ -62,7 +62,8 @@ plots[["ensembl_vs_first_allk"]] <-
   facet_grid(methone ~ methtwo, scales = "free") +
   geom_vline(xintercept = 0, linetype = "dashed", colour = 2) +
   theme(axis.text.x = element_text(size = 6)) +
-  labs(title = "Difference single method vs ensemble, all k")
+  labs(title = "Difference single method vs ensemble, all k",
+       x = "Difference ARI")
 
 plots[["ensembl_vs_first_truek"]] <- 
   ggplot(res_median %>% filter(k == truenclust), aes(ARIdiff1)) +
@@ -70,7 +71,8 @@ plots[["ensembl_vs_first_truek"]] <-
   facet_grid(methone ~ methtwo, scales = "free") +
   geom_vline(xintercept = 0, linetype = "dashed", colour = 2) +
   theme(axis.text.x = element_text(size = 6)) +
-  labs(title = "Difference single method vs ensemble, truenclust")
+  labs(title = "Difference single method vs ensemble, truenclust",
+       x = "Difference ARI")
 
 sum_max <- sum_all2 %>% select(dataset, methone, methtwo, k, ARIensmbl, run,
                                ARIone, ARItwo, truenclust) %>%
