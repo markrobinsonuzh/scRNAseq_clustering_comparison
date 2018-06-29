@@ -8,7 +8,8 @@ datasets <- c("Kumar", "Trapnell" ,"Koh",
            "Zhengmix4eq", "Zhengmix4uneq" ,"Zhengmix8eq")
 filterings <-  c("filteredExpr10","filteredHVG10", "filteredM3Drop10")
 
-dir <-"data/"
+dir <-"/Volumes/Shared/data/seq/scRNAseq_clustering_comparison/data/"
+
 # load full data
 list.full <-as.list( paste0(dir,"sce_full/","sce_full_", datasets, ".rds") )
 names(list.full) <- datasets
@@ -20,24 +21,13 @@ ngenes <- sapply(full_data, function(x) nrow(x)) # nfeatures
 mcounts <-sapply(full_data, function(x) median(x$total_counts, na.rm = TRUE)/1e6) # median counts per cell (Mio)
 mgenes <- sapply(full_data, function(x) median(x$total_features, na.rm = TRUE))# median features per cell, genes with zero expression excluded
 npop <- sapply(full_data, function(x) length( unique(SummarizedExperiment::colData(x)$phenoid) ) )# n populations per dataset
-# compute silhouette widths
-# Eucl. distances from transposed count matrix
-s <- lapply(full_data,function(x) {
 
-  d <- dist( t(scater::exprs(x))) 
-  s <- cluster::silhouette(
-    as.integer(
-      as.factor(
-        colData(x)$phenoid)),
-    d)
-  ssum <- summary(s)
-  return(ssum)
-  })
-# save sum silhouette obj
-saveRDS(s, file = "res_silhouette.rds")
+# avg.silhoutte width
+readRDS(file = "res_silhouette.rds")
+avg.s <- sapply(s,function(x)x$avg.width)
 
 # table
-tbl <- cbind(ncells, mcounts, mgenes,ngenes, npop)
+tbl <- cbind(ncells, mcounts, mgenes,ngenes, npop, avg.s )
 
 print( xtable::xtable(tbl) )
 write.csv(tbl, file="tbldata.csv")
