@@ -25,7 +25,7 @@ cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASET
 
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds
 
-figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
+figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
@@ -275,6 +275,9 @@ plots/performance/difference_in_k.rds plots/runtime/runtime.rds Rscripts/manuscr
 	mkdir -p $(@D)
 	$(R) "--args stabilityrds='$(word 1,$^)' entropyrds='$(word 2,$^)' diffrds='$(word 3,$^)' timerds='$(word 4,$^)' outrds='$@'" Rscripts/manuscript/plot_figure2.R Rout/plot_figure2.Rout
 
+plots/manuscript/figure3.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts/manuscript/plot_figure3.R
+	mkdir -p $(@D)
+	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure3.R Rout/plot_figure3.Rout
 
 
 

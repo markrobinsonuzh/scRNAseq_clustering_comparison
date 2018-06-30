@@ -3,13 +3,16 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
+print(ensemblerds)
+print(outrds)
+
 suppressPackageStartupMessages({
   library(cowplot)
 })
 
-ensemble <- readRDS("plots/ensemble/ensemble_vs_individual.rds")
+ensemble <- readRDS(ensemblerds)
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
 cowplot::plot_grid(
   ensemble[["ensembl_vs_bestworst_truek"]],
   ensemble[["ensembl_vs_first_truek"]],
