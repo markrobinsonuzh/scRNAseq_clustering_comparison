@@ -14,7 +14,7 @@ ncores := 12
 .PHONY: all prepare_data cluster
 
 ## Define rules
-all: cluster
+all: prepare_data cluster summarise figs memoryusage
 
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
@@ -23,7 +23,8 @@ cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATAS
 
 cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds
+summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
+output/dataset_summarytable.csv
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
 plots/performance/seurat_diagnostics.rds \
@@ -189,6 +190,16 @@ output/silhouettes/silhouettes.rds: $(foreach d,$(DATASETS),data/sce_full/sce_fu
 Rscripts/evaluate_datasets/compute_avg_silhouette_width.R
 	mkdir -p $(@D)
 	$(R) "--args datadir='data' datasets='$(DATASETSc)' ncores=$(ncores) outrds='$@'" Rscripts/evaluate_datasets/compute_avg_silhouette_width.R Rout/compute_avg_silhouette_width.Rout
+
+## ------------------------------------------------------------------------------------ ##
+## Summarize dataset characteristics in table
+## ------------------------------------------------------------------------------------ ##
+output/dataset_summarytable.csv: output/silhouettes/silhouettes.rds \
+$(foreach d,$(DATASETS),data/sce_full/sce_full_$(d).rds) \
+$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
+Rscripts/manuscript_tables/table_datasets.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 silhouetterds='$<' outcsv='$@'" Rscripts/manuscript_tables/table_datasets.R Rout/table_datasets.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plots

@@ -1,44 +1,59 @@
 # Overview Table for datasets
-library(cluster)
-library(scater)
+args <- (commandArgs(trailingOnly = TRUE))
+for (i in 1:length(args)) {
+  eval(parse(text = args[[i]]))
+}
 
-datasets <- c("Kumar", "Trapnell" ,"Koh",
-           "SimKumar4easy", "SimKumar4hard", "SimKumar8hard", 
-           "KohTCC", "TrapnellTCC", "KumarTCC", 
-           "Zhengmix4eq", "Zhengmix4uneq" ,"Zhengmix8eq")
-filterings <-  c("filteredExpr10","filteredHVG10", "filteredM3Drop10")
+filterings <- strsplit(filterings, ",")[[1]]
+datasets <- strsplit(datasets, ",")[[1]]
+names(datasets) <- datasets
 
-dir <-"data/"
-# load full data
-list.full <-as.list( paste0(dir,"sce_full/","sce_full_", datasets, ".rds") )
-names(list.full) <- datasets
-full_data <- lapply(list.full, function(x) readRDS(x)  )
+print(filterings)
+print(pctkeep)
+print(datasets)
+print(datadir)
+print(silhouetterds)
+print(outcsv)
 
-# number of cells, number of features per dataset, median counts per cell, median gnees per cell, number of suppopulations
-ncells <- sapply(full_data, function(x) ncol(x)) # ncell
-ngenes <- sapply(full_data, function(x) nrow(x)) # nfeatures
-mcounts <-sapply(full_data, function(x) median(x$total_counts, na.rm = TRUE)/1e6) # median counts per cell (Mio)
-mgenes <- sapply(full_data, function(x) median(x$total_features, na.rm = TRUE))# median features per cell, genes with zero expression excluded
-npop <- sapply(full_data, function(x) length( unique(SummarizedExperiment::colData(x)$phenoid) ) )# n populations per dataset
-# compute silhouette widths
-# Eucl. distances from transposed count matrix
-s <- lapply(full_data,function(x) {
+suppressPackageStartupMessages({
+  library(scater)
+  library(parallel)
+})
 
-  d <- dist( t(scater::exprs(x))) 
-  s <- cluster::silhouette(
-    as.integer(
-      as.factor(
-        colData(x)$phenoid)),
-    d)
-  ssum <- summary(s)
-  return(ssum)
-  })
-# save sum silhouette obj
-saveRDS(s, file = "res_silhouette.rds")
+datasets_filtered <- c(outer(paste0(datadir, "/sce_filtered", filterings, pctkeep, "/sce_filtered", 
+                                    filterings, pctkeep), 
+                             paste0(datasets, ".rds"),
+                             FUN = paste, sep = "_"))
+names(datasets_filtered) <- gsub("\\.rds", "", basename(datasets_filtered))
 
-# table
-tbl <- cbind(ncells, mcounts, mgenes,ngenes, npop)
+datasets_full <- paste0(datadir, "/sce_full/sce_full_", datasets, ".rds")
+names(datasets_full) <- gsub("\\.rds", "", basename(datasets_full))
 
-print( xtable::xtable(tbl) )
-write.csv(tbl, file="tbldata.csv")
+all_data <- lapply(c(datasets_filtered, datasets_full), function(x) {
+  readRDS(x)
+})
 
+## number of cells, number of features per dataset, median counts per cell,
+## median genes per cell, number of suppopulations
+tbl <- do.call(rbind, lapply(names(all_data), function(nm) {
+  x <- all_data[[nm]]
+  data.frame(dataset = nm,
+             ncells = ncol(x),
+             ngenes = nrow(x),
+             mediancount = median(colSums(counts(x)), na.rm = TRUE),
+             mediangenes = median(colSums(counts(x) != 0), na.rm = TRUE),
+             npop = length(unique(colData(x)$phenoid)),
+             stringsAsFactors = FALSE)
+}))
+
+
+## avg.silhoutte width
+silh <- readRDS(file = silhouetterds)
+avg.s <- sapply(s, function(x) x$avg.width)
+
+## table
+tbl <- tbl %>% dplyr::left_join(avg.s)
+
+write.csv(tbl, file = outcsv)
+date()
+sessionInfo()

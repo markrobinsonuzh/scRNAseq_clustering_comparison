@@ -98,10 +98,11 @@ plots[["normentropy_allds_allk"]] <-
   theme(legend.position = "none") +
   labs(x = "method", y = expression("normalised entropy" *" "* frac(H, H[max])),
        title = "normalised entropy all datasets, all k") 
+
 # Difference to truth at truenclust
 plots[["deltaentropy_at_truth"]] <- 
-  ggplot(data = res_entropy %>% filter(k == truenclust)%>%
-           mutate(ds=s-s.true), 
+  ggplot(data = res_entropy %>% filter(k == truenclust) %>%
+           mutate(ds = s - s.true), 
          aes(x = method, y = ds, group = method, color = method)) +       
   geom_boxplot() +
   geom_hline(aes(yintercept = 0), linetype = "dashed") +
@@ -111,11 +112,12 @@ plots[["deltaentropy_at_truth"]] <-
   theme(axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1),
         legend.position = "none") +
   labs(x = "method", y = "entropy", 
-       title = "difference entropy at truth, k=truenclust") 
-# Difference to truth at truenclust
+       title = "difference entropy at truth, k = truenclust")
+
+# Difference to truth at truenclust, normalized entropy
 plots[["deltanormentropy_at_truth"]] <- 
-  ggplot(data = res_entropy %>% filter(k == truenclust)%>%
-           mutate(ds.norm=s.norm-s.true.norm), 
+  ggplot(data = res_entropy %>% filter(k == truenclust) %>%
+           mutate(ds.norm = s.norm - s.true.norm), 
          aes(x = method, y = ds.norm, group = method, color = method)) +       
   geom_boxplot() +
   geom_hline(aes(yintercept = 0), linetype = "dashed") +
