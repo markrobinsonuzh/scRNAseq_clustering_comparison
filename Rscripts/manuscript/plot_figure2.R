@@ -22,7 +22,7 @@ pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
 cowplot::plot_grid(
   stability[["stability_heatmap_truek"]], 
   cowplot::plot_grid(
-    entropy[["normentropy_allds_allk"]],
+    entropy[["deltanormentropy_at_truth"]],
     differences[["diff_kmax_ktrue"]],
     timing[["time_normalized_by_tsne"]], 
     labels = c("B", "C", "D"), nrow = 1

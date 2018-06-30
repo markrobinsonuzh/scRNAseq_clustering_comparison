@@ -98,6 +98,32 @@ plots[["normentropy_allds_allk"]] <-
   theme(legend.position = "none") +
   labs(x = "method", y = expression("normalised entropy" *" "* frac(H, H[max])),
        title = "normalised entropy all datasets, all k") 
+# Difference to truth at truenclust
+plots[["deltaentropy_at_truth"]] <- 
+  ggplot(data = res_entropy %>% filter(k == truenclust)%>%
+           mutate(ds=s-s.true), 
+         aes(x = method, y = ds, group = method, color = method)) +       
+  geom_boxplot() +
+  geom_hline(aes(yintercept = 0), linetype = "dashed") +
+  facet_grid(. ~ dataset, scale = "free") +
+  manual.scale +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1),
+        legend.position = "none") +
+  labs(x = "method", y = "entropy", 
+       title = "difference entropy at truth, k=truenclust") 
+# Difference to truth at truenclust
+plots[["deltanormentropy_at_truth"]] <- 
+  ggplot(data = res_entropy %>% filter(k == truenclust)%>%
+           mutate(ds.norm=s.norm-s.true.norm), 
+         aes(x = method, y = ds.norm, group = method, color = method)) +       
+  geom_boxplot() +
+  geom_hline(aes(yintercept = 0), linetype = "dashed") +
+  manual.scale +
+  theme_bw() +
+  theme(legend.position= "none",
+        axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1)) +
+  labs(x = "", y = expression("difference normalised entropy" *" "* frac(H, H[max]))) 
 
 pdf(gsub("rds$", "pdf", outrds), width = 12, height = 6)
 print(plots[["entropy_byds_byk"]])
@@ -105,6 +131,9 @@ print(plots[["entropy_vs_ari_byds"]])
 print(plots[["normentropy_by_ds"]])
 print(plots[["normentropy_allds_truek"]])
 print(plots[["normentropy_allds_allk"]])
+print(plots[["deltaentropy_at_truth"]])
+print(plots[["deltanormentropy_at_truth"]])
+
 dev.off()
 
 saveRDS(plots, file = outrds)
