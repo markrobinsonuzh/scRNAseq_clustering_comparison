@@ -23,12 +23,13 @@ cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATAS
 
 cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
+summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
-plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds
+plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
+plots/facets_clustering/facets_clustering.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -164,19 +165,30 @@ $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),$(ev
 ## ------------------------------------------------------------------------------------ ##
 output/clustering_summary/clustering_summary.rds: Rscripts/evaluate_results/summarize_clustering_results.R \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+	mkdir -p $(@D)
 	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Compute consensus
 ## ------------------------------------------------------------------------------------ ##
 output/consensus/consensus.rds: output/clustering_summary/clustering_summary.rds Rscripts/similarities_consensus/compute_consensus.R
+	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ncores=$(ncores) outrds='$@'" Rscripts/similarities_consensus/compute_consensus.R Rout/compute_consensus.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Compute ensembles
 ## ------------------------------------------------------------------------------------ ##
 output/ensemble/ensemble.rds: output/clustering_summary/clustering_summary.rds Rscripts/ensemble/compute_ensemble.R
+	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ncores=$(ncores) outrds='$@'" Rscripts/ensemble/compute_ensemble.R Rout/compute_ensemble.Rout
+
+## ------------------------------------------------------------------------------------ ##
+## Compute silhouette widths for full data sets
+## ------------------------------------------------------------------------------------ ##
+output/silhouettes/silhouettes.rds: $(foreach d,$(DATASETS),data/sce_full/sce_full_$(d).rds) \
+Rscripts/evaluate_datasets/compute_avg_silhouette_width.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' ncores=$(ncores) outrds='$@'" Rscripts/evaluate_datasets/compute_avg_silhouette_width.R Rout/compute_avg_silhouette_width.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plots
@@ -240,6 +252,13 @@ $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sc
 Rscripts/evaluate_datasets/plot_shared_genes_venn.R
 	mkdir -p $(@D)
 	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 outrds='$@'" Rscripts/evaluate_datasets/plot_shared_genes_venn.R Rout/plot_shared_genes_venn.Rout
+
+plots/facets_clustering/facets_clustering.rds: output/clustering_summary/clustering_summary.rds \
+$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
+Rscripts/evaluate_results/plot_facets_of_clustering_tSNE.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_facets_of_clustering_tSNE.R Rout/plot_facets_of_clustering_tSNE.Rout
+
 
 
 

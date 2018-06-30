@@ -1,36 +1,41 @@
-#________________________________
-#Compute silhouette widths for datasets
-#_________________________________
-library(cluster)
-library(scater)
+args <- (commandArgs(trailingOnly = TRUE))
+for (i in 1:length(args)) {
+  eval(parse(text = args[[i]]))
+}
 
-# Overview Table for datasets
+datasets <- strsplit(datasets, ",")[[1]]
+names(datasets) <- datasets
 
-datasets <- c("Kumar", "Trapnell" ,"Koh",
-              "SimKumar4easy", "SimKumar4hard", "SimKumar8hard", 
-              "KohTCC", "TrapnellTCC", "KumarTCC", 
-              "Zhengmix4eq", "Zhengmix4uneq" ,"Zhengmix8eq")
-filterings <-  c("filteredExpr10","filteredHVG10", "filteredM3Drop10")
+print(datadir)
+print(datasets)
+print(ncores)
+print(outrds)
 
-dir <-"/Volumes/Shared/data/seq/scRNAseq_clustering_comparison/data/"
+## Compute silhouette widths for datasets
+suppressPackageStartupMessages({
+  library(cluster)
+  library(scater)
+  library(parallel)
+})
 
-# load full data
-list.full <-as.list( paste0(dir,"sce_full/","sce_full_", datasets, ".rds") )
-names(list.full) <- datasets
-full_data <- lapply(list.full, function(x) readRDS(x)  )
-# compute silhouette widths
+datasets_full <- paste0(datadir, "/sce_full/sce_full_", datasets, ".rds")
+names(datasets_full) <- gsub("\\.rds", "", basename(datasets_full))
 
-# Eucl. distances from transposed count matrix
-s <- lapply(full_data,function(x){
-  d <- dist( t(scater::exprs(x))) 
+full_data <- lapply(datasets_full, function(x) {
+  readRDS(x)
+})
+
+## Euclidean distances from transposed count matrix
+silh <- mclapply(full_data, function(x) {
+  d <- dist(t(logcounts(x))) 
   s <- cluster::silhouette(
     as.integer(
       as.factor(
         colData(x)$phenoid)),
     d)
-  ssum <- summary(s)
-  return(ssum)
-})
+  summary(s)
+}, mc.preschedule = FALSE, mc.cores = ncores)
 
-#save somewhere
-saveRDS(s, file = "ouput/res_silhouette.rds")
+saveRDS(silh, file = outrds)
+date()
+sessionInfo()
