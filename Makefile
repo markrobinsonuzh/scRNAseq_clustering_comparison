@@ -28,7 +28,7 @@ summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
-plots/similarities_between_methods/similarities.rds 
+plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -234,6 +234,14 @@ plots/ensemble/ensemble_vs_individual.rds: output/clustering_summary/clustering_
 output/ensemble/ensemble.rds Rscripts/ensemble/plot_ensemble_vs_individual.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/plot_ensemble_vs_individual.R Rout/plot_ensemble_vs_individual.Rout
+
+plots/shared_genes_filterings/shared_genes_filterings.rds: \
+$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
+Rscripts/evaluate_datasets/plot_shared_genes_venn.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 outrds='$@'" Rscripts/evaluate_datasets/plot_shared_genes_venn.R Rout/plot_shared_genes_venn.Rout
+
+
 
 
 ## ------------------------------------------------------------------------------------ ##
