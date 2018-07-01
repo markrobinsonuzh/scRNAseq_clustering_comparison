@@ -18,6 +18,7 @@ print(outcsv)
 suppressPackageStartupMessages({
   library(scater)
   library(parallel)
+  library(dplyr)
 })
 
 datasets_filtered <- c(outer(paste0(datadir, "/sce_filtered", filterings, pctkeep, "/sce_filtered", 
@@ -49,10 +50,13 @@ tbl <- do.call(rbind, lapply(names(all_data), function(nm) {
 
 ## avg.silhoutte width
 silh <- readRDS(file = silhouetterds)
-avg.s <- sapply(s, function(x) x$avg.width)
+avg.s <- sapply(silh, function(x) x$avg.width)
 
 ## table
-tbl <- tbl %>% dplyr::left_join(avg.s)
+tbl <- tbl %>% dplyr::left_join(data.frame(dataset = names(avg.s),
+                                           avg_silh = avg.s,
+                                           stringsAsFactors = FALSE),
+                                by = "dataset")
 
 write.csv(tbl, file = outcsv)
 date()

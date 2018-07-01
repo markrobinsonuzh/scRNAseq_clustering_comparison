@@ -297,22 +297,12 @@ plots/manuscript/figure3.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts
 
 
 
-
-
-
-
-
-
-
-
-
-
 ## ------------------------------------------------------------------------------------ ##
 ## Plot memory usage
 ## ------------------------------------------------------------------------------------ ##
 plots/memory_usage/memory_usage.rds: Rscripts/plot_memory_usage.R \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 	mkdir -p $(@D)
-	grep "Ncells|Vcells" Rout/* > $(@D)/memory_usage.txt
-	$(R) "--args memusetxt='memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
+	egrep "Ncells|Vcells" Rout/* > $(@D)/memory_usage.txt
+	$(R) "--args memusetxt='$(@D)/memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
