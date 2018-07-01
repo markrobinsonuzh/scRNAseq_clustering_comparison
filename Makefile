@@ -303,7 +303,7 @@ plots/manuscript/figure3.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts
 plots/memory_usage/memory_usage.rds: Rscripts/plot_memory_usage.R \
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 	mkdir -p $(@D)
-	egrep "Ncells|Vcells" Rout/* > $(@D)/memory_usage.txt
+	egrep "Ncells|Vcells" Rout/run_clustering* > $(@D)/memory_usage.txt
 	$(R) "--args memusetxt='$(@D)/memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
 listpackages:
