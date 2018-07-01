@@ -46,12 +46,12 @@ diff_abs <- res_summary %>%
 
 plots[["diff_kmax_ktrue"]] <- 
   ggplot(diff_abs, aes(x = method, y = k_diff, group = method, color = method)) + 
-  geom_boxplot(outlier.color = NA, alpha = 0.5) + 
+  geom_boxplot(outlier.color = NA, alpha = 0.5, size = 1.1) + 
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.2, stackratio = 1) +
   theme_bw() +
   manual.scale +
   labs(title = "Difference between k giving maximal performance and true k", x="", y="Difference in k") +
-  theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 1)) +
+  theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 0.5)) +
   facet_grid(~ filtering, scales = "free") +
   theme(axis.text = element_text(size = 15),
         axis.title = element_text(size = 15),
