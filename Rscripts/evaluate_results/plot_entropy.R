@@ -45,15 +45,22 @@ res_entropy <- res %>%
 
 # plot entropy per k
 plots[["entropy_byds_byk"]] <- 
-  ggplot(data = res_entropy %>% filter(!is.na(s)), 
-         aes(x = k, y = s, group = method, color = method)) +       
-  geom_smooth() +
+  ggplot(data = res_entropy %>% filter(!is.na(s)) %>%
+           dplyr::group_by(dataset, method, filtering, k, truenclust, s.true) %>%
+           dplyr::summarize(entropy = median(s, na.rm = TRUE)), 
+         aes(x = k, y = entropy, group = method, color = method)) +       
+  geom_line(size = 1) +
   facet_grid(filtering ~ dataset, scale = "free_x") +
   geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
   geom_point(aes(x = truenclust, y = s.true), color = 1, shape = 4) +
   manual.scale +
   theme_bw() +
-  labs(x = "k", y = "entropy") 
+  labs(x = "Number of clusters", y = "Entropy")  + 
+  theme(axis.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right")
 
 plots[["entropy_vs_ari_byds"]] <- 
   ggplot(data = res_entropy %>% filter(k == truenclust), 
@@ -93,9 +100,9 @@ plots[["normentropy_allds_allk"]] <-
   geom_boxplot() +
   manual.scale +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1)) +
-  theme(axis.text.y = element_text(size = 15)) +
-  theme(legend.position = "none") +
+  theme(axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1),
+        axis.text.y = element_text(size = 15),
+        legend.position = "none") +
   labs(x = "method", y = expression("normalised entropy" *" "* frac(H, H[max])),
        title = "normalised entropy all datasets, all k") 
 
@@ -129,15 +136,17 @@ plots[["deltanormentropy_at_truth"]] <-
         axis.title = element_text(size = 12)) +
   labs(x = "", y = expression("Difference between normalised entropy" *" "* frac(H, H[max],) *" for clustering and truth")) 
 
-pdf(gsub("rds$", "pdf", outrds), width = 12, height = 6)
+pdf(gsub("\\.rds$", "_byds_byk.pdf", outrds), width = 20, height = 10)
 print(plots[["entropy_byds_byk"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_normentropy.pdf", outrds), width = 12, height = 6)
 print(plots[["entropy_vs_ari_byds"]])
 print(plots[["normentropy_by_ds"]])
 print(plots[["normentropy_allds_truek"]])
 print(plots[["normentropy_allds_allk"]])
 print(plots[["deltaentropy_at_truth"]])
 print(plots[["deltanormentropy_at_truth"]])
-
 dev.off()
 
 saveRDS(plots, file = outrds)

@@ -77,15 +77,21 @@ res_stab$k <- as.integer(res_stab$k)
 # ------------------------------------
 # methods combined
 plots[["stability_allmethods"]] <- 
-  ggplot(res_stab,
+  ggplot(res_stab %>% dplyr::group_by(dataset, method, filtering, k, truenclust) %>%
+           dplyr::summarize(ari.stab = median(ari.stab, na.rm = TRUE)),
          aes(x = k, y = ari.stab, group = method, color = method)) + 
-  geom_smooth() + 
+  geom_line(size = 1) + 
   geom_vline(aes(xintercept = truenclust), linetype = "dashed") + 
   theme_bw() +
   manual.scale +
   facet_grid(filtering ~ dataset, scales = "free_x") +
   ylim(NA, 1) +
-  labs(y = "Stability (ARI)")
+  labs(y = "Stability (ARI)", x = "Number of clusters") + 
+  theme(axis.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right")
 
 # methods separated
 plots[["stability_sepmethods"]] <- 
@@ -136,8 +142,11 @@ plots[["stability_heatmap_truek"]] <-
         axis.ticks = element_blank(),
         strip.text = element_text(size = 20))
 
-pdf(gsub("rds$", "pdf", outrds), width = 15, height = 7)
+pdf(gsub("\\.rds$", "_allmethods.pdf", outrds), width = 20, height = 10)
 print(plots[["stability_allmethods"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_truek.pdf", outrds), width = 12, height = 7)
 print(plots[["stability_sepmethods"]])
 print(plots[["stability_truek"]])
 print(plots[["stability_heatmap_truek"]])
