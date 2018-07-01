@@ -94,7 +94,7 @@ plots[["consensus_heatmap_estk"]] <-
         legend.key.width = unit(0.5, "cm"),
         axis.ticks = element_blank())
 
-pdf(gsub("rds$", "df", outrds), width = 20, height = 12)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 12)
 plots[["consensus_ari"]]
 plots[["consensus_heatmap_truek"]]
 plots[["consensus_heatmap_est,"]]

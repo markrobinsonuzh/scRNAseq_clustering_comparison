@@ -27,6 +27,7 @@ summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/si
 output/dataset_summarytable.csv
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
+plots/manuscript/figure4.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
@@ -290,6 +291,9 @@ plots/manuscript/figure3.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts
 	mkdir -p $(@D)
 	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure3.R Rout/plot_figure3.Rout
 
+plots/manuscript/figure4.rds: plots/similarities_between_methods/similarities.rds Rscripts/manuscript/plot_figure4.R
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure4.R Rout/plot_figure4.Rout
 
 
 

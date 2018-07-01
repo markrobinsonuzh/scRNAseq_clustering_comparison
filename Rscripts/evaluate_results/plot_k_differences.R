@@ -40,8 +40,8 @@ res_summary <- res %>% dplyr::group_by(dataset, method, run, k) %>%
 ## Calculate the difference between the k that gives the maximal ARI and the true k
 diff_abs <- res_summary %>% 
   dplyr::group_by(dataset, filtering, method, truenclust, k) %>%
-  dplyr::summarize(medARI = median(ARI)) %>%
-  dplyr::filter(medARI == max(medARI)) %>%
+  dplyr::summarize(medARI = median(ARI, na.rm = TRUE)) %>%
+  dplyr::filter(medARI == max(medARI, na.rm = TRUE)) %>%
   dplyr::mutate(k_diff = (k - truenclust))
 
 plots[["diff_kmax_ktrue"]] <- 
@@ -50,7 +50,8 @@ plots[["diff_kmax_ktrue"]] <-
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.2, stackratio = 1) +
   theme_bw() +
   manual.scale +
-  labs(title = "Difference between k giving maximal performance and true k", x="", y="Difference in k") +
+  labs(title = "Difference between k giving maximal performance and true k", 
+       x = "", y = "Difference in k") +
   theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 0.5)) +
   facet_grid(~ filtering, scales = "free") +
   theme(axis.text = element_text(size = 15),
@@ -72,7 +73,7 @@ plots[["diff_kest_ktrue"]] <-
   geom_boxplot() + 
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.1, stackratio = 1) +
   theme_bw() +
-  labs(title = "Difference between estimated and true k", x="", y="Difference in k") +
+  labs(title = "Difference between estimated and true k", x = "", y = "Difference in k") +
   manual.scale +
   facet_wrap(~filtering, scales="free_x")+
   theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 1),
