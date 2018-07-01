@@ -70,8 +70,8 @@ plots <- lapply(c(1:4), function(i) {
   plot_tSNE(res_summary, full_data, methods[i], datasets[i], nrun[i])
 })
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
-cowplot::plot_grid(plotlist = plots, labels = "auto")
+pdf(gsub("rds$", "pdf", outrds), width = 16, height = 12)
+cowplot::plot_grid(plotlist = plots, labels = LETTERS[seq_len(length(plots))])
 dev.off()
 
 saveRDS(NULL, file = outrds)

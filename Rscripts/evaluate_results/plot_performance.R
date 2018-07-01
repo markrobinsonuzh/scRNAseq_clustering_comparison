@@ -50,7 +50,12 @@ plots[["median_ari_vs_k"]] <-
   theme_bw() +
   manual.scale +
   facet_grid(filtering ~ dataset, scales = "free_x") +
-  labs(title = "", x = "Number of clusters", y = "Median Adjusted Rand Index")
+  labs(title = "", x = "Number of clusters", y = "Median Adjusted Rand Index") + 
+  theme(axis.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right")
 
 ## Heatmap of median ARI at true k
 plots[["median_ari_heatmap_truek"]] <- 
@@ -101,9 +106,15 @@ plots[["median_ari_heatmap_estnclust"]] <-
         axis.ticks = element_blank(),
         strip.text = element_text(size = 20))
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
+pdf(gsub("\\.rds$", "_medianARIvsk.pdf", outrds), width = 20, height = 15)
 print(plots[["median_ari_vs_k"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_medianARIheatmap_truek.pdf", outrds), width = 20, height = 9)
 print(plots[["median_ari_heatmap_truek"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_medianARIheatmap_estk.pdf", outrds), width = 15, height = 9)
 print(plots[["median_ari_heatmap_estnclust"]])
 dev.off()
 

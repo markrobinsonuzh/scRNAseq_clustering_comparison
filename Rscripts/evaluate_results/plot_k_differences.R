@@ -50,8 +50,8 @@ plots[["diff_kmax_ktrue"]] <-
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.2, stackratio = 1) +
   theme_bw() +
   manual.scale +
-  labs(title = "Difference between k giving maximal performance and true k", 
-       x = "", y = "Difference in k") +
+  labs(y = "Difference between k giving maximal ARI and true k", 
+       x = "", title = "") +
   theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 0.5)) +
   facet_grid(~ filtering, scales = "free") +
   theme(axis.text = element_text(size = 15),
@@ -70,21 +70,24 @@ diff_estnclust$method <- factor(diff_estnclust$method)
 
 plots[["diff_kest_ktrue"]] <- 
   ggplot(na.omit(diff_estnclust), aes(x = method, y = k_diff, color = method)) + 
-  geom_boxplot() + 
+  geom_boxplot(size = 1.1) + 
   geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.1, stackratio = 1) +
   theme_bw() +
-  labs(title = "Difference between estimated and true k", x = "", y = "Difference in k") +
+  labs(y = "Difference between estimated and true k", x = "", title = "") +
   manual.scale +
   facet_wrap(~filtering, scales="free_x")+
-  theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 1),
+  theme(axis.text.x = element_text(size = rel(1), angle = 90, hjust = 1, vjust = 0.5),
         axis.text = element_text(size = 15),
         axis.title = element_text(size = 15),
         legend.text = element_text(size = 15),
         strip.text = element_text(size = 16),
         legend.position = "none")
 
-pdf(gsub("rds$", "pdf", outrds), width = 12, height = 7)
+pdf(gsub("\\.rds$", "_diff_kmax_ktrue.pdf", outrds), width = 12, height = 7)
 print(plots[["diff_kmax_ktrue"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_diff_kest_ktrue.pdf", outrds), width = 12, height = 7)
 print(plots[["diff_kest_ktrue"]])
 dev.off()
 
