@@ -46,8 +46,13 @@ plots[["time_boxplot_perds"]] <-
   scale_y_log10() +
   theme_bw() +
   manual.scale +
-  theme(axis.text.x = element_text(size = rel(0.8), angle = 90, hjust = 1, vjust = 1))+
-  labs(title = "Run time")
+  labs(title = "", x = "", y = "Elapsed time (s)") + 
+  theme(axis.text.x = element_text(size = rel(0.8), angle = 90, vjust = 0.5, hjust = 1),
+        axis.text.y = element_text(size = 16),
+        legend.position = "none",
+        axis.title = element_text(size = 20),
+        legend.text = element_text(size = 16),
+        legend.title = element_text(size = 16))
 
 ## Elapsed time, normalized by median time for RtsneKmeans
 median.tsne <- res_summary %>% 
@@ -76,20 +81,35 @@ plots[["time_normalized_by_tsne"]] <-
         legend.position = "none",
         axis.title = element_text(size = 15),
         legend.text = element_text(size = 15),
+        legend.title = element_text(size = 16),
         strip.text = element_text(size = 16))
 
 plots[["time_by_k"]] <- 
-  ggplot(res_summary, aes(x = k, y = elapsed, group = method, color = method)) + 
-  geom_smooth() + 
+  ggplot(res_summary %>% dplyr::group_by(dataset, filtering, method, k) %>%
+           dplyr::summarize(medianelapsed = median(elapsed)) %>%
+           dplyr::ungroup(), 
+         aes(x = k, y = medianelapsed, group = method, color = method)) + 
+  geom_line(size = 1) + 
+  theme_bw() + 
   facet_grid(filtering ~ dataset, scales = "free") + 
   manual.scale +
   scale_y_log10() +
-  labs(title="Elapsed runtime by k", y="elapsed time (s)")
+  labs(title = "", y = "Elapsed time (s)", x = "Number of clusters") + 
+  theme(axis.text = element_text(size = 16),
+        axis.title = element_text(size = 20),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right")
 
-
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 15)
+pdf(gsub("\\.rds$", "_boxplot_perds.pdf", outrds), width = 20, height = 15)
 print(plots[["time_boxplot_perds"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_normalizedtime.pdf", outrds), width = 20, height = 15)
 print(plots[["time_normalized_by_tsne"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_time_vs_k.pdf", outrds), width = 20, height = 15)
 print(plots[["time_by_k"]])
 dev.off()
 
