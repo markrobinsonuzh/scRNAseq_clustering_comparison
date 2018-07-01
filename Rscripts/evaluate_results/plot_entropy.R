@@ -119,13 +119,15 @@ plots[["deltanormentropy_at_truth"]] <-
   ggplot(data = res_entropy %>% filter(k == truenclust) %>%
            mutate(ds.norm = s.norm - s.true.norm), 
          aes(x = method, y = ds.norm, group = method, color = method)) +       
-  geom_boxplot() +
+  geom_boxplot(size = 1.1) +
   geom_hline(aes(yintercept = 0), linetype = "dashed") +
   manual.scale +
   theme_bw() +
   theme(legend.position= "none",
-        axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1)) +
-  labs(x = "", y = expression("difference normalised entropy" *" "* frac(H, H[max]))) 
+        axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5, hjust = 1),
+        axis.text.y = element_text(size = 15),
+        axis.title = element_text(size = 12)) +
+  labs(x = "", y = expression("Difference between normalised entropy" *" "* frac(H, H[max],) *" for clustering and truth")) 
 
 pdf(gsub("rds$", "pdf", outrds), width = 12, height = 6)
 print(plots[["entropy_byds_byk"]])

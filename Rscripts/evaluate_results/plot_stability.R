@@ -114,21 +114,27 @@ plots[["stability_truek"]] <-
 # plot heat map on median stability with truenclust
 plots[["stability_heatmap_truek"]] <- 
   ggplot(res_stab %>% filter(k == truenclust) %>% 
-         dplyr::group_by(filtering, dataset, method, k) %>%
-         dplyr::summarise(median.stability = median(ari.stab)),
-          aes(x = reorder(method, median.stability, FUN = mean, na.rm = TRUE),
-              y = reorder(dataset, median.stability, FUN = mean, na.rm = TRUE),
-              fill = median.stability)) +
-          geom_tile(color = "white", size = 0.1) +
-          facet_wrap(~ filtering) +
-          scale_fill_viridis(name = "median stability (ARI)", direction = -1, na.value = "grey") +
-          theme_tufte(base_family = "Helvetica") +
-          labs(x = NULL, y = NULL, title = "median stability (ARI), k = truenclust") +
-          coord_equal() +
-          theme(axis.text.x = element_text(size = 8, angle = 90, hjust = 1, vjust = 1),
-                panel.border = element_blank(),
-                legend.title.align = 1,
-                axis.ticks = element_blank())
+           dplyr::group_by(filtering, dataset, method, k) %>%
+           dplyr::summarise(median.stability = median(ari.stab)),
+         aes(x = reorder(method, median.stability, FUN = mean, na.rm = TRUE),
+             y = reorder(dataset, median.stability, FUN = mean, na.rm = TRUE),
+             fill = median.stability)) +
+  geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
+  facet_wrap(~ filtering) +
+  scale_fill_viridis(name = "Median \nstability \n(ARI)", direction = -1, na.value = "grey") +
+  theme_tufte(base_family = "Helvetica") +
+  labs(x = NULL, y = NULL, title = "median stability (ARI), k = truenclust") +
+  coord_equal() +
+  theme(axis.text.x = element_text(size = 18, angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.title.align = 0,
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        legend.key.size = unit(2, "cm"),
+        legend.key.width = unit(0.5, "cm"),
+        axis.ticks = element_blank(),
+        strip.text = element_text(size = 20))
 
 pdf(gsub("rds$", "pdf", outrds), width = 15, height = 7)
 print(plots[["stability_allmethods"]])

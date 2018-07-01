@@ -67,16 +67,16 @@ plots[["time_normalized_by_tsne"]] <-
          aes(x = reorder(method, norm.time, FUN = median, order = TRUE, na.rm = TRUE) , 
              y = norm.time, group = method, color = method)) +
   manual.scale +
-  geom_boxplot() +
+  geom_boxplot(size = 1.1) +
   scale_y_log10() +
   theme_bw() +
   labs(x = "", y = "Run time, normalized by RtsneKmeans", size = 16)+
-  theme(axis.text.x = element_text(size = 15, angle = 90, vjust = 0.5, hjust = 1)) +
-  theme(legend.position = "none") +
-  theme(axis.title = element_text(size = 15)) +
-  theme(legend.text = element_text(size = 15)) +
-  theme(legend.position = "none") +
-  theme(strip.text = element_text(size = 16))
+  theme(axis.text.x = element_text(size = 15, angle = 90, vjust = 0.5, hjust = 1),
+        axis.text.y = element_text(size = 15),
+        legend.position = "none",
+        axis.title = element_text(size = 15),
+        legend.text = element_text(size = 15),
+        strip.text = element_text(size = 16))
 
 plots[["time_by_k"]] <- 
   ggplot(res_summary, aes(x = k, y = elapsed, group = method, color = method)) + 

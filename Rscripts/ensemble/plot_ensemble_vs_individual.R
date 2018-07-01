@@ -67,12 +67,13 @@ plots[["ensembl_vs_first_allk"]] <-
 
 plots[["ensembl_vs_first_truek"]] <- 
   ggplot(res_median %>% filter(k == truenclust), aes(ARIdiff1)) +
-  geom_histogram() +
   facet_grid(methone ~ methtwo, scales = "free") +
   geom_vline(xintercept = 0, linetype = "dashed", colour = 2) +
-  theme(axis.text.x = element_text(size = 6)) +
-  labs(title = "Difference single method vs ensemble, truenclust",
-       x = "Difference ARI")
+  geom_histogram() +
+  theme(axis.text.x = element_text(size = 6),
+        strip.text = element_text(size = 8)) +
+  labs(title = "",
+       x = "ARI difference between ensemble and method in row, for true k")
 
 sum_max <- sum_all2 %>% select(dataset, methone, methtwo, k, ARIensmbl, run,
                                ARIone, ARItwo, truenclust) %>%
@@ -116,10 +117,11 @@ plots[["ensembl_vs_bestworst_truek"]] <-
   geom_hline(yintercept = 0, linetype = "dashed") +
   theme_bw() +
   viridis::scale_color_viridis(option = "C", direction = -1) +
-  labs(color = "ARI best/worst", x = "difference to ensemble", y = "ARI difference", 
-       title = "difference between ensemble and best/worst method, for truenclust") +
+  labs(color = "ARI best/worst", x = "",
+       y = "ARI difference between ensembl and best/worst individual method, for true k", 
+       title = "") +
   theme(axis.text.x = element_text(size = 15),
-        axis.text.y = element_text(size = 12),
+        axis.text.y = element_text(size = 15),
         axis.title = element_text(size = 15)) +
   scale_x_discrete(labels = c("diff.best" = "ensemble-best", "diff.worst" = "ensemble-worst"))
 
