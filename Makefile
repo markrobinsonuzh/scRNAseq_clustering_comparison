@@ -306,3 +306,6 @@ $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),resu
 	egrep "Ncells|Vcells" Rout/* > $(@D)/memory_usage.txt
 	$(R) "--args memusetxt='$(@D)/memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
+listpackages:
+	$(R) Rscripts/list_packages.R Rout/list_packages.Rout
+
