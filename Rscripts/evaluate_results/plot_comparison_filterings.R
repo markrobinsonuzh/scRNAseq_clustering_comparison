@@ -20,7 +20,6 @@ suppressPackageStartupMessages({
   library(ggthemes)
   library(viridis) 
   library(ggalluvial)
-  
 })
 
 ## Read clustering results
@@ -89,9 +88,9 @@ res_stab <- res_stab %>% tidyr::separate(filtering1, sep = "_", into = c("run1",
     filteredExpr10_filteredM3Drop10 = "Expr10_M3Drop10",
     filteredM3Drop10_filteredHVG10 = "M3Drop10_HVG10",
     filteredExpr10_filteredExpr10 = "Expr10_Expr10",
-    filteredHVG10_filteredHVG10="HVG10_HVG10",
-    filteredM3Drop10_filteredM3Drop10= "M3Drop10_M3Drop10")) %>%
-    dplyr::ungroup()
+    filteredHVG10_filteredHVG10 = "HVG10_HVG10",
+    filteredM3Drop10_filteredM3Drop10 = "M3Drop10_M3Drop10")) %>%
+  dplyr::ungroup()
 
 res_stab$ARI <- as.numeric(res_stab$ARI)
 
@@ -132,11 +131,11 @@ plots[["filterings_byk"]] <-
   facet_grid(dataset ~ method , scales = "free") +
   ylim(NA, 1) +
   labs(y = "ARI", title = "", x = "Number of clusters")
-## ARI between filterings for truenclust, heatmaps by filterings
 
+## ARI between filterings for truenclust, heatmaps by filterings
 plots[["filterings_heatmap_perdata_truek"]] <- 
   ggplot(res_stab %>% dplyr::group_by(dataset, method, k, filtering) %>%
-           dplyr::filter(k == truenclust)%>% 
+           dplyr::filter(k == truenclust) %>% 
            dplyr::mutate(medianARI = median(ARI)),
          aes(x = reorder(method, medianARI, FUN = mean, na.rm = TRUE), 
              y = reorder(dataset, medianARI, FUN = mean, na.rm = TRUE), 
@@ -157,12 +156,13 @@ plots[["filterings_heatmap_perdata_truek"]] <-
         legend.key.width = unit(0.5, "cm"),
         axis.ticks = element_blank(),
         strip.text = element_text(size = 20))
+
 plots[["filterings_heatmap_summary_truek"]] <- 
   ggplot(res_stab %>% dplyr::group_by(dataset, method, k, filtering) %>%
-           dplyr::filter(k == truenclust)%>% 
-           dplyr::mutate(ARI = median(ARI))%>%
-           group_by(method, filtering)%>%
-           dplyr::summarise(medianARI = median(ARI, na.rm=TRUE)),
+           dplyr::filter(k == truenclust) %>% 
+           dplyr::mutate(ARI = median(ARI)) %>%
+           dplyr::group_by(method, filtering) %>%
+           dplyr::summarise(medianARI = median(ARI, na.rm = TRUE)),
          aes(x = reorder(method, medianARI, FUN = mean, na.rm = TRUE), 
              y = reorder(filtering, medianARI, FUN = mean, na.rm = TRUE), 
              fill = medianARI)) +
