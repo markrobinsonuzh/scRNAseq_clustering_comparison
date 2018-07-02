@@ -31,7 +31,7 @@ plots/manuscript/figure4.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
-plots/facets_clustering/facets_clustering.rds
+plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -259,18 +259,25 @@ output/ensemble/ensemble.rds Rscripts/ensemble/plot_ensemble_vs_individual.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ensemblerds='$(word 2,$^)' outrds='$@'" Rscripts/ensemble/plot_ensemble_vs_individual.R Rout/plot_ensemble_vs_individual.Rout
 
+## Venn diagram of genes retained after filtering
 plots/shared_genes_filterings/shared_genes_filterings.rds: \
 $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
 Rscripts/evaluate_datasets/plot_shared_genes_venn.R
 	mkdir -p $(@D)
 	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 outrds='$@'" Rscripts/evaluate_datasets/plot_shared_genes_venn.R Rout/plot_shared_genes_venn.Rout
 
+## Illustration of some bad clustering results
 plots/facets_clustering/facets_clustering.rds: output/clustering_summary/clustering_summary.rds \
 $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
 Rscripts/evaluate_results/plot_facets_of_clustering_tSNE.R
 	mkdir -p $(@D)
 	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_facets_of_clustering_tSNE.R Rout/plot_facets_of_clustering_tSNE.Rout
 
+## t-SNE plots for all data sets
+plots/datasets_tsne/datasets_tsne.rds: $(foreach d,$(DATASETS),data/sce_full/sce_full_$(d).rds) \
+Rscripts/evaluate_datasets/plot_datasets_tsne.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' outrds='$@'" Rscripts/evaluate_datasets/plot_datasets_tsne.R Rout/plot_datasets_tsne.Rout
 
 
 
