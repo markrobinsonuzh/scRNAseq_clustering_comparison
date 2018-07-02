@@ -36,35 +36,33 @@ res_summary <- res %>% dplyr::group_by(dataset, method, k) %>% nest()
 
 res_summary <- res_summary %>% 
   mutate(truenclust = purrr::map_int(data, function(x) {
-    y <- length(unique(x$trueclass))
-    return(y)
+    length(unique(x$trueclass))
   }))
   
 ## wide format
 cast.map <-  function(x) {
-  d <- reshape2::dcast(x, cell ~ run, value.var = "cluster")
-  return(d)
+  reshape2::dcast(x, cell ~ run, value.var = "cluster")
 }
 
 res_nested <- res_summary %>% mutate(data.wide = purrr::map(data, cast.map)) 
 
 ## Help function for computing ARI 
-ARi_df <- function(x) {
+ARI_df <- function(x) {
   stopifnot(class(x) == "data.frame")
   stopifnot(class(x[, 1]) == "character")
   
   x <- select(x, -cell)
   columns <- combn(ncol(x), 2)
   ari.nk <- array(NA, ncol(columns))
-  for (i in 1:10) {
-    ari.nk[i] <- mclust::adjustedRandIndex(x[,columns[1, i]], x[,columns[2,i]])
+  for (i in seq_len(length(ari.nk))) {
+    ari.nk[i] <- mclust::adjustedRandIndex(x[, columns[1, i]], x[, columns[2, i]])
   }
   stab <- as.data.frame(cbind(ari.stab = ari.nk, run1 = columns[1, ], run2 = columns[2, ]))
   return(stab)
 }
 
 ## compute ARI
-res_stab.tmp <- res_nested %>% mutate(stability = purrr::map(data.wide, ARi_df)) 
+res_stab.tmp <- res_nested %>% mutate(stability = purrr::map(data.wide, ARI_df)) 
 
 ## unnest
 res_stab <- res_stab.tmp %>% select(dataset, method, k, stability, truenclust) %>% unnest() %>%

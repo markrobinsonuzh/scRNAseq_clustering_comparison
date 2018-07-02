@@ -31,7 +31,8 @@ plots/manuscript/figure4.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
-plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds
+plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds \
+plots/filtering_comparisons/filtering_comparisons.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -279,7 +280,11 @@ Rscripts/evaluate_datasets/plot_datasets_tsne.R
 	mkdir -p $(@D)
 	$(R) "--args datadir='data' datasets='$(DATASETSc)' outrds='$@'" Rscripts/evaluate_datasets/plot_datasets_tsne.R Rout/plot_datasets_tsne.Rout
 
-
+## compare filterings
+plots/filtering_comparisons/filtering_comparisons.rds: output/clustering_summary/clustering_summary.rds \
+Rscripts/evaluate_results/plot_comparison_filterings.R 
+	mkdir -p $(@D)
+	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_comparison_filterings.R Rout/plot_comparison_filterings.Rout
 
 
 ## ------------------------------------------------------------------------------------ ##
