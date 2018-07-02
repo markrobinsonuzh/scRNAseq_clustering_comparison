@@ -17,6 +17,10 @@ suppressPackageStartupMessages({
   library(purrr)
   library(reshape2)
   library(RColorBrewer)
+  library(ggthemes)
+  library(viridis) 
+  library(ggalluvial)
+  
 })
 
 ## Read clustering results
@@ -79,7 +83,15 @@ res_stab <- res_stab %>% tidyr::separate(filtering1, sep = "_", into = c("run1",
     filteredHVG10_filteredExpr10 = "filteredExpr10_filteredHVG10",
     filteredM3Drop10_filteredExpr10 = "filteredExpr10_filteredM3Drop10",
     filteredHVG10_filteredM3Drop10 = "filteredM3Drop10_filteredHVG10")) %>%
-  dplyr::ungroup()
+  dplyr::mutate(filtering = dplyr::recode_factor(
+    filtering,
+    filteredExpr10_filteredHVG10 = "Expr10_HVG10",
+    filteredExpr10_filteredM3Drop10 = "Expr10_M3Drop10",
+    filteredM3Drop10_filteredHVG10 = "M3Drop10_HVG10",
+    filteredExpr10_filteredExpr10 = "Expr10_Expr10",
+    filteredHVG10_filteredHVG10="HVG10_HVG10",
+    filteredM3Drop10_filteredM3Drop10= "M3Drop10_M3Drop10")) %>%
+    dplyr::ungroup()
 
 res_stab$ARI <- as.numeric(res_stab$ARI)
 
@@ -87,7 +99,6 @@ res_stab$ARI <- as.numeric(res_stab$ARI)
 ## Plot stability by k
 ## ------------------------------------
 ## load colors
-## color set , from https://www.r-bloggers.com/the-paul-tol-21-color-salute/
 colors <- c("red", "blue", "green", 
             "orange", "pink", "brown")
 
@@ -121,6 +132,55 @@ plots[["filterings_byk"]] <-
   facet_grid(dataset ~ method , scales = "free") +
   ylim(NA, 1) +
   labs(y = "ARI", title = "", x = "Number of clusters")
+## ARI between filterings for truenclust, heatmaps by filterings
+
+plots[["filterings_heatmap_perdata_truek"]] <- 
+  ggplot(res_stab %>% dplyr::group_by(dataset, method, k, filtering) %>%
+           dplyr::filter(k == truenclust)%>% 
+           dplyr::mutate(medianARI = median(ARI)),
+         aes(x = reorder(method, medianARI, FUN = mean, na.rm = TRUE), 
+             y = reorder(dataset, medianARI, FUN = mean, na.rm = TRUE), 
+             fill = medianARI)) +
+  geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
+  facet_wrap(~ filtering) +
+  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  theme_tufte(base_family = "Helvetica") +
+  labs(x = NULL, y = NULL, title = "") +
+  coord_equal() +
+  theme(axis.text.x = element_text(size = 18, angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.title.align = 1,
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        legend.key.size = unit(2, "cm"),
+        legend.key.width = unit(0.5, "cm"),
+        axis.ticks = element_blank(),
+        strip.text = element_text(size = 20))
+plots[["filterings_heatmap_summary_truek"]] <- 
+  ggplot(res_stab %>% dplyr::group_by(dataset, method, k, filtering) %>%
+           dplyr::filter(k == truenclust)%>% 
+           dplyr::mutate(ARI = median(ARI))%>%
+           group_by(method, filtering)%>%
+           dplyr::summarise(medianARI = median(ARI, na.rm=TRUE)),
+         aes(x = reorder(method, medianARI, FUN = mean, na.rm = TRUE), 
+             y = reorder(filtering, medianARI, FUN = mean, na.rm = TRUE), 
+             fill = medianARI)) +
+  geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
+  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  theme_tufte(base_family = "Helvetica") +
+  labs(x = NULL, y = NULL, title = "") +
+  coord_equal() +
+  theme(axis.text.x = element_text(size = 18, angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 16),
+        legend.title = element_text(size = 16),
+        legend.title.align = 1,
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        legend.key.size = unit(2, "cm"),
+        legend.key.width = unit(0.5, "cm"),
+        axis.ticks = element_blank(),
+        strip.text = element_text(size = 20))
 
 pdf(gsub("\\.rds$", "_truek.pdf", outrds), width = 20, height = 12)
 plots[["filterings_truek"]]
@@ -128,6 +188,14 @@ dev.off()
 
 pdf(gsub("\\.rds$", "_byk.pdf", outrds), width = 20, height = 12)
 plots[["filterings_byk"]]
+dev.off()
+
+pdf(gsub("\\.rds$", "_heatmap_perdata_truek.pdf", outrds), width = 20, height = 12)
+plots[["filterings_heatmap_perdata_truek"]]
+dev.off()
+
+pdf(gsub("\\.rds$", "_heatmap_summary_truek.pdf", outrds), width = 20, height = 12)
+plots[["filterings_heatmap_summary_truek"]]
 dev.off()
 
 saveRDS(plots, file = outrds)
