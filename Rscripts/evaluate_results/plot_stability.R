@@ -125,7 +125,7 @@ plots[["stability_heatmap_truek"]] <-
              fill = median.stability)) +
   geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
   facet_wrap(~ filtering) +
-  scale_fill_viridis(name = "Median \nstability \n(ARI)", direction = -1, na.value = "grey") +
+  scale_fill_viridis(name = "Median \nstability \n(ARI)", direction = -1,limits=c(0,1),na.value = "grey") +
   theme_tufte(base_family = "Helvetica") +
   labs(x = NULL, y = NULL, title = "median stability (ARI), k = truenclust") +
   coord_equal() +
