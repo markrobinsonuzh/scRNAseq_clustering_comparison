@@ -23,6 +23,8 @@ cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATAS
 
 cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
+cluster1: $(foreach f,$(ALLFILTERINGS),$(foreach m,SAFE,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
 output/dataset_summarytable.csv
 
