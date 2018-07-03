@@ -3,8 +3,10 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
+
 print(clusteringsummary)
 print(outrds)
+
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -110,6 +112,36 @@ plots[["median_ari_heatmap_bestk"]] <-
         axis.ticks = element_blank(),
         strip.text = element_text(size = 20))
 
+
+aris_realk <- res_summary %>% 
+  dplyr::filter(k == truenclust,
+                dataset %in% c("Koh","SimKumar8hard","Trapnell",
+                               "Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq")) 
+
+## Scatter plots -- time versus ARI
+# plots[["scatter_time_vs_ari_truek_HVG10"]] <- 
+#   ggplot(aris_realk %>% filter(filtering=="filteredHVG10"), aes(x=ARI, y=elapsed, colour=method)) + 
+#   geom_point(size=8, alpha=.6) + 
+#   scale_y_log10() +
+#   facet_wrap(~dataset, scales="free") +
+#   ylab("elapsed time (seconds)") + xlab("Adjusted Rand Index")
+# 
+# plots[["scatter_time_vs_ari_truek_Expr10"]] <- 
+#   ggplot(aris_realk %>% filter(filtering=="filteredExpr10"), aes(x=ARI, y=elapsed, colour=method)) + 
+#   geom_point(size=8, alpha=.6) + 
+#   scale_y_log10() +
+#   facet_wrap(~dataset, scales="free") +
+#   ylab("elapsed time (seconds)") + xlab("Adjusted Rand Index")
+
+plots[["scatter_time_vs_ari_truek"]] <- 
+  ggplot(aris_realk, aes(x=ARI, y=elapsed, colour=method, shape=filtering)) + 
+  geom_point(size=6, alpha=.8) + 
+  scale_y_log10() +
+  facet_wrap(~dataset, scales="free") +
+  ylab("elapsed time (seconds)") + xlab("Adjusted Rand Index") + 
+  theme_light()
+
+
 ## Heatmap of ARI at estimated number of clusters
 plots[["median_ari_heatmap_estnclust"]] <- 
   ggplot(res_summary %>% dplyr::filter(k == estnclust) %>%
@@ -149,6 +181,10 @@ dev.off()
 
 pdf(gsub("\\.rds$", "_medianARIheatmap_bestk.pdf", outrds), width = 15, height = 9)
 print(plots[["median_ari_heatmap_bestk"]])
+dev.off()
+
+pdf(gsub("\\.rds$", "_scatter_time_vs_ari_truek.pdf", outrds), width = 15, height = 9)
+print(plots[["scatter_time_vs_ari_truek"]])
 dev.off()
 
 saveRDS(plots, file = outrds)
