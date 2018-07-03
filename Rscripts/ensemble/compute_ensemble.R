@@ -33,7 +33,7 @@ df_seurat <- df %>% dplyr::filter(method == "Seurat") %>%
 df_sub <- plyr::rbind.fill(df_sub, df_seurat)
 
 ## Help function for computing ensemble clusters
-## df: dataframe with variables method, k, dataset, cell, trueclass
+## df: dataframe with variables method, k, dataset, cell, trueclass, run
 ## methods: character vector with method names for ensemble
 ## output: tibble longformat with method cluster, ensemble cluster, trueclass, dataset
 ## ------------------------------------------------------------------
@@ -45,15 +45,15 @@ helper_ensemble <- function(methods, df) {
     print(paste(i, paste(methods, collapse = "+")))
     
     ## Extract only results for the current dataset
-    res <- df %>% filter(dataset %in% i) 
+    res <- df %>% dplyr::filter(dataset == i) 
     
     ## Process each k separately
     combined_l <- vector("list", length(unique(res$k)))
     names(combined_l) <- unique(res$k)
+    
     for (u in unique(res$k)) {
-      
       ## Extract only results for the current k
-      res.k <- res %>% filter(k == u)
+      res.k <- res %>% dplyr::filter(k == u)
       
       ## Skip if results for one method not exist
       if (sum(unique(res.k$method) %in% methods) != length(methods)) {
@@ -68,9 +68,7 @@ helper_ensemble <- function(methods, df) {
         ## If all values are NA, replace them with 0
         if (all(is.na(res2))) {
           res2[] <- 0
-        } else {
-          res2 <- res2
-        }
+        } 
         
         ## Process each run separately
         runs <- unique(res.k$run)
@@ -98,7 +96,7 @@ helper_ensemble <- function(methods, df) {
         }
 
         out <- data.frame(res.w, stringsAsFactors = FALSE) %>%
-          dplyr::mutate(dataset = i, k = u, method = paste(methods ,collapse = ".")) %>%
+          dplyr::mutate(dataset = i, k = u, method = paste(methods, collapse = ".")) %>%
           dplyr::left_join(data.frame(m, stringsAsFactors = FALSE, check.names = FALSE) %>% 
                            tibble::rownames_to_column("cell"), by = "cell")
         combined_l[[as.character(u)]] <- out
@@ -112,7 +110,7 @@ helper_ensemble <- function(methods, df) {
   res.df <- reshape2::melt(data = res.df, 
                            id.vars = c("dataset", "trueclass", "cell", "method", "k"), 
                            measure.vars = as.character(runs),
-                           value.name = c("cons_cluster"), variable.name = c("run"))
+                           value.name = "cons_cluster", variable.name = "run")
   return(res.df)
 }
 
