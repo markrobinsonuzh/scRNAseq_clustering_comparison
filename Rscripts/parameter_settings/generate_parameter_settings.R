@@ -260,13 +260,21 @@ for (f in filterings) {
 ## FlowSOM parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(nPC = 50, xdim = 15, ydim = 15)), file = "parameter_settings/FlowSOM.json")
+write(toJSON(list(nPC = 50)), file = "parameter_settings/FlowSOM.json")
 
 ## Dataset-specific
 for (f in filterings) {
   for (d in datasets) {
-    write(toJSON(list()), 
-          file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
+    if (d %in% c("Kumar", "KumarTCC", "Trapnell", "TrapnellTCC")) {
+      write(toJSON(list(xdim = 5, ydim = 5)), 
+            file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
+    } else if (d %in% c("Koh", "KohTCC", "SimKumar4easy", "SimKumar4hard", "SimKumar8hard")) {
+      write(toJSON(list(list(xdim = 8, ydim = 8))), 
+            file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
+    } else {
+      write(toJSON(list(xdim = 15, ydim = 15)), 
+            file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
+    }
   }
 }
 
