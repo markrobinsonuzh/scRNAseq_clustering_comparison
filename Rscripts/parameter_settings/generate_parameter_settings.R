@@ -269,7 +269,7 @@ for (f in filterings) {
       write(toJSON(list(xdim = 5, ydim = 5)), 
             file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
     } else if (d %in% c("Koh", "KohTCC", "SimKumar4easy", "SimKumar4hard", "SimKumar8hard")) {
-      write(toJSON(list(list(xdim = 8, ydim = 8))), 
+      write(toJSON(list(xdim = 8, ydim = 8)), 
             file = paste0("parameter_settings/sce_", f, "_", d, "_FlowSOM.json"))
     } else {
       write(toJSON(list(xdim = 15, ydim = 15)), 
