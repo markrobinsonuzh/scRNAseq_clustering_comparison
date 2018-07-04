@@ -218,8 +218,8 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   
   #colors for heatmap
   colors <- list(
-    dimension = c(PCA = "#C10359", tSNE = "#E0B1C6"),
-    clustering = c(hc = "#01368C", graph = "#2F6CCE", kmeans = "#93B8F2", svm = "#D6E4F9"),
+    dimension = c(PCA = "#C10359", tSNE = "#fd9ec9", None = "#fed8e9"),
+    clustering = c(HC = "#01368C", Graph = "#2F6CCE", Kmeans = "#93B8F2"),
     counts = c(raw = "#2EA801", lognorm = "#96E878")
   )
   
@@ -232,7 +232,8 @@ plot_crossmethod_concordance <- function(res, ncluster) {
           axis.text = element_blank(),
           axis.line = element_blank(),
           axis.title = element_blank(),
-          plot.margin = unit(c(0, 7, 0, 7), "mm"))
+          legend.position = "none",
+          plot.margin = unit(c(0, 1, 0, 1), "mm"))
   g2 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = clustering)) + 
     geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
     scale_fill_manual(values = colors$clustering) + 
@@ -242,7 +243,8 @@ plot_crossmethod_concordance <- function(res, ncluster) {
           axis.text = element_blank(),
           axis.line = element_blank(),
           axis.title = element_blank(),
-          plot.margin = unit(c(0, 7, 0, 7), "mm"))
+          legend.position = "none",
+          plot.margin = unit(c(0, 1, 0, 1), "mm"))
   g3 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = counts)) + 
     geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
     scale_fill_manual(values = colors$counts) + 
@@ -252,51 +254,53 @@ plot_crossmethod_concordance <- function(res, ncluster) {
           axis.text = element_blank(),
           axis.line = element_blank(),
           axis.title = element_blank(),
-          plot.margin = unit(c(0, 7, 0, 7), "mm"))
+          legend.position = "none",
+          plot.margin = unit(c(0, 1, 0, 1), "mm"))
+  
   
   # legends
   gds <- plot_grid(get_legend(g1 + 
-                                theme(legend.position = "left") + 
+                                theme(legend.position = "bottom") + 
                                 guides(fill = 
-                                         guide_legend(ncol = 2,
-                                                      title = "dimension reduction", title.position = "top",
+                                         guide_legend(ncol = 4,
+                                                      title = "Dimension reduction", title.position = "top",
                                                       override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 12,
+                                                      title.theme = element_text(size = 20,
                                                                                  angle = 0),
-                                                      label.theme = element_text(size = 10,
+                                                      label.theme = element_text(size = 16,
                                                                                  angle = 0),
                                                       keywidth = 1, default.unit = "cm"))),
                    get_legend(g2 + 
                                 theme(legend.position = "left") + 
                                 guides(fill = 
-                                         guide_legend(ncol = 2,
+                                         guide_legend(ncol = 4,
                                                       title = "Clustering method", title.position = "top",
                                                       override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 12,
+                                                      title.theme = element_text(size = 20,
                                                                                  angle = 0),
-                                                      label.theme = element_text(size = 10,
+                                                      label.theme = element_text(size = 16,
                                                                                  angle = 0),
                                                       keywidth = 1, default.unit = "cm"))),
                    get_legend(g3 + 
                                 theme(legend.position = "left") + 
                                 guides(fill = 
-                                         guide_legend(ncol = 1,
+                                         guide_legend(ncol = 4,
                                                       title = "Count type", title.position = "top",
                                                       override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 12,
+                                                      title.theme = element_text(size = 20,
                                                                                  angle = 0),
-                                                      label.theme = element_text(size = 10,
+                                                      label.theme = element_text(size = 16,
                                                                                  angle = 0),
                                                       keywidth = 1, default.unit = "cm"))),
                    
-                   nrow = 1, rel_widths = c(1.25, 1, 1, 1))
+                   nrow= 1)
   
   ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
                         g1 + theme(legend.position = "none"),
                         g2 + theme(legend.position = "none"),
                         g3 + theme(legend.position = "none"),
-                        gds + theme(plot.margin = unit(c(0, 0, 0, 15), "mm")), 
-                        rel_heights = c(6, 0.75, 0.75 ,0.75 ,0.75, 2), ncol = 1)
+                        gds + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
+                        rel_heights = c(3, 0.3, 0.3 ,0.3 ,0.3, 5), ncol = 1)
   
   # store plots in plot.list 
   plot.list <- list()
