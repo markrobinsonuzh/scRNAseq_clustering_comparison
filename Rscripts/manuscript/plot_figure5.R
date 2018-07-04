@@ -3,21 +3,17 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
-print(ensemblerds)
+print(consensusrds)
 print(outrds)
 
 suppressPackageStartupMessages({
   library(cowplot)
 })
 
-ensemble <- readRDS(ensemblerds)
+consensus <- readRDS(consensusrds)
 
 pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
-cowplot::plot_grid(
-  ensemble[["ensembl_vs_bestworst_truek"]],
-  ensemble[["ensembl_vs_first_truek"]],
-    labels = c("A", "B"), nrow = 1
-)
+cowplot::plot_grid(plotlist = sapply(consensus[1], '[', 3))
 dev.off()
 
 saveRDS(NULL, file = outrds)

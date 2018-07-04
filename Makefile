@@ -29,7 +29,7 @@ summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/si
 output/dataset_summarytable.csv
 
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
-plots/manuscript/figure4.rds \
+plots/manuscript/figure4.rds plots/manuscript/figure5.rds \
 plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
@@ -296,18 +296,23 @@ plots/manuscript/figure1.rds: plots/performance/performance.rds Rscripts/manuscr
 	mkdir -p $(@D)
 	$(R) "--args performancerds='$<' outrds='$@'" Rscripts/manuscript/plot_figure1.R Rout/plot_figure1.Rout
 
-plots/manuscript/figure2.rds: plots/performance/stability.rds plots/performance/entropy.rds \
-plots/performance/difference_in_k.rds plots/runtime/runtime.rds Rscripts/manuscript/plot_figure2.R
+plots/manuscript/figure2.rds: plots/performance/performance.rds plots/runtime/runtime.rds \
+Rscripts/manuscript/plot_figure2.R
 	mkdir -p $(@D)
-	$(R) "--args stabilityrds='$(word 1,$^)' entropyrds='$(word 2,$^)' diffrds='$(word 3,$^)' timerds='$(word 4,$^)' outrds='$@'" Rscripts/manuscript/plot_figure2.R Rout/plot_figure2.Rout
+	$(R) "--args performancerds='$(word 1,$^)' timerds='$(word 2,$^)' outrds='$@'" Rscripts/manuscript/plot_figure2.R Rout/plot_figure2.Rout
 
-plots/manuscript/figure3.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts/manuscript/plot_figure3.R
+plots/manuscript/figure3.rds: plots/performance/stability.rds plots/performance/entropy.rds \
+plots/performance/difference_in_k.rds Rscripts/manuscript/plot_figure3.R
 	mkdir -p $(@D)
-	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure3.R Rout/plot_figure3.Rout
+	$(R) "--args stabilityrds='$(word 1,$^)' entropyrds='$(word 2,$^)' diffrds='$(word 3,$^)' timerds='$(word 4,$^)' outrds='$@'" Rscripts/manuscript/plot_figure3.R Rout/plot_figure3.Rout
 
-plots/manuscript/figure4.rds: plots/similarities_between_methods/similarities.rds Rscripts/manuscript/plot_figure4.R
+plots/manuscript/figure4.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts/manuscript/plot_figure4.R
 	mkdir -p $(@D)
-	$(R) "--args consensusrds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure4.R Rout/plot_figure4.Rout
+	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure4.R Rout/plot_figure4.Rout
+
+plots/manuscript/figure5.rds: plots/similarities_between_methods/similarities.rds Rscripts/manuscript/plot_figure5.R
+	mkdir -p $(@D)
+	$(R) "--args consensusrds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure5.R Rout/plot_figure5.Rout
 
 
 

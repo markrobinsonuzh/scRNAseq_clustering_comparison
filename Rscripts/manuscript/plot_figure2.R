@@ -3,9 +3,7 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
-print(stabilityrds)
-print(entropyrds)
-print(diffrds)
+print(performancerds)
 print(timerds)
 print(outrds)
 
@@ -13,21 +11,14 @@ suppressPackageStartupMessages({
   library(cowplot)
 })
 
-stability <- readRDS(stabilityrds)
-entropy <- readRDS(entropyrds)
-differences <- readRDS(diffrds)
+performance <- readRDS(performancerds)
 timing <- readRDS(timerds)
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 16)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
 cowplot::plot_grid(
-  stability[["stability_heatmap_truek"]] + ggtitle(""), 
-  cowplot::plot_grid(
-    entropy[["deltanormentropy_at_truth"]],
-    differences[["diff_kmax_ktrue"]],
-    timing[["time_normalized_by_tsne"]], 
-    labels = c("B", "C", "D"), nrow = 1, rel_widths = c(1, 1.3, 1)
-  ), 
-  labels = c("A", ""), ncol = 1, rel_heights = c(1, 0.8)
+  timing[["time_normalized_by_tsne"]], 
+  performance[["scatter_time_vs_ari_truek"]], 
+  labels = c("A", "B"), nrow = 1, rel_widths = c(1, 3)
 )
 dev.off()
 

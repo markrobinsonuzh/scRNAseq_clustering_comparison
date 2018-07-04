@@ -3,20 +3,28 @@ for (i in 1:length(args)) {
   eval(parse(text = args[[i]]))
 }
 
-print(ensemblerds)
+print(stabilityrds)
+print(entropyrds)
+print(diffrds)
 print(outrds)
 
 suppressPackageStartupMessages({
   library(cowplot)
 })
 
-ensemble <- readRDS(ensemblerds)
+stability <- readRDS(stabilityrds)
+entropy <- readRDS(entropyrds)
+differences <- readRDS(diffrds)
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 16)
 cowplot::plot_grid(
-  ensemble[["ensembl_vs_bestworst_truek"]],
-  ensemble[["ensembl_vs_first_truek"]],
-    labels = c("A", "B"), nrow = 1
+  stability[["stability_heatmap_truek"]] + ggtitle(""), 
+  cowplot::plot_grid(
+    entropy[["deltanormentropy_at_truth"]],
+    differences[["diff_kmax_ktrue"]],
+    labels = c("B", "C"), nrow = 1, rel_widths = c(1, 1.3)
+  ), 
+  labels = c("A", ""), ncol = 1, rel_heights = c(1, 0.8)
 )
 dev.off()
 
