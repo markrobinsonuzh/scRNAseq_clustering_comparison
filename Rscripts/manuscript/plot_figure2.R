@@ -19,7 +19,7 @@ cowplot::plot_grid(
   timing[["time_normalized_by_tsne"]], 
   performance[["scatter_time_vs_ari_truek"]], 
   labels = c("A", "B"), nrow = 1, rel_widths = c(1, 3), 
-  label_size = 20
+  label_size = 35
 )
 dev.off()
 
