@@ -246,9 +246,9 @@ Rscripts/evaluate_results/plot_Seurat_k_resolution.R
 
 ## similarities between methods
 plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
-Rscripts/similarities_consensus/plot_similarities_between_methods2.R 
+Rscripts/similarities_consensus/plot_similarities_between_methods2.R methodchart.csv
 	mkdir -p $(@D)
-	$(R) "--args consensusrds='$<' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
+	$(R) "--args consensusrds='$<' methodchart='methodchart.csv' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
 
 ## performance for consensus clusters
 plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
@@ -306,13 +306,13 @@ plots/performance/difference_in_k.rds Rscripts/manuscript/plot_figure3.R
 	mkdir -p $(@D)
 	$(R) "--args stabilityrds='$(word 1,$^)' entropyrds='$(word 2,$^)' diffrds='$(word 3,$^)' timerds='$(word 4,$^)' outrds='$@'" Rscripts/manuscript/plot_figure3.R Rout/plot_figure3.Rout
 
-plots/manuscript/figure4.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts/manuscript/plot_figure4.R
+plots/manuscript/figure4.rds: plots/similarities_between_methods/similarities.rds Rscripts/manuscript/plot_figure4.R
 	mkdir -p $(@D)
-	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure4.R Rout/plot_figure4.Rout
+	$(R) "--args consensusrds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure4.R Rout/plot_figure4.Rout
 
-plots/manuscript/figure5.rds: plots/similarities_between_methods/similarities.rds Rscripts/manuscript/plot_figure5.R
+plots/manuscript/figure5.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts/manuscript/plot_figure5.R
 	mkdir -p $(@D)
-	$(R) "--args consensusrds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure5.R Rout/plot_figure5.Rout
+	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure5.R Rout/plot_figure5.Rout
 
 
 

@@ -4,6 +4,7 @@ for (i in 1:length(args)) {
 }
 
 print(consensusrds)
+print(methodchart)
 print(outrds)
 
 suppressPackageStartupMessages({
@@ -45,7 +46,7 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     dplyr::filter(k == ifelse(ncluster == 0, truenclust, ncluster)) %>%
     filter(resolution == sample(resolution, 1)) %>% 
     dplyr::select(dataset, method, consensus, k, cell)
-  res.cons <- bind_rows(res.cons , res.cons.seurat)
+  res.cons <- dplyr::bind_rows(res.cons , res.cons.seurat)
   
   # compute  matrix with pairwise ARIs
   l <- vector("list", length = length(unique(res.cons$dataset)))
@@ -57,15 +58,16 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     m <- matrix(NA, nrow = length(unique(x$method)), ncol = length(unique(x$method)))
     rownames(m) <- unique(x$method)
     colnames(m) <- unique(x$method)
-    for(j in unique(x$method)) {
+    for (j in unique(x$method)) {
       print(j)
       c1 <- subset(x, method == j) 
-      c1 <- c1$consensus
-      for(u in unique(x$method)) {
+      for (u in unique(x$method)) {
         print(u)
         c2 <- subset(x, method == u) 
-        c2 <- c2$consensus
-        m[j, u] <- mclust::adjustedRandIndex(c1, c2)
+        ## get shared cells, calculate ARI
+        scl <- intersect(c1$cell, c2$cell)
+        m[j, u] <- mclust::adjustedRandIndex(c1$consensus[match(scl, c1$cell)], 
+                                             c2$consensus[match(scl, c2$cell)])
       }
     }
     l[[i]] <- m
@@ -85,21 +87,26 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   stopifnot(all(rownames(m.median) == colnames(m.median)))
   
   # plot all ARIs, facet by filter and dataset
+  if (ncluster == 0) {
+    ttl <- ""
+  } else {
+    ttl <- paste0("Number of clusters = ", ncluster)
+  }
   heatmap.dataset <- 
     ggplot(df %>% tidyr::separate(L1, sep = "_", into = c("sce", "filtering", "dataset")) %>%
              dplyr::select(-sce),
            aes(x = Var1, y = Var2, fill = ARI)) +
     geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
     facet_grid(filtering ~ dataset, drop = FALSE) +
-    scale_fill_viridis(name = "ARI", direction = -1 ) +
+    scale_fill_viridis(name = "ARI", direction = -1, na.value = "white") +
     theme_tufte(base_family = "Helvetica") +
-    labs(x = NULL, y = NULL, title = paste0("k =", ncluster)) +
+    labs(x = NULL, y = NULL, title = ttl) +
     coord_equal() +
     theme(strip.text.x = element_text(size = 8),
-          axis.text.x = element_text(size = 6, angle = 90),
+          axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 1),
           axis.text.y = element_text(size = 6),
           legend.title = element_text(size = 6),
-          legend.title.align = 1,
+          legend.title.align = 0,
           legend.text = element_text(size = 6),
           legend.position = "right",
           legend.key.size = unit(0.5, "cm"),
@@ -111,12 +118,12 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
     scale_fill_viridis(name = "ARI", direction = -1) +
     theme_tufte(base_family = "Helvetica") +
-    labs(x = NULL, y = NULL, title = paste0("median ARI, k = ", ncluster)) +
+    labs(x = NULL, y = NULL, title = paste0("Median similarity ", ttl)) +
     coord_equal() +
-    theme(axis.text.x = element_text(size = 6, angle = 90),
-          axis.text.y = element_text(size = 6),
-          legend.title = element_text(size = 6),
-          legend.title.align = 1,
+    theme(axis.text.x = element_text(size = 12, angle = 90, vjust = 0.5, hjust = 1),
+          axis.text.y = element_text(size = 12),
+          legend.title = element_text(size = 12),
+          legend.title.align = 0,
           legend.text = element_text(size = 6),
           legend.position = "right",
           legend.key.size = unit(0.5, "cm"),
@@ -150,7 +157,7 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   
   ## Get all subclusters for individual data set instances
   cmtmp <- df 
-  uniqvals <- unique(cmtmp$L1)
+  uniqvals <- unique(cmtmp$L1) ## data sets
   # per dataset i
   subclusters_all <- lapply(uniqvals, function(i) {
     print(i)
@@ -159,14 +166,12 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     stopifnot(all(rownames(cmtmp2) == colnames(cmtmp2)))
     stopifnot(all((cmtmp2 == t(cmtmp2))[!is.na(cmtmp2 == t(cmtmp2))]))
     cmtmp2 <- cmtmp2[apply(cmtmp2, 1, function(x){!all(is.na(x))}), ]
-    cmtmp2 <- cmtmp2[,apply(cmtmp2, 2, function(x){!all(is.na(x))})]
+    cmtmp2 <- cmtmp2[, apply(cmtmp2, 2, function(x){!all(is.na(x))})]
     get_subclusters(hclust(as.dist(1 - cmtmp2)))
   })
   
   ## Get stability values for each subcluster in subclusters_average
-  # find datasets with a missing method elemnt in subclusters_all 
-  ## dataset with missing seurat
-  # find missings
+  ## find datasets with a missing method element in subclusters_all 
   which_missing <- function(x, invert, toMatch) {
     toMatch <- c(paste0(toMatch))
     m <- purrr::map(x, function(x) {
@@ -178,14 +183,17 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     return(m)
   }
   
-  # for this particular datasets (column in w), add the missing method in the particular branch, suchthat the we have a TRUE in w (if the rest is the same)
+  ## for this particular datasets (column in w), add the missing method in the
+  ## particular branch, such that the we have a TRUE in w (if the rest is the
+  ## same)
   x <- sapply(
     subclusters_all, function(w) {
-      subclusters_average %in% w })
+      subclusters_average %in% w 
+    })
   
   p <- rownames(m.median)
   # which missing
-  for (i in  p){
+  for (i in p) {
     x[which_missing(subclusters_average, invert = FALSE, toMatch = paste(i)), 
       which_missing(subclusters_all, invert = TRUE, toMatch = paste(i))] <- TRUE
   }
@@ -208,19 +216,20 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     ggplot2::scale_x_reverse() + ggplot2::coord_flip() + 
     theme(plot.margin = unit(c(1, 1, 1, 1), "mm")) + 
     xlim_tree(0.75) +
-    ggtitle(paste0("number of cluster=", ncluster))
+    ggtitle(ttl)
   
   # add annotation to tree
-  annot <- readr::read_delim("methodchart.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+  annot <- readr::read_delim(methodchart, ";", escape_double = FALSE, trim_ws = TRUE)
   tiporder <- trees$data %>% dplyr::filter(isTip) %>% dplyr::arrange(y)
   annot <- annot[match(tiporder$label, annot$method), 
                  c("dimension", "clustering", "counts"), drop = FALSE]
   
-  #colors for heatmap
+  # colors for heatmap
   colors <- list(
     dimension = c(PCA = "#C10359", tSNE = "#fd9ec9", None = "#fed8e9"),
-    clustering = c(HC = "#01368C", Graph = "#2F6CCE", Kmeans = "#93B8F2"),
-    counts = c(raw = "#2EA801", lognorm = "#96E878")
+    clustering = c(Hierarchical = "#01368C", Graph = "#2F6CCE", Kmeans = "#93B8F2",
+                   SOM = "#d1e1fa", ModelBased = "#030a17"),
+    counts = c(Raw = "#2EA801", LogNorm = "#96E878")
   )
   
   g1 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = dimension)) + 
@@ -285,7 +294,7 @@ plot_crossmethod_concordance <- function(res, ncluster) {
                                 theme(legend.position = "left") + 
                                 guides(fill = 
                                          guide_legend(ncol = 4,
-                                                      title = "Count type", title.position = "top",
+                                                      title = "Input", title.position = "top",
                                                       override.aes = list(size = 1.5),
                                                       title.theme = element_text(size = 20,
                                                                                  angle = 0),
@@ -295,18 +304,18 @@ plot_crossmethod_concordance <- function(res, ncluster) {
                    
                    nrow= 1)
   
-  ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
+  ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, -150, 0), "mm")), 
                         g1 + theme(legend.position = "none"),
                         g2 + theme(legend.position = "none"),
                         g3 + theme(legend.position = "none"),
                         gds + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
-                        rel_heights = c(3, 0.3, 0.3 ,0.3 ,0.3, 5), ncol = 1)
+                        rel_heights = c(3, 0.3, 0.3 ,0.3 ,0.3), ncol = 1)
   
   # store plots in plot.list 
   plot.list <- list()
-  plot.list[[1]] <- heatmap.dataset
-  plot.list[[2]] <- heatmap.median
-  plot.list[[3]] <- ann.tree
+  plot.list[["heatmap_dataset"]] <- heatmap.dataset
+  plot.list[["heatmap_median"]] <- heatmap.median
+  plot.list[["ann_tree"]] <- ann.tree
   return(plot.list)
 }
 
@@ -317,19 +326,27 @@ list.k <- as.list(c(0, 3:10))
 plots <- lapply(list.k, function(x) {plot_crossmethod_concordance(res, ncluster = x)})
 
 pdf(gsub("\\.rds$", "_median_all.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(plots , '[', 2))
+cowplot::plot_grid(plotlist = sapply(plots , "[", "heatmap_median"))
 dev.off()
 
-pdf(gsub("\\.rds$", "_dataset_all.pdf", outrds), width = 50, height = 10)
-cowplot::plot_grid(plotlist = sapply(plots , '[', 1), ncol = 2)
+pdf(gsub("\\.rds$", "_median_all_truenclust.pdf", outrds), width = 7, height = 7)
+cowplot::plot_grid(plotlist = sapply(plots[1] , "[", "heatmap_median"))
+dev.off()
+
+pdf(gsub("\\.rds$", "_dataset_all.pdf", outrds), width = 50, height = 50)
+cowplot::plot_grid(plotlist = sapply(plots , "[", "heatmap_dataset"), ncol = 2)
+dev.off()
+
+pdf(gsub("\\.rds$", "_dataset_all_truenclust.pdf", outrds), width = 15, height = 10)
+cowplot::plot_grid(plotlist = sapply(plots[1] , "[", "heatmap_dataset"))
 dev.off()
 
 pdf(gsub("\\.rds$", "_tree_all.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(plots , '[', 3))
+cowplot::plot_grid(plotlist = sapply(plots , "[", "ann_tree"))
 dev.off()
 
 pdf(gsub("\\.rds$", "_tree_all_truenclust.pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = sapply(plots[1], '[', 3))
+cowplot::plot_grid(plotlist = sapply(plots[1], "[", "ann_tree"))
 dev.off()
 
 saveRDS(plots, file = outrds)
