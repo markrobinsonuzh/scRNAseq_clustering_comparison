@@ -47,7 +47,6 @@ tbl <- do.call(rbind, lapply(names(all_data), function(nm) {
              stringsAsFactors = FALSE)
 }))
 
-
 ## avg.silhoutte width
 silh <- readRDS(file = silhouetterds)
 avg.s <- sapply(silh, function(x) x$avg.width)
@@ -60,16 +59,5 @@ tbl <- tbl %>% dplyr::left_join(data.frame(dataset = names(avg.s),
 
 write.csv(tbl, file = outcsv)
 
-## fractions of excluded cells 
-tbl_cellexcl <- tbl %>%
-  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
-  dplyr::select(-sce)  %>%
-  group_by(dataset) %>%
-  mutate(p.excluded=1-ncells/max(ncells)) %>%
-  reshape2::dcast(dataset~filtering, value.var = "p.excluded") %>%
-  select(2:4) %>%
-  filter(filteredExpr10!=0) %>% 
-  xtable::xtable(caption = "Fractions of filtered cells for the Zhengmix datasets.")
-  
 date()
 sessionInfo()
