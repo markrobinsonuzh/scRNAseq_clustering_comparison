@@ -50,7 +50,8 @@ venn_diagrams <- lapply(gene_ids_by_ds ,function(x){
                            ext.text = TRUE,
                            lwd = 1,
                            cat.default.pos = "outer",
-                           cat.dist = c(0.05, 0.05, 0.05)
+                           cat.dist = c(0.05, 0.05, 0.05),
+                           print.mode="percent"
                            )
   })
 
@@ -58,7 +59,7 @@ venn_diagrams <- lapply(gene_ids_by_ds ,function(x){
 plots <-  lapply(venn_diagrams, function(x)gTree(children=x))
 
 pdf(gsub("rds$", "pdf", outrds), width = 15, height = 10)
-cowplot::plot_grid(plotlist = plots, ncol = 3, labels = names(plots))
+cowplot::plot_grid(plotlist = plots, ncol = 3, labels = datasets)
 dev.off()
 
 saveRDS(plots, file = outrds)
