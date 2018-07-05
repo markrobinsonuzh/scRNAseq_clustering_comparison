@@ -22,9 +22,11 @@ cowplot::plot_grid(
   cowplot::plot_grid(
     entropy[["deltanormentropy_at_truth"]],
     differences[["diff_kmax_ktrue"]],
-    labels = c("B", "C"), nrow = 1, rel_widths = c(1, 1.3)
+    labels = c("B", "C"), nrow = 1, rel_widths = c(1, 1.3),
+    label_size = 20
   ), 
-  labels = c("A", ""), ncol = 1, rel_heights = c(1, 0.8)
+  labels = c("A", ""), ncol = 1, rel_heights = c(1, 0.8),
+  label_size = 20
 )
 dev.off()
 

@@ -68,7 +68,7 @@ plots[["median_ari_heatmap_truek"]] <-
              fill = medianARI)) +
   geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
   facet_wrap(~ filtering) +
-  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  scale_fill_viridis(name = "Median ARI", direction = -1, na.value = "white") +
   theme_tufte(base_family = "Helvetica") +
   labs(x = NULL, y = NULL, title = "") +
   coord_equal() +
@@ -95,7 +95,7 @@ plots[["median_ari_heatmap_bestk"]] <-
              fill = medianARI)) +
   geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
   facet_wrap(~ filtering) +
-  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  scale_fill_viridis(name = "Median ARI", direction = -1, na.value = "white") +
   theme_tufte(base_family = "Helvetica") +
   labs(x = NULL, y = NULL, title = "") +
   coord_equal() +
@@ -158,7 +158,7 @@ plots[["median_ari_heatmap_estnclust"]] <-
              fill = medianARI)) +
   geom_tile(color = "white", size = 0.5, na.rm = FALSE) +
   facet_wrap(~ filtering) +
-  scale_fill_viridis(name = "Median ARI", direction = -1) +
+  scale_fill_viridis(name = "Median ARI", direction = -1, na.value = "white") +
   theme_tufte(base_family = "Helvetica") +
   labs(x = NULL, y = NULL, title = "") +
   coord_equal() +

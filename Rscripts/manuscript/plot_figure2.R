@@ -18,7 +18,8 @@ pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
 cowplot::plot_grid(
   timing[["time_normalized_by_tsne"]], 
   performance[["scatter_time_vs_ari_truek"]], 
-  labels = c("A", "B"), nrow = 1, rel_widths = c(1, 3)
+  labels = c("A", "B"), nrow = 1, rel_widths = c(1, 3), 
+  label_size = 20
 )
 dev.off()
 
