@@ -54,24 +54,27 @@ tbl <- do.call(rbind, lapply( names(all_data), function(nm) {
     select( total_counts, total_features, pct_counts_top_50_features) %>%
     mutate(cell=row.names(.), dataset=nm )
 }))
-
-dd <- left_join(res_filt,tbl, by=c("cell", "dataset"))%>%select(-resolution) 
 # nest dataframe, remove NA groups
-d <- dd%>%group_by(dataset,method, k, run)%>%
+comb.tbl <- left_join(res_filt,tbl, by=c("cell", "dataset")) %>%
+  select(-resolution) %>%
+  group_by(dataset,method, k, run) %>%
   filter(any(!is.na(cluster))) %>%
   nest()
+
 ## test on total_features, total_counts
 # functions for test with KW
 kw.fun <- function(df){
-  kruskal.test(formula=total_counts~cluster , data=df)
+  kruskal.test(formula=total_counts~cluster, data=df)
 }
 # extract pval
 p_kw <- function(mod){
   mod$p.value
 }
-f <- d %>% mutate( model= map(data, kw.fun) ) %>% 
+f <- comb.tbl %>% mutate( model= map(data, kw.fun) ) %>% 
   transmute(dataset,method, p.value = map_dbl(model, p_kw))  %>%
   mutate(p.corr=p.adjust(p.value, "BH"))
+
+
 # plot pvals
 # format
 f <- f%>%tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
