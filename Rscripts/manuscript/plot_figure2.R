@@ -14,7 +14,7 @@ suppressPackageStartupMessages({
 performance <- readRDS(performancerds)
 timing <- readRDS(timerds)
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 8)
 cowplot::plot_grid(
   timing[["time_normalized_by_tsne"]], 
   performance[["scatter_time_vs_ari_truek"]], 

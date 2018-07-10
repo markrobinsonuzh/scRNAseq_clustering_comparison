@@ -58,7 +58,7 @@ venn_diagrams <- lapply(gene_ids_by_ds ,function(x){
 ## Reformat gList to gTree
 plots <-  lapply(venn_diagrams, function(x) gTree(children = x))
 
-pdf(gsub("rds$", "pdf", outrds), width = 15, height = 10)
+pdf(gsub("rds$", "pdf", outrds), width = 15, height = 15)
 cowplot::plot_grid(plotlist = plots, ncol = 3, labels = names(plots))
 dev.off()
 

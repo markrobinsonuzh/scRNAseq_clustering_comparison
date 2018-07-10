@@ -9,7 +9,7 @@ include include_methods.mk
 include include_datasets.mk
 include include_filterings.mk
 
-ncores := 30
+ncores := 24
 
 .PHONY: all prepare_data cluster
 

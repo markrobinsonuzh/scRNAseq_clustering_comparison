@@ -90,9 +90,13 @@ helper_ensemble <- function(methods, df) {
           
           ## Make ensemble and generate consensus clustering
           re <- clue::as.cl_ensemble(re)
-          re <- clue::cl_consensus(re, method = "SE", control = list(nruns = 50)) # no NAS!
-          clusters <- clue::cl_class_ids(re)
-          m[, runs[j]] <- clusters[rownames(m)]
+          if (all(sapply(re, length) == 0)) {
+            m[, runs[j]] <- NA
+          } else {
+            re <- clue::cl_consensus(re, method = "SE", control = list(nruns = 50)) # no NAS!
+            clusters <- clue::cl_class_ids(re)
+            m[, runs[j]] <- clusters[rownames(m)]
+          }
         }
 
         out <- data.frame(res.w, stringsAsFactors = FALSE) %>%
