@@ -77,9 +77,9 @@ p_kw <- function(mod){
 }
 
 res.pval <- comb.tbl %>% mutate( mod.counts= map(data, kw.fun, formula=as.formula(total_counts~cluster)),
-                          mod.features=map(data, kw.fun, formula=as.formula(total_features~cluster)) ) %>% 
+                                 mod.features=map(data, kw.fun, formula=as.formula(total_features~cluster)) ) %>% 
   transmute(dataset,method, p.counts = map_dbl(mod.counts, p_kw), 
-                            p.features =  map_dbl(mod.features, p_kw))  %>%
+            p.features =  map_dbl(mod.features, p_kw))  %>%
   mutate(p.counts=p.adjust(p.counts, "BH"),
          p.features=p.adjust(p.features, "BH"))
 
@@ -104,9 +104,9 @@ ggplot2::ggplot(res.pval,
   #facet_grid(.~dataset) +
   theme(axis.text.x = element_text(angle=90))
 
-# To do , add mt genes etc. as covariates
+# To do; add covariates
 lapply(all_data,function(x){
-  sum(grepl("mt", rownames(x)), na.rm = TRUE) 
+  sum(grepl("^rps-", rownames(x)), na.rm = TRUE) 
 })
 lapply(all_data,function(x){
   sum(grepl("rpl", rownames(x)), na.rm = TRUE) 
