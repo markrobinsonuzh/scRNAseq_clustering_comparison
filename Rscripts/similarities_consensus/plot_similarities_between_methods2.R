@@ -226,10 +226,10 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   
   # colors for heatmap
   colors <- list(
-    dimension = c(PCA = "#C10359", tSNE = "#fd9ec9", None = "#fed8e9"),
+    dimension = c(PCA = "#C10359", tSNE = "#fd9ec9", Various = "#FF33FF", None = "#fed8e9"),
     clustering = c(Hierarchical = "#01368C", Graph = "#2F6CCE", Kmeans = "#93B8F2",
-                   SOM = "#d1e1fa", ModelBased = "#030a17"),
-    counts = c(Raw = "#2EA801", LogNorm = "#96E878")
+                   SOM = "#d1e1fa", ModelBased = "#030a17", Various = "#9933FF"),
+    counts = c(Raw = "#2EA801", LogNorm = "#96E878", Various = "#DBFC07")
   )
   
   g1 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = dimension)) + 
