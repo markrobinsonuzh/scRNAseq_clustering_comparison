@@ -12,19 +12,23 @@ print(pctkeep)
 print(datasets)
 print(datadir)
 print(clusteringsummary)
+print(outrds)
+
 #------------------------------------------------
 # Test covariates
 #------------------------------------------------
 suppressPackageStartupMessages({
-  
   library(dplyr)
   library(purrr)
   library(tidyr)
   library(SingleCellExperiment)
   library(ggplot2)
-  
 })
-# load data
+
+## load colors
+source("Rscripts/Colorscheme.R")
+
+## load data
 datasets_filtered <- c(outer(paste0(datadir, "/sce_filtered", filterings, pctkeep, "/sce_filtered", 
                                     filterings, pctkeep), 
                              paste0(datasets, ".rds"),
@@ -38,79 +42,81 @@ all_data <- lapply(c(datasets_filtered, datasets_full), function(x) {
   readRDS(x)
 })
 
-# load summaries
+## load summaries
 res <- readRDS(file = clusteringsummary)
-res <-  res %>%group_by(dataset, method,run) %>%
-  mutate( cluster=as.numeric(cluster), truenclust=length(unique(trueclass) ))
+res <- res %>% dplyr::group_by(dataset, method, run) %>%
+  dplyr::mutate(cluster = as.numeric(cluster), truenclust = length(unique(trueclass)))
 
-# remove Seurat, k == truenclust
-# what to do with the different runs(test all, conensus)? choose only one as starting point
-res_filt <- res %>% filter( k==truenclust, run==1, !method %in% c("Seurat"))
-# combine dataframes 
+## remove Seurat, k == truenclust
+## what to do with the different runs(test all, conensus)? choose only one as starting point
+res_filt <- res %>% dplyr::filter(k == truenclust, run == 1, !method %in% c("Seurat"))
+
+## combine dataframes 
 ## select what
-select <- as.name(c)
 sel <- c("total_counts", "total_features", "pct_counts_top_50_features")
-as.name(sel[2] )
 
-tbl <- do.call(rbind, lapply( names(all_data), function(nm) {
+tbl <- do.call(rbind, lapply(names(all_data), function(nm) {
   x <- all_data[[nm]]
   colData <- colData(x) %>%
     as.data.frame() %>% 
-    select( total_counts, total_features, pct_counts_top_50_features) %>%
-    mutate(cell=row.names(.), dataset=nm )
+    dplyr::select(total_counts, total_features, pct_counts_top_50_features) %>%
+    dplyr::mutate(cell = row.names(.), dataset = nm)
 }))
-# nest dataframe, remove NA groups
-comb.tbl <- left_join(res_filt,tbl, by=c("cell", "dataset")) %>%
-  select(-resolution) %>%
-  group_by(dataset,method, k, run) %>%
-  filter(any(!is.na(cluster))) %>%
+
+## nest dataframe, remove NA groups
+comb.tbl <- dplyr::inner_join(res_filt, tbl, by = c("cell", "dataset")) %>%
+  dplyr::select(-resolution) %>%
+  dplyr::group_by(dataset,method, k, run) %>%
+  dplyr::filter(any(!is.na(cluster))) %>%
   nest()
 
 ## test on total_features, total_counts
-# functions for test with KW
+## functions for test with KW
 kw.fun <- function(df, formula){
-  kruskal.test(formula=formula, data=df)
+  kruskal.test(formula = formula, data = df)
 }
-# extract pval
-p_kw <- function(mod){
+
+## extract pval
+p_kw <- function(mod) {
   mod$p.value
 }
 
-res.pval <- comb.tbl %>% mutate( mod.counts= map(data, kw.fun, formula=as.formula(total_counts~cluster)),
-                                 mod.features=map(data, kw.fun, formula=as.formula(total_features~cluster)) ) %>% 
+res.pval <- comb.tbl %>% 
+  dplyr::mutate(mod.counts = map(data, kw.fun, formula = as.formula(total_counts~cluster)),
+                mod.features = map(data, kw.fun, formula = as.formula(total_features~cluster))) %>% 
   transmute(dataset,method, p.counts = map_dbl(mod.counts, p_kw), 
-            p.features =  map_dbl(mod.features, p_kw))  %>%
-  mutate(p.counts=p.adjust(p.counts, "BH"),
-         p.features=p.adjust(p.features, "BH"))
+            p.features =  map_dbl(mod.features, p_kw)) %>%
+  mutate(p.counts = p.adjust(p.counts, "BH"),
+         p.features = p.adjust(p.features, "BH"))
 
-# plot pvals
-# format
-res.pval <- res.pval%>%tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
+## plot pvals
+## format
+res.pval <- res.pval %>% 
+  tidyr::separate(dataset, sep = "_", into = c("sce", "filtering", "dataset")) %>%
   dplyr::select(-sce)
-# plot
+
+## plot
+pdf(gsub("rds$", "pdf", outrds), width = 12, height = 8)
 ggplot2::ggplot(res.pval,
-                aes(x=method,y=p.features)) +
-  geom_point(aes(color=dataset),position="jitter") +
-  #facet_grid(filtering~dataset, scales = "free" ) +
-  geom_hline(yintercept=0.01 ) +
-  #facet_grid(.~dataset) +
-  theme(axis.text.x = element_text(angle=90))
+                aes(x = method, y = -log10(p.features))) +
+  geom_point(aes(color = method, shape = filtering), size = 3, 
+             position = position_jitter(width = 0.1)) +
+  expand_limits(y = 0) + manual.scale + 
+  theme_bw() + facet_wrap(~ dataset, scales = "free_y") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
 ggplot2::ggplot(res.pval,
-                aes(x=method,y=p.counts)) +
-  geom_point(aes(color=dataset),position="jitter") +
-  #facet_grid(filtering~dataset, scales = "free" ) +
-  geom_hline(yintercept=0.01 ) +
-  #facet_grid(.~dataset) +
-  theme(axis.text.x = element_text(angle=90))
+                aes(x = method, y = -log10(p.counts))) +
+  geom_point(aes(color = method, shape = filtering), size = 3, 
+             position = position_jitter(width = 0.1)) +
+  expand_limits(y = 0) + manual.scale + 
+  theme_bw() + facet_wrap(~ dataset, scales = "free_y") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+dev.off()
 
-# To do; add covariates
-lapply(all_data,function(x){
-  sum(grepl("^rps-", rownames(x)), na.rm = TRUE) 
-})
-lapply(all_data,function(x){
-  sum(grepl("rpl", rownames(x)), na.rm = TRUE) 
-})
+saveRDS(NULL, outrds)
+date()
+sessionInfo()
 
 
 

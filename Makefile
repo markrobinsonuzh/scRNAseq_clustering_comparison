@@ -23,8 +23,6 @@ cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATAS
 
 cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-cluster1: $(foreach f,$(ALLFILTERINGS),$(foreach m,SAFE,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
-
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
 output/dataset_summarytable.csv
 
@@ -34,7 +32,7 @@ plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
 plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds \
-plots/filtering_comparisons/filtering_comparisons.rds
+plots/filtering_comparisons/filtering_comparisons.rds plots/covariate_cluster_association/covariate_cluster_association.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
 
@@ -288,6 +286,13 @@ Rscripts/evaluate_results/plot_comparison_filterings.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_comparison_filterings.R Rout/plot_comparison_filterings.Rout
 
+## test for differences in covariates between clusters
+plots/covariate_cluster_association/covariate_cluster_association.rds: output/clustering_summary/clustering_summary.rds \
+$(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
+$(foreach d,$(DATASETS),data/sce_full/sce_full_$(d).rds) \
+Rscripts/evaluate_results/test_for_covariates.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' datasets='$(DATASETSc)' filterings='$(FILTERINGSc)' pctkeep=10 clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/test_for_covariates.R Rout/test_for_covariates.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Manuscript figures
