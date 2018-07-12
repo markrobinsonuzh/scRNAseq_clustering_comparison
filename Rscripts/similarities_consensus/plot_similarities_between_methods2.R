@@ -309,7 +309,7 @@ plot_crossmethod_concordance <- function(res, ncluster) {
                         g2 + theme(legend.position = "none"),
                         g3 + theme(legend.position = "none"),
                         gds + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
-                        rel_heights = c(3, 0.3, 0.3 ,0.3 ,0.3), ncol = 1)
+                        rel_heights = c(3, 0.3, 0.3, 0.3, 0.3), ncol = 1)
   
   # store plots in plot.list 
   plot.list <- list()
