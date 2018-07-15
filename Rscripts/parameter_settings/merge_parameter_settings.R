@@ -38,7 +38,7 @@ allparams <- lapply(filterings, function(f) {
   })
 })
 allparams <- unlist(unlist(allparams, recursive = FALSE), recursive = FALSE)
-names(allparams) <- paste0("sce_filtered", gsub("\\.", "_", names(allparams)))
+names(allparams) <- paste0("sce_", gsub("\\.", "_", names(allparams)))
 
 saveRDS(allparams, outrds)
 date()

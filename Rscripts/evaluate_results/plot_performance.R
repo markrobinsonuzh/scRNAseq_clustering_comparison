@@ -56,7 +56,7 @@ plots[["median_ari_vs_k"]] <-
         axis.title = element_text(size = 20),
         legend.title = element_text(size = 16),
         legend.text = element_text(size = 16),
-        legend.position = "right")
+        legend.position = "bottom")
 
 ## Heatmap of median ARI at true k
 plots[["median_ari_heatmap_truek"]] <- 
@@ -185,7 +185,7 @@ pdf(gsub("\\.rds$", "_medianARIheatmap_estk.pdf", outrds), width = 15, height = 
 print(plots[["median_ari_heatmap_estnclust"]])
 dev.off()
 
-pdf(gsub("\\.rds$", "_medianARIheatmap_bestk.pdf", outrds), width = 15, height = 9)
+pdf(gsub("\\.rds$", "_medianARIheatmap_bestk.pdf", outrds), width = 20, height = 9)
 print(plots[["median_ari_heatmap_bestk"]])
 dev.off()
 

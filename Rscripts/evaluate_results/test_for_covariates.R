@@ -48,7 +48,7 @@ res <- res %>% dplyr::group_by(dataset, method, run) %>%
   dplyr::mutate(cluster = as.numeric(cluster), truenclust = length(unique(trueclass)))
 
 ## remove Seurat, k == truenclust
-## what to do with the different runs(test all, conensus)? choose only one as starting point
+## Select one run
 res_filt <- res %>% dplyr::filter(k == truenclust, run == 1, !method %in% c("Seurat"))
 
 ## combine dataframes 
@@ -103,7 +103,10 @@ ggplot2::ggplot(res.pval,
              position = position_jitter(width = 0.1)) +
   expand_limits(y = 0) + manual.scale + 
   theme_bw() + facet_wrap(~ dataset, scales = "free_y") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+  labs(y = "-log10(adjusted p-value)", x = "", 
+       title = "Association between number of detected features and cluster assignment") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        axis.title.y = element_text(size = 16))
 
 ggplot2::ggplot(res.pval,
                 aes(x = method, y = -log10(p.counts))) +
@@ -111,7 +114,10 @@ ggplot2::ggplot(res.pval,
              position = position_jitter(width = 0.1)) +
   expand_limits(y = 0) + manual.scale + 
   theme_bw() + facet_wrap(~ dataset, scales = "free_y") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+  labs(y = "-log10(adjusted p-value)", x = "",
+       title = "Association between number of counts and cluster assignment") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        axis.title.y = element_text(size = 16))
 dev.off()
 
 saveRDS(NULL, outrds)

@@ -194,7 +194,7 @@ pdf(gsub("\\.rds$", "_heatmap_perdata_truek.pdf", outrds), width = 20, height = 
 plots[["filterings_heatmap_perdata_truek"]]
 dev.off()
 
-pdf(gsub("\\.rds$", "_heatmap_summary_truek.pdf", outrds), width = 20, height = 12)
+pdf(gsub("\\.rds$", "_heatmap_summary_truek.pdf", outrds), width = 15, height = 8)
 plots[["filterings_heatmap_summary_truek"]]
 dev.off()
 

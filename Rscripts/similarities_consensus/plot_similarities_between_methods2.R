@@ -38,14 +38,14 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   res.cons <- res %>% dplyr::group_by(dataset, method, k) %>% 
     dplyr::mutate(truenclust = length(unique(trueclass))) %>% 
     dplyr::filter(k == ifelse(ncluster == 0, truenclust, ncluster), !method %in% c("Seurat")) %>% 
-    dplyr::select(dataset, method, consensus, k, cell)
+    dplyr::select(dataset, method, consensus, k, cell, trueclass)
   # for Seurat, pick resolution param 
   res.cons.seurat <- res %>% dplyr::group_by(dataset, method, k) %>% 
     dplyr::filter(method %in% c("Seurat")) %>% 
     dplyr::mutate(truenclust = length(unique(trueclass))) %>% 
     dplyr::filter(k == ifelse(ncluster == 0, truenclust, ncluster)) %>%
     filter(resolution == sample(resolution, 1)) %>% 
-    dplyr::select(dataset, method, consensus, k, cell)
+    dplyr::select(dataset, method, consensus, k, cell, trueclass)
   res.cons <- dplyr::bind_rows(res.cons , res.cons.seurat)
   
   # compute  matrix with pairwise ARIs
@@ -55,15 +55,26 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   for (i in unique(res.cons$dataset)) {
     print(i)
     x <- subset(res.cons, dataset == i)
-    m <- matrix(NA, nrow = length(unique(x$method)), ncol = length(unique(x$method)))
-    rownames(m) <- unique(x$method)
-    colnames(m) <- unique(x$method)
-    for (j in unique(x$method)) {
+    m <- matrix(NA, nrow = length(unique(x$method)) + 1, 
+                ncol = length(unique(x$method)) + 1)
+    rownames(m) <- c(unique(x$method), "Truth")
+    colnames(m) <- c(unique(x$method), "Truth")
+    for (j in c(unique(x$method), "Truth")) {
       print(j)
-      c1 <- subset(x, method == j) 
-      for (u in unique(x$method)) {
+      if (j == "Truth") {
+        c1 <- x %>% dplyr::ungroup() %>% dplyr::select(cell, trueclass) %>% 
+          dplyr::distinct() %>% dplyr::rename(consensus = trueclass)
+      } else {
+        c1 <- subset(x, method == j) 
+      }
+      for (u in c(unique(x$method), "Truth")) {
         print(u)
-        c2 <- subset(x, method == u) 
+        if (u == "Truth") {
+          c2 <- x %>% dplyr::ungroup() %>% dplyr::select(cell, trueclass) %>% 
+            dplyr::distinct() %>% dplyr::rename(consensus = trueclass)
+        } else {
+          c2 <- subset(x, method == u) 
+        }
         ## get shared cells, calculate ARI
         scl <- intersect(c1$cell, c2$cell)
         m[j, u] <- mclust::adjustedRandIndex(c1$consensus[match(scl, c1$cell)], 
@@ -80,9 +91,8 @@ plot_crossmethod_concordance <- function(res, ncluster) {
     dplyr::summarise(median = median(ARI, na.rm = TRUE)) %>%
     dplyr::arrange(Var1, Var2) %>% dplyr::ungroup()
   
-  ## Calculate average area under concordance curve across all data set
-  ## instances, for each pair of methods
-  
+  ## Calculate median ARI across all data set instances, for each pair of
+  ## methods
   m.median <- reshape2::acast(df.median, Var1 ~ Var2, value.var = "median") 
   stopifnot(all(rownames(m.median) == colnames(m.median)))
   

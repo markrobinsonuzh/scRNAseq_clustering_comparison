@@ -19,4 +19,4 @@ colors <- tol12qualitative
 
 # manual scale for ggplot
 names(colors) <- methods
-manual.scale <- scale_colour_manual(name = "method", values = colors)
+manual.scale <- scale_colour_manual(name = "", values = colors)
