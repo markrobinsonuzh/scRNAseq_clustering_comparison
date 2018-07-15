@@ -14,7 +14,7 @@ Todo.md
 data/
 envs/
 old/
-parameter_settings/
+./parameter_settings/
 results/
 scRNAseq_clustering_comparison.Rproj
 Rlibrary3.5/
@@ -25,7 +25,6 @@ Rscripts/clustering/Reference_manual_RaceID2_StemID.pdf
 plots2/
 Rplots.pdf
 memory_usage.txt
-Rscripts/plot_memory_usage.R
 Rscripts/evaluate_datasets/countsim_report.html
 
 

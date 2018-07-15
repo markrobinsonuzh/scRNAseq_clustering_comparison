@@ -14,7 +14,7 @@ ncores := 24
 .PHONY: all prepare_data cluster
 
 ## Define rules
-all: prepare_data cluster summarise figs memoryusage
+all: prepare_data cluster summarise figs memoryusage mergeparameters
 
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
@@ -35,6 +35,8 @@ plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.
 plots/filtering_comparisons/filtering_comparisons.rds plots/covariate_cluster_association/covariate_cluster_association.rds
 
 memoryusage: plots/memory_usage/memory_usage.rds
+
+mergeparameters: output/parameter_settings/all_parameter_settings.rds
 
 ## ------------------------------------------------------------------------------------ ##
 ## Setup
@@ -322,8 +324,15 @@ plots/manuscript/figure5.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts
 
 
 
-
-
+## ------------------------------------------------------------------------------------ ##
+## Prepare data for distribution
+## ------------------------------------------------------------------------------------ ##
+output/parameter_settings/all_parameter_settings.rds: \
+$(foreach d,$(DATASETS),$(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),parameter_settings/sce_$(f)_$(d)_$(m).json))) \
+$(foreach d,$(DATASETS),$(foreach f,$(ALLFILTERINGS),parameter_settings/sce_$(f)_$(d).json)) \
+$(foreach m,$(METHODS),parameter_settings/$(m).json) Rscripts/parameter_settings/merge_parameter_settings.R
+	mkdir -p $(@D)
+	$(R) "--args paramdir='parameter_settings' datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/parameter_settings/merge_parameter_settings.R Rout/merge_parameter_settings.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Plot memory usage
