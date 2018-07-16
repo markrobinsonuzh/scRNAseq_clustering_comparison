@@ -33,7 +33,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 
 ## Adding a data set
 - To add a data set to the comparison, construct a script that will generate a `SingleCellExperiment` object for each of the filterings, and put it in the corresponding folder in `data`.
-- Generate `rds` files containing the parameter values to use for each method (or empty lists if there are no hyperparameters). See `Rscripts/parameter_settings/generate_parameter_settings.R` for examples.
+- Generate `rds` files containing the parameter values to use for each method (or empty lists if there are no hyperparameters). See [Rscripts/parameter_settings/generate_parameter_settings.R](Rscripts/parameter_settings/generate_parameter_settings.R) for examples.
 - Then add the name of the data set to `include_datasets.mk`.
 
 ## Adding a method
