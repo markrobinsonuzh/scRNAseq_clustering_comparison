@@ -5,7 +5,12 @@
 .Ruserdata
 clustering_duo.Rproj
 .DS_Store
-output/
+output/clustering_summary
+output/consensus
+output/dataset_summarytable.csv
+output/ensemble
+output/parameter_settings
+output/silhouettes
 plots/
 Rout/
 Rscripts2/
