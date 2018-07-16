@@ -22,7 +22,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
                        "splatter", "cluster", "scran", "tibble", "grid", 
                        "gridExtra", "VennDiagram", "ggalluvial", "M3Drop",
                        "MultiAssayExperiment", "rjson", "hadley/multidplyr",
-                       "mclust", "ape", "clusterExperiment"))
+                       "mclust", "ape", "clusterExperiment", "csoneson/countsimQC"))
 ```
 
 - Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.5GB).
