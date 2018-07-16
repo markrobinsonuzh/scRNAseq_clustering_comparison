@@ -43,3 +43,6 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 
 ## Downloading the data and results directly
 The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+
+## countsimQC report 
+The [countsimQC](https://github.com/csoneson/countsimQC) report, comparing the characteristics of the simulated data sets to the underlying real data set, can be found [here](http://htmlpreview.github.io/?https://github.com/markrobinsonuzh/scRNAseq_clustering_comparison/blob/master/output/countsimQC/Kumar_countsimQC.html).
