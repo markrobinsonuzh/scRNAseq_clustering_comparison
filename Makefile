@@ -1,6 +1,4 @@
-## Define the versions of R and the paths to the libraries
-#R := R_LIBS=/home/Shared/Rlib/release-3.6-lib/ /usr/local/R/R-3.4.2/bin/R CMD BATCH --no-restore --no-save
-#Rd := R_LIBS=/home/Shared/Rlib/devel-lib/ /usr/local/R/R-devel/bin/R CMD BATCH --no-restore --no-save
+## Define the path to the R binary and the R library
 Rscript := /usr/local/R/R-3.4.2/src/unix/Rscript --no-restore --no-save
 R := R_LIBS=Rlibrary3.5 /usr/local/R/R-3.5.0/bin/R CMD BATCH --no-restore --no-save
 
@@ -9,23 +7,28 @@ include include_methods.mk
 include include_datasets.mk
 include include_filterings.mk
 
+## Set number of cores to use for multi-threaded computations
 ncores := 24
 
-.PHONY: all prepare_data cluster
+.PHONY: all prepare_data cluster summarise figs memoryusage mergeparameters
 
+## ------------------------------------------------------------------------------------ ##
 ## Define rules
+## ------------------------------------------------------------------------------------ ##
+## Default rule
 all: prepare_data cluster summarise figs memoryusage mergeparameters
 
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
 
+## Run clustering
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-cluster5: $(foreach f,$(ALLFILTERINGS),$(foreach m,RaceID2,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
-
+## Summarise clustering output
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
 output/dataset_summarytable.csv
 
+## Plot
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
 plots/manuscript/figure4.rds plots/manuscript/figure5.rds \
 plots/performance/seurat_diagnostics.rds \
@@ -34,13 +37,19 @@ plots/similarities_between_methods/similarities.rds plots/shared_genes_filtering
 plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds \
 plots/filtering_comparisons/filtering_comparisons.rds plots/covariate_cluster_association/covariate_cluster_association.rds
 
+## Plot approximate memory usage
 memoryusage: plots/memory_usage/memory_usage.rds
 
+## Generate a file with all parameter settings
 mergeparameters: output/parameter_settings/all_parameter_settings.rds
+
+## List all packages that were used, by parsing the Rout files
+listpackages:
+	$(R) Rscripts/list_packages.R Rout/list_packages.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Setup
-## Note! Run the setup rule only once, to set up the directory structure and download the data. 
+## Important!! Run the setup rule only once, to set up the directory structure and download the data. 
 ## If it is rerun, it will update the raw data files and cause the results to be out of date.
 ## If additional parameters need to be defined or modified at a later stage, generate only 
 ## those parameter files manually.
@@ -53,13 +62,9 @@ directories:
 	mkdir -p data/data_raw
 	mkdir -p data/data_raw/zheng
 	mkdir -p data/sce_full
-	mkdir -p plots/qc_data
-	mkdir -p plots/performance
-	mkdir -p plots/runtime
 	mkdir -p results
 	mkdir -p Rout
-	mkdir -p output/clustering_summary
-	mkdir -p output/parameter_range_investigation
+	mkdir -p parameter_settings
 
 conquer: directories
 	wget -P data/data_raw http://imlspenticton.uzh.ch/robinson_lab/conquer/data-mae/GSE60749-GPL13112.rds
@@ -146,18 +151,9 @@ endef
 $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),$(eval $(call filterrule,$(d),$(f),$(p))))))
 
 ## ------------------------------------------------------------------------------------ ##
-## Generate QC plots
-## ------------------------------------------------------------------------------------ ##
-#define qcrule
-#plots/qc_data/$(1).rds: data/sce_full/sce_full_$(1).rds Rscripts/evaluate_datasets/plot_dataset_characteristics.R
-#	$(R) "--args scefull='data/sce_full/sce_full_$(1).rds' scefiltered='data/sce_filteredExpr/sce_filteredExpr_$(1).rds' outrds='$$@'" Rscripts/evaluate_datasets/plot_dataset_characteristics.R Rout/plot_dataset_characteristics_$(1).Rout
-#endef
-#$(foreach d,$(DATASETS),$(eval $(call qcrule,$(d))))
-
-## ------------------------------------------------------------------------------------ ##
 ## Apply clustering methods
 ## ------------------------------------------------------------------------------------ ##
-define clusterrule ## $(1) - sce_full, sce_filteredExpr, sce_filteredHVG, sce_filteredM3Drop. $(2) - dataset. $(3) - clustering method
+define clusterrule
 results/$(1)_$(2)_$(3).rds: data/$(1)/$(1)_$(2).rds parameter_settings/$(1)_$(2).json \
 parameter_settings/$(1)_$(2)_$(3).json parameter_settings/$(3).json \
 Rscripts/clustering/apply_$(3).R Rscripts/clustering/run_clustering.R
@@ -174,14 +170,14 @@ $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),resu
 	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
 
 ## ------------------------------------------------------------------------------------ ##
-## Compute consensus
+## Compute consensus across the five repeated runs
 ## ------------------------------------------------------------------------------------ ##
 output/consensus/consensus.rds: output/clustering_summary/clustering_summary.rds Rscripts/similarities_consensus/compute_consensus.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' ncores=$(ncores) outrds='$@'" Rscripts/similarities_consensus/compute_consensus.R Rout/compute_consensus.Rout
 
 ## ------------------------------------------------------------------------------------ ##
-## Compute ensembles
+## Compute ensembles by combining each pair of methods
 ## ------------------------------------------------------------------------------------ ##
 output/ensemble/ensemble.rds: output/clustering_summary/clustering_summary.rds Rscripts/ensemble/compute_ensemble.R
 	mkdir -p $(@D)
@@ -232,13 +228,13 @@ Rscripts/evaluate_results/plot_entropy.R Rscripts/Colorscheme.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_entropy.R Rout/plot_entropy.Rout
 
-## difference between estimated or optimal k and true k
+## difference between estimated k or optimal k and true k
 plots/performance/difference_in_k.rds: output/clustering_summary/clustering_summary.rds \
 Rscripts/evaluate_results/plot_k_differences.R Rscripts/Colorscheme.R
 	mkdir -p $(@D)
 	$(R) "--args clusteringsummary='$<' outrds='$@'" Rscripts/evaluate_results/plot_k_differences.R Rout/plot_k_differences.Rout
 
-## Seurat k vs resolution
+## Seurat: k vs resolution
 plots/performance/seurat_diagnostics.rds: output/clustering_summary/clustering_summary.rds \
 Rscripts/evaluate_results/plot_Seurat_k_resolution.R
 	mkdir -p $(@D)
@@ -321,9 +317,6 @@ plots/manuscript/figure5.rds: plots/ensemble/ensemble_vs_individual.rds Rscripts
 	mkdir -p $(@D)
 	$(R) "--args ensemblerds='$(word 1,$^)' outrds='$@'" Rscripts/manuscript/plot_figure5.R Rout/plot_figure5.Rout
 
-
-
-
 ## ------------------------------------------------------------------------------------ ##
 ## Prepare data for distribution
 ## ------------------------------------------------------------------------------------ ##
@@ -343,6 +336,4 @@ $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),resu
 	egrep "Ncells|Vcells" Rout/run_clustering* > $(@D)/memory_usage.txt
 	$(R) "--args memusetxt='$(@D)/memory_usage.txt' outrds='$@'" Rscripts/plot_memory_usage.R Rout/plot_memory_usage.Rout
 
-listpackages:
-	$(R) Rscripts/list_packages.R Rout/list_packages.Rout
 

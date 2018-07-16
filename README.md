@@ -1,24 +1,28 @@
 # scRNAseq clustering comparison
-A study to compare methods for clustering of scRNA-seq data
+This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data
 
 ## Instructions
+If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time.
+
 - Clone this repository
 - Modify the `R` and `Rscript` variables in the top of `Makefile` to point to the version of `R` that you want to use.
 - Install the necessary `R` packages and dependencies:
 
 ```
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("RColorBrewer", "ggplot2", "dplyr", "tidyr", "VCCRI/CIDR", 
-           "flowCore", "FlowSOM", "Rtsne", "scater", "SC3", 
-           "Seurat", "TSCAN", "IMB-Computational-Genomics-Lab/ascend",
-           "BiocParallel", "class", "SingleCellExperiment",
-           "JustinaZ/pcaReduce", "clue", "rjson", 
-           "plyr", "purrr", "reshape2", "parallel", "cowplot", 
-           "pheatmap", "ggthemes", "viridis", "data.tree", "ggtree",
-           "splatter", "cluster", "scran", "tibble", "grid", 
-           "gridExtra", "VennDiagram", "ggalluvial", "M3Drop",
-           "MultiAssayExperiment", "rjson", "hadley/multidplyr",
-           "mclust", "ape", "clusterExperiment"))
+install.packages("BiocManager")
+BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr", 
+                       "tidyr", "VCCRI/CIDR", 
+                       "flowCore", "FlowSOM", "Rtsne", "scater", "SC3", 
+                       "Seurat", "TSCAN", 
+                       "IMB-Computational-Genomics-Lab/ascend",
+                       "BiocParallel", "class", "SingleCellExperiment",
+                       "JustinaZ/pcaReduce", "clue", "rjson", 
+                       "plyr", "purrr", "reshape2", "parallel", "cowplot", 
+                       "pheatmap", "ggthemes", "viridis", "data.tree", "ggtree",
+                       "splatter", "cluster", "scran", "tibble", "grid", 
+                       "gridExtra", "VennDiagram", "ggalluvial", "M3Drop",
+                       "MultiAssayExperiment", "rjson", "hadley/multidplyr",
+                       "mclust", "ape", "clusterExperiment"))
 ```
 
 - Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.5GB).
@@ -29,8 +33,13 @@ biocLite(c("RColorBrewer", "ggplot2", "dplyr", "tidyr", "VCCRI/CIDR",
 
 ## Adding a data set
 - To add a data set to the comparison, construct a script that will generate a `SingleCellExperiment` object for each of the filterings, and put it in the corresponding folder in `data`.
+- Generate `rds` files containing the parameter values to use for each method (or empty lists if there are no hyperparameters). See `Rscripts/parameter_settings/generate_parameter_settings.R` for examples.
 - Then add the name of the data set to `include_datasets.mk`.
 
 ## Adding a method
 - To add a clustering method to the comparison, construct a script containing a function that defines how to apply the method to a data set (see scripts in `Rscripts/clustering` for examples).
+- Generate `rds` files containing the parameter values to use for each data set (or empty lists if there are no hyperparameters). See `Rscripts/parameter_settings/generate_parameter_settings.R` for examples.
 - Then add the name of the method to `include_methods.mk`.
+
+## Downloading the data and results directly
+We have made the raw and filtered data sets, as well as all the clustering results, available in a compressed file that can be downloaded from []() (XX GB). 
