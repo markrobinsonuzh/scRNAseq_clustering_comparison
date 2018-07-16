@@ -26,7 +26,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 ```
 
 - Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.5GB).
-- Run `make` to perform the analysis. Note that this will take a lot of time to run through completely, and you may want to run it initially with a subset of the methods (modify [include_methods](include_methods.mk)) and/or data sets (modify [include_datasets.mk](include_datasets.mk)). 
+- Run `make` to perform the analysis. Note that this will take a lot of time to run through completely, and you may want to run it initially with a subset of the methods (modify [include_methods.mk](include_methods.mk)) and/or data sets (modify [include_datasets.mk](include_datasets.mk)). 
 
 ## Important!
 - Only run `make setup` once, at the start of the analysis. Running it again will cause all the data sets to be updated, and consequently all results will be out of date and will need to be rerun.
