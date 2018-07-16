@@ -19,7 +19,8 @@ ncores := 24
 all: prepare_data cluster summarise figs memoryusage mergeparameters
 
 ## Prepare data
-prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds)))
+prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
+output/countsimQC/Kumar_countsimQC.html
 
 ## Run clustering
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
@@ -139,6 +140,15 @@ data/data_raw/GSE60749-GPL13112$(2).rds
 endef
 $(foreach d,Kumar SimKumar4easy SimKumar4hard SimKumar8hard,$(eval $(call qckumarrule,$(d),)))
 $(foreach d,Kumar,$(eval $(call qckumarrule,$(d),TCC)))
+
+## ------------------------------------------------------------------------------------ ##
+## countsimQC report
+## ------------------------------------------------------------------------------------ ##
+output/countsimQC/Kumar_countsimQC.html: data/sce_full/sce_full_Kumar.rds data/sce_full/sce_full_SimKumar4easy.rds \
+data/sce_full/sce_full_SimKumar4hard.rds data/sce_full/sce_full_SimKumar8hard.rds \
+Rscripts/evaluate_datasets/compare_countsimQC.R
+	mkdir -p $(@D)
+	$(R) "--args datadir='data' outdir='$(@D)' outfile='$(notdir $@)'" Rscripts/evaluate_datasets/compare_countsimQC.R Rout/compare_countsimQC.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Generate filtered data sets
