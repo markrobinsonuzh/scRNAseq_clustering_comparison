@@ -42,4 +42,4 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 - Then add the name of the method to `include_methods.mk`.
 
 ## Downloading the data and results directly
-We have made the raw and filtered data sets, as well as all the clustering results, available in a compressed file that can be downloaded from []() (XX GB). 
+The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
