@@ -1,7 +1,10 @@
 # scRNAseq clustering comparison
-This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data
+This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data.
 
-## Instructions
+## Downloading the data and results directly
+The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+
+## Instructions for running the code
 If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time.
 
 - Clone this repository
@@ -41,8 +44,80 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 - Generate `rds` files containing the parameter values to use for each data set (or empty lists if there are no hyperparameters). See [Rscripts/parameter_settings/generate_parameter_settings.R](Rscripts/parameter_settings/generate_parameter_settings.R) for examples.
 - Then add the name of the method to [include_methods.mk](include_methods.mk).
 
-## Downloading the data and results directly
-The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
-
 ## countsimQC report 
 The [countsimQC](https://github.com/csoneson/countsimQC) report, comparing the characteristics of the simulated data sets to the underlying real data set, can be found [here](http://htmlpreview.github.io/?https://github.com/markrobinsonuzh/scRNAseq_clustering_comparison/blob/master/output/countsimQC/Kumar_countsimQC.html).
+
+## Package versions
+The following package versions were used for the clustering and evaluation in our paper:
+
+```
+ADPclust_0.7
+amap_0.8-16
+ape_5.1
+ascend_0.5.0
+bindrcpp_0.2.2
+Biobase_2.40.0
+BiocGenerics_0.26.0
+BiocParallel_1.14.1
+bit_1.1-14
+bit64_0.9-7
+cidr_0.1.5
+class_7.3-14
+clue_0.3-55
+cluster_2.0.7-1
+clusterExperiment_2.0.2
+cowplot_0.9.2
+data.table_1.11.4
+data.tree_0.7.5
+DelayedArray_0.6.0
+dplyr_0.7.5
+flexmix_2.3-14
+flowCore_1.46.1
+FlowSOM_1.12.0
+fpc_2.1-11
+futile.logger_1.4.3
+GenomeInfoDb_1.16.0
+GenomicRanges_1.32.3
+ggalluvial_0.6.0
+ggplot2_2.2.1
+ggthemes_3.5.0
+ggtree_1.12.0
+gridExtra_2.3
+igraph_1.2.1
+IRanges_2.14.10
+lattice_0.20-35
+locfit_1.5-9.1
+M3Drop_1.4.0
+MASS_7.3-50
+Matrix_1.2-14
+matrixStats_0.53.1
+mclust_5.4
+mnormt_1.5-5
+multidplyr_0.0.0.9000
+numDeriv_2016.8-1
+pcaMethods_1.72.0
+pcaReduce_1.0
+permute_0.9-4
+pheatmap_1.0.10
+plyr_1.8.4
+purrr_0.2.5
+RColorBrewer_1.1-2
+reshape2_1.4.3
+rjson_0.2.19
+Rtsne_0.13
+S4Vectors_0.18.2
+SC3_1.8.0
+scater_1.8.0
+scran_1.6.9
+Seurat_2.3.1
+SingleCellExperiment_1.2.0
+stringr_1.3.1
+SummarizedExperiment_1.10.1
+tidyr_0.8.1
+TSCAN_1.18.0
+tsne_0.1-3
+vegan_2.5-2
+VennDiagram_1.6.20
+viridis_0.5.1
+viridisLite_0.3.0
+```
