@@ -252,9 +252,9 @@ Rscripts/evaluate_results/plot_Seurat_k_resolution.R
 
 ## similarities between methods
 plots/similarities_between_methods/similarities.rds: output/consensus/consensus.rds \
-Rscripts/similarities_consensus/plot_similarities_between_methods2.R methodchart.csv
+Rscripts/similarities_consensus/plot_similarities_between_methods.R methodchart.csv
 	mkdir -p $(@D)
-	$(R) "--args consensusrds='$<' methodchart='methodchart.csv' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods2.R Rout/plot_similarities_between_methods2.Rout
+	$(R) "--args consensusrds='$<' methodchart='methodchart.csv' outrds='$@'" Rscripts/similarities_consensus/plot_similarities_between_methods.R Rout/plot_similarities_between_methods.Rout
 
 ## performance for consensus clusters
 plots/performance/res_performance_cons.rds: output/consensus/consensus.rds \
