@@ -28,7 +28,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
                        "mclust", "ape", "clusterExperiment", "csoneson/countsimQC"))
 ```
 
-- Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.5GB).
+- Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.7GB).
 - Run `make` to perform the analysis. Note that this will take a lot of time to run through completely, and you may want to run it initially with a subset of the methods (modify [include_methods.mk](include_methods.mk)) and/or data sets (modify [include_datasets.mk](include_datasets.mk)). 
 
 ## Important!
