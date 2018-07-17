@@ -45,7 +45,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 - Then add the name of the method to [include_methods.mk](include_methods.mk).
 
 ## countsimQC report 
-The [countsimQC](https://github.com/csoneson/countsimQC) report, comparing the characteristics of the simulated data sets to the underlying real data set, can be found [here](http://htmlpreview.github.io/?https://github.com/markrobinsonuzh/scRNAseq_clustering_comparison/blob/master/output/countsimQC/Kumar_countsimQC.html).
+The [countsimQC](https://github.com/csoneson/countsimQC) report, comparing the characteristics of the simulated data sets to the underlying real data set, can be found [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/Kumar_countsimQC.html).
 
 ## R package versions
 The following R packages were used for the clustering and evaluation in our paper:
