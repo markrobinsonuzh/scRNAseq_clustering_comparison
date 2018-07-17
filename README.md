@@ -5,10 +5,10 @@ This repository contains the code for our study comparing methods for unsupervis
 The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
 
 ## Instructions for running the code
-If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time.
+If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time (and that the preprocessed data and clustering output is available from the link above).
 
 - Clone this repository
-- Modify the `R` and `Rscript` variables in the top of [Makefile](Makefile) to point to the version of `R` that you want to use.
+- Modify the `R` and `Rscript` variables in the top of the [Makefile](Makefile) to point to the version of `R` that you want to use.
 - Install the necessary `R` packages and dependencies:
 
 ```
@@ -47,8 +47,8 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
 ## countsimQC report 
 The [countsimQC](https://github.com/csoneson/countsimQC) report, comparing the characteristics of the simulated data sets to the underlying real data set, can be found [here](http://htmlpreview.github.io/?https://github.com/markrobinsonuzh/scRNAseq_clustering_comparison/blob/master/output/countsimQC/Kumar_countsimQC.html).
 
-## Package versions
-The following package versions were used for the clustering and evaluation in our paper:
+## R package versions
+The following R packages were used for the clustering and evaluation in our paper:
 
 ```
 ADPclust_0.7
