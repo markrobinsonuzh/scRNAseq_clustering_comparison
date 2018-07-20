@@ -1,5 +1,7 @@
 # scRNAseq clustering comparison
 This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data.
+[![DOI](https://zenodo.org/badge/98410072.svg)](https://zenodo.org/badge/latestdoi/98410072)
+
 
 ## Downloading the data and results directly
 The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
