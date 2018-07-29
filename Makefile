@@ -16,7 +16,7 @@ ncores := 24
 ## Define rules
 ## ------------------------------------------------------------------------------------ ##
 ## Default rule
-all: prepare_data cluster summarise figs memoryusage mergeparameters
+all: prepare_data cluster summarise figs memoryusage mergeparameters parameterrange scalable
 
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \
@@ -24,6 +24,12 @@ output/countsimQC/Kumar_countsimQC.html
 
 ## Run clustering
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
+
+## Calculate scalability
+scalable: $(foreach m,$(METHODS),output/scalability/scalability_$(m).rds)
+
+## Investigate parameter ranges
+parameterrange: output/investigate_parameter_range/investigate_parameter_range_RtsneKmeans.rds
 
 ## Summarise clustering output
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
@@ -178,6 +184,27 @@ output/clustering_summary/clustering_summary.rds: Rscripts/evaluate_results/summ
 $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 	mkdir -p $(@D)
 	$(R) "--args datasets='$(DATASETSc)' filterings='$(ALLFILTERINGSc)' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/summarize_clustering_results.R Rout/summarize_clustering_results.Rout
+
+## ------------------------------------------------------------------------------------ ##
+## Evaluate scalability
+## ------------------------------------------------------------------------------------ ##
+define scalabilityrule
+output/scalability/scalability_$(1).rds: data/sce_filteredExpr10/sce_filteredExpr10_Zhengmix4uneq.rds \
+Rscripts/evaluate_results/calculate_scalability.R Rscripts/clustering/apply_$(1).R \
+parameter_settings/sce_filteredExpr10_Zhengmix4uneq.json parameter_settings/sce_filteredExpr10_Zhengmix4uneq_$(1).json \
+parameter_settings/$(1).json
+	mkdir -p $$(@D)
+	$(R) "--args scefile='$$<' method='$(1)' outrds='$$@'" Rscripts/evaluate_results/calculate_scalability.R Rout/calculate_scalability_$(1).Rout
+endef
+$(foreach m,$(METHODS),$(eval $(call scalabilityrule,$(m))))
+
+## ------------------------------------------------------------------------------------ ##
+## Investigate parameter ranges
+## ------------------------------------------------------------------------------------ ##
+output/investigate_parameter_range/investigate_parameter_range_RtsneKmeans.rds: data/sce_filteredExpr10/sce_filteredExpr10_Zhengmix8eq.rds \
+Rscripts/investigate_parameter_range/investigate_parameter_range_RtsneKmeans.R Rscripts/clustering/apply_RtsneKmeans.R
+	mkdir -p $(@D)
+	$(R) "--args scefile='$<' k=8 outrds='$@'" Rscripts/investigate_parameter_range/investigate_parameter_range_RtsneKmeans.R Rout/investigate_parameter_range_RtsneKmeans.Rout
 
 ## ------------------------------------------------------------------------------------ ##
 ## Compute consensus across the five repeated runs

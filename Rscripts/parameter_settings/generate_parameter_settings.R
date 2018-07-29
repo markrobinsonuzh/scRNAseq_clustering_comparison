@@ -260,7 +260,7 @@ for (f in filterings) {
 ## FlowSOM parameters
 ## -------------------------------------------------------------------------- ##
 ## General
-write(toJSON(list(nPC = 50)), file = "parameter_settings/FlowSOM.json")
+write(toJSON(list(nPC = 30)), file = "parameter_settings/FlowSOM.json")
 
 ## Dataset-specific
 for (f in filterings) {
