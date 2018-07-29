@@ -1,6 +1,10 @@
-# scRNAseq clustering comparison
-This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data.
 [![DOI](https://zenodo.org/badge/98410072.svg)](https://zenodo.org/badge/latestdoi/98410072)
+
+# scRNAseq clustering comparison
+This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data:
+
+- Duò A, Robinson MD and Soneson C: [A systematic performance evaluation of clustering methods for single-cell RNA-seq data](https://f1000research.com/articles/7-1141/v1). F1000Research 7:1141 (2018).
+
 
 
 ## Downloading the data and results directly
