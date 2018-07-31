@@ -198,6 +198,11 @@ parameter_settings/$(1).json
 endef
 $(foreach m,$(METHODS),$(eval $(call scalabilityrule,$(m))))
 
+plots/scalability/scalability.rds: $(foreach m,$(METHODS),output/scalability/scalability_$(m).rds) \
+Rscripts/evaluate_results/plot_scalability.R Rscripts/Colorscheme.R
+	mkdir -p $(@D)
+	$(R) "--args scalabilitydir='output/scalability' methods='$(METHODSc)' outrds='$@'" Rscripts/evaluate_results/plot_scalability.R Rout/plot_scalability.Rout
+
 ## ------------------------------------------------------------------------------------ ##
 ## Investigate parameter ranges
 ## ------------------------------------------------------------------------------------ ##
