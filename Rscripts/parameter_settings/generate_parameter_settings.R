@@ -43,6 +43,20 @@ for (f in filterings) {
         file = paste0("parameter_settings/sce_", f, "_KohTCC.json"))
 }
 
+## monocle parameters
+## -------------------------------------------------------------------------- ##
+## General
+write(toJSON(list()), file = "parameter_settings/monocle.json")
+
+## Dataset-specific
+for (f in filterings) {
+  for (d in datasets) {
+    write(toJSON(list(num_dim = 50, max_components = 3)), 
+          file = paste0("parameter_settings/sce_", f, "_", d, "_monocle.json"))
+    
+  }
+}
+
 ## SAFE parameters
 ## -------------------------------------------------------------------------- ##
 ## General

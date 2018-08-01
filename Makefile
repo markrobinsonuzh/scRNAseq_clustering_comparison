@@ -25,15 +25,15 @@ output/countsimQC/Kumar_countsimQC.html
 ## Run clustering
 cluster: $(foreach f,$(ALLFILTERINGS),$(foreach m,$(METHODS),$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
-## Calculate scalability
-scalable: $(foreach m,$(METHODS),output/scalability/scalability_$(m).rds)
+cluster1: $(foreach f,$(ALLFILTERINGS),$(foreach m,SIMLR,$(foreach d,$(DATASETS),results/sce_$(f)_$(d)_$(m).rds)))
 
 ## Investigate parameter ranges
 parameterrange: output/investigate_parameter_range/investigate_parameter_range_RtsneKmeans.rds
 
 ## Summarise clustering output
 summarise: output/consensus/consensus.rds output/ensemble/ensemble.rds output/silhouettes/silhouettes.rds \
-output/dataset_summarytable.csv
+output/dataset_summarytable.csv \
+$(foreach m,$(METHODS),output/scalability/scalability_$(m).rds)
 
 ## Plot
 figs: plots/manuscript/figure1.rds plots/manuscript/figure2.rds plots/manuscript/figure3.rds \
@@ -42,7 +42,8 @@ plots/performance/seurat_diagnostics.rds \
 plots/performance/res_performance_cons.rds plots/ensemble/ensemble_vs_individual.rds \
 plots/similarities_between_methods/similarities.rds plots/shared_genes_filterings/shared_genes_filterings.rds \
 plots/facets_clustering/facets_clustering.rds plots/datasets_tsne/datasets_tsne.rds \
-plots/filtering_comparisons/filtering_comparisons.rds plots/covariate_cluster_association/covariate_cluster_association.rds
+plots/filtering_comparisons/filtering_comparisons.rds plots/covariate_cluster_association/covariate_cluster_association.rds \
+plots/scalability/scalability.rds
 
 ## Plot approximate memory usage
 memoryusage: plots/memory_usage/memory_usage.rds
