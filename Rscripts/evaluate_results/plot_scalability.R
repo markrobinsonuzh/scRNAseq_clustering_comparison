@@ -33,7 +33,8 @@ ggplot(scalability %>% dplyr::filter(!is.na(elapsed)),
   theme_bw() + 
   scale_y_continuous(limits = c(0, NA)) + 
   theme(axis.title = element_text(size = 14),
-        axis.text = element_text(size = 11)) +
+        axis.text = element_text(size = 11),
+        legend.position = "none") +
   facet_wrap(~ method, scales = "free") + 
   manual.scale + 
   xlab("Number of cells") + ylab("Elapsed time (s)")

@@ -12,11 +12,11 @@ suppressPackageStartupMessages({
 
 ensemble <- readRDS(ensemblerds)
 
-pdf(gsub("rds$", "pdf", outrds), width = 20, height = 10)
+pdf(gsub("rds$", "pdf", outrds), width = 20, height = 13)
 cowplot::plot_grid(
   ensemble[["ensembl_vs_bestworst_truek"]],
   ensemble[["ensembl_vs_first_truek"]],
-    labels = c("A", "B"), nrow = 1, label_size = 35
+    labels = c("A", "B"), nrow = 1, label_size = 35, rel_widths = c(1, 2)
 )
 dev.off()
 

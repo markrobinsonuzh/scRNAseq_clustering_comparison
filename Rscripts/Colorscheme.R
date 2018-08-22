@@ -13,6 +13,6 @@ colors <- c(CIDR = "#332288", FlowSOM = "#6699CC", PCAHC = "#88CCEE",
             PCAKmeans = "#44AA99", pcaReduce = "#117733",
             RtsneKmeans = "#999933", Seurat = "#DDCC77", SC3svm = "#661100", 
             SC3 = "#CC6677", TSCAN = "grey34", ascend = "orange", SAFE = "black",
-            monocle = "red", RaceID = "blue")
+            monocle = "red", RaceID2 = "blue")
 
 manual.scale <- scale_colour_manual(name = "", values = colors)

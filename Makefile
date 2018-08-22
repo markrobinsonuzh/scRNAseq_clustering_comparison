@@ -16,7 +16,7 @@ ncores := 24
 ## Define rules
 ## ------------------------------------------------------------------------------------ ##
 ## Default rule
-all: prepare_data cluster summarise figs memoryusage mergeparameters parameterrange scalable
+all: prepare_data cluster summarise figs memoryusage mergeparameters parameterrange
 
 ## Prepare data
 prepare_data: $(foreach d,$(DATASETS),$(foreach f,$(FILTERINGS),$(foreach p,$(PCTKEEP),data/sce_filtered$(f)$(p)/sce_filtered$(f)$(p)_$(d).rds))) \

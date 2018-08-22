@@ -238,13 +238,15 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   colors <- list(
     dimension = c(PCA = "#C10359", tSNE = "#fd9ec9", Various = "#FF33FF", None = "#fed8e9"),
     clustering = c(Hierarchical = "#01368C", Graph = "#2F6CCE", Kmeans = "#93B8F2",
-                   SOM = "#d1e1fa", ModelBased = "#030a17", Various = "#9933FF"),
+                   SOM = "#d1e1fa", ModelBased = "#030a17", Density = "#6600cc", 
+                   Kmedoids = "#d9b3ff", Various = "#9933FF"),
     counts = c(Raw = "#2EA801", LogNorm = "#96E878", Various = "#DBFC07")
   )
   
   g1 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = dimension)) + 
-    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
-    scale_fill_manual(values = colors$dimension) + 
+    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", 
+               color = "white", size = 0.25) + 
+    scale_fill_manual(values = colors$dimension, breaks = names(colors$dimension)) + 
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) + 
     theme(axis.ticks = element_blank(),
@@ -254,8 +256,9 @@ plot_crossmethod_concordance <- function(res, ncluster) {
           legend.position = "none",
           plot.margin = unit(c(0, 1, 0, 1), "mm"))
   g2 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = clustering)) + 
-    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
-    scale_fill_manual(values = colors$clustering) + 
+    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, 
+               linetype = "solid", color = "white", size = 0.25) + 
+    scale_fill_manual(values = colors$clustering, breaks = names(colors$clustering)) + 
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) + 
     theme(axis.ticks = element_blank(),
@@ -265,8 +268,9 @@ plot_crossmethod_concordance <- function(res, ncluster) {
           legend.position = "none",
           plot.margin = unit(c(0, 1, 0, 1), "mm"))
   g3 <- ggplot(annot) + geom_tile(aes(x = 1:nrow(annot), y = 1, fill = counts)) + 
-    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", color = "white", size = 0.25) + 
-    scale_fill_manual(values = colors$counts) + 
+    geom_vline(xintercept = (1:(nrow(annot) - 1)) + 0.5, linetype = "solid", 
+               color = "white", size = 0.25) + 
+    scale_fill_manual(values = colors$counts, breaks = names(colors$counts)) + 
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) + 
     theme(axis.ticks = element_blank(),
@@ -278,48 +282,49 @@ plot_crossmethod_concordance <- function(res, ncluster) {
   
   
   # legends
-  gds <- plot_grid(get_legend(g1 + 
-                                theme(legend.position = "bottom") + 
-                                guides(fill = 
-                                         guide_legend(ncol = 4,
-                                                      title = "Dimension reduction", title.position = "top",
-                                                      override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 20,
-                                                                                 angle = 0),
-                                                      label.theme = element_text(size = 16,
-                                                                                 angle = 0),
-                                                      keywidth = 1, default.unit = "cm"))),
-                   get_legend(g2 + 
-                                theme(legend.position = "left") + 
-                                guides(fill = 
-                                         guide_legend(ncol = 4,
-                                                      title = "Clustering method", title.position = "top",
-                                                      override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 20,
-                                                                                 angle = 0),
-                                                      label.theme = element_text(size = 16,
-                                                                                 angle = 0),
-                                                      keywidth = 1, default.unit = "cm"))),
-                   get_legend(g3 + 
-                                theme(legend.position = "left") + 
-                                guides(fill = 
-                                         guide_legend(ncol = 4,
-                                                      title = "Input", title.position = "top",
-                                                      override.aes = list(size = 1.5),
-                                                      title.theme = element_text(size = 20,
-                                                                                 angle = 0),
-                                                      label.theme = element_text(size = 16,
-                                                                                 angle = 0),
-                                                      keywidth = 1, default.unit = "cm"))),
-                   
-                   nrow= 1)
+  gds <- plot_grid(
+    get_legend(g1 + 
+                 theme(legend.position = "bottom") + 
+                 guides(fill = 
+                          guide_legend(ncol = 4,
+                                       title = "Dimension reduction", title.position = "top",
+                                       override.aes = list(size = 1.5),
+                                       title.theme = element_text(size = 20,
+                                                                  angle = 0),
+                                       label.theme = element_text(size = 16,
+                                                                  angle = 0),
+                                       keywidth = 1, default.unit = "cm"))),
+    get_legend(g2 + 
+                 theme(legend.position = "left") + 
+                 guides(fill = 
+                          guide_legend(ncol = 4,
+                                       title = "Clustering method", title.position = "top",
+                                       override.aes = list(size = 1.5),
+                                       title.theme = element_text(size = 20,
+                                                                  angle = 0),
+                                       label.theme = element_text(size = 16,
+                                                                  angle = 0),
+                                       keywidth = 1, default.unit = "cm"))),
+    get_legend(g3 + 
+                 theme(legend.position = "left") + 
+                 guides(fill = 
+                          guide_legend(ncol = 4,
+                                       title = "Input", title.position = "top",
+                                       override.aes = list(size = 1.5),
+                                       title.theme = element_text(size = 20,
+                                                                  angle = 0),
+                                       label.theme = element_text(size = 16,
+                                                                  angle = 0),
+                                       keywidth = 1, default.unit = "cm"))),
+    
+    nrow = 1, rel_widths = c(1, 1.5, 1))
   
-  ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, -150, 0), "mm")), 
+  ann.tree <- plot_grid(trees + theme(plot.margin = unit(c(0, 0, -25, 0), "mm")), 
                         g1 + theme(legend.position = "none"),
                         g2 + theme(legend.position = "none"),
                         g3 + theme(legend.position = "none"),
                         gds + theme(plot.margin = unit(c(0, 0, 0, 0), "mm")), 
-                        rel_heights = c(3, 0.3, 0.3, 0.3, 0.3), ncol = 1)
+                        rel_heights = c(3, 0.3, 0.3, 0.3, 0.5), ncol = 1)
   
   # store plots in plot.list 
   plot.list <- list()
