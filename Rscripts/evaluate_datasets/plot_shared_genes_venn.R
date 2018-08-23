@@ -13,14 +13,16 @@ print(datasets)
 print(datadir)
 print(outrds)
 
-#------------------------------------------------
+# ------------------------------------------------
 # Venn diagrams of genes for the filtered datasets
-#------------------------------------------------
+# ------------------------------------------------
 suppressPackageStartupMessages({
   library(VennDiagram)
   library(grid)
   library(gridExtra)
   library(SingleCellExperiment)
+  library(cowplot)
+  library(UpSetR)
 })
 
 datasets_filtered <- c(outer(paste0(datadir, "/sce_filtered", filterings, pctkeep, "/sce_filtered", 
@@ -62,7 +64,22 @@ pdf(gsub("rds$", "pdf", outrds), width = 15, height = 15)
 cowplot::plot_grid(plotlist = plots, ncol = 3, labels = names(plots))
 dev.off()
 
-saveRDS(plots, file = outrds)
+## UpSet plots
+plots_upset <- lapply(gene_ids_by_ds, function(w) {
+  allgenes <- unique(unlist(w))
+  dat <- do.call(cbind, lapply(w, function(i) allgenes %in% i))
+  upset(data.frame(dat + 0), nintersects = NA, order.by = "degree", 
+        empty.intersections = TRUE)
+  grid.edit('arrange', name = 'arrange2')
+  grid.grab()
+})
+pdf(gsub("\\.rds$", "_upset.pdf", outrds), height = 15, width = 15)
+cowplot::plot_grid(plotlist = plots_upset, ncol = 3, labels = names(plots), 
+                   label_x = 0.05, hjust = 0)
+dev.off()
+
+
+saveRDS(list(plots = plots, plots_upset), file = outrds)
 date()
 sessionInfo()
 

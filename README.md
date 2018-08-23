@@ -8,10 +8,17 @@ This repository contains the code for our study comparing methods for unsupervis
 
 
 ## Downloading the data and results directly
-The unfiltered and filtered data sets, as well as all the clustering results, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+The unfiltered and filtered data sets, as well as all the clustering results from v1 of the paper, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+
+The data and clustering results from both versions of the paper are also available from the [`DuoClustering2018`]() Bioconductor package. Install using the `BiocManager` CRAN package (note that you need the development version of Bioconductor):
+
+```
+install.packages("BiocManager")
+BiocManager::install("DuoClustering2018")
+```
 
 ## Instructions for running the code
-If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time (and that the preprocessed data and clustering output is available from the link above).
+If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time (and that the preprocessed data and clustering output is available as described above).
 
 - Clone this repository
 - Modify the `R` and `Rscript` variables in the top of the [Makefile](Makefile) to point to the version of `R` that you want to use.
@@ -26,14 +33,18 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
                        "IMB-Computational-Genomics-Lab/ascend",
                        "BiocParallel", "class", "SingleCellExperiment",
                        "JustinaZ/pcaReduce", "clue", "rjson", 
-                       "plyr", "purrr", "reshape2", "parallel", "cowplot", 
-                       "pheatmap", "ggthemes", "viridis", "data.tree", "ggtree",
-                       "splatter", "cluster", "scran", "tibble", "grid", 
-                       "gridExtra", "VennDiagram", "ggalluvial", "M3Drop",
-                       "MultiAssayExperiment", "rjson", "hadley/multidplyr",
-                       "mclust", "ape", "clusterExperiment", "csoneson/countsimQC"))
+                       "plyr", "purrr", "reshape2", "parallel", 
+                       "pheatmap", "ggthemes", "viridis", "data.tree", 
+                       "ggtree", "cowplot", "grid", "M3Drop",
+                       "splatter", "cluster", "scran", "tibble", 
+                       "gridExtra", "VennDiagram", "ggalluvial", 
+                       "MultiAssayExperiment", "rjson", 
+                       "hadley/multidplyr",
+                       "mclust", "ape", "clusterExperiment", 
+                       "csoneson/countsimQC", "monocle"))
 ```
 
+- If you want to include RaceID2, download the `RaceID2_StemID_class.R` script from [https://github.com/dgrun/StemID](https://github.com/dgrun/StemID) (we used the version from March 3, 2017) and place it in the [Rscripts/clustering](Rscripts/clustering) directory. 
 - Run `make setup` to set up the directory structure and download the raw data (total size approximately 2.7GB).
 - Run `make` to perform the analysis. Note that this will take a lot of time to run through completely, and you may want to run it initially with a subset of the methods (modify [include_methods.mk](include_methods.mk)) and/or data sets (modify [include_datasets.mk](include_datasets.mk)). 
 
@@ -129,5 +140,6 @@ viridisLite_0.3.0
 ```
 
 ## Disclaimer
-All methods included in the evaluation except [SAFE](https://www.biorxiv.org/content/early/2018/03/28/215723) are implemented as R packages (for version, see above). To ensure full reproducibility of our analyses, we have included the version of the SAFE-clustering code that was used for our evaluations in the repository. This includes the [gpmetis](gpmetis) and [shmetis](shmetis) executables, as well as the folder [Rscripts/clustering/SAFE_2.1_Linux](Rscripts/clustering/SAFE_2.1_Linux). These files were obtained from [https://yunliweb.its.unc.edu//safe/](https://yunliweb.its.unc.edu//safe/) on July 2, 2018. Minor modifications were made in the [Rscripts/clustering/SAFE_2.1_Linux/SAFE_modified.R](Rscripts/clustering/SAFE_2.1_Linux/SAFE_modified.R) and [Rscripts/clustering/SAFE_2.1_Linux/individual_clustering_modified.R](Rscripts/clustering/SAFE_2.1_Linux/individual_clustering_modified.R) scripts (clearly marked in the respective scripts), in order to allow setting the number of cores for execution, and to disable the internal cell/gene filtering for SC3 and Seurat, since we provide pre-filtered data in our evaluation. 
+All methods included in the evaluation except [SAFE](https://www.biorxiv.org/content/early/2018/03/28/215723) and [RaceID2]() are implemented as R packages (for version, see above). To ensure full reproducibility of our analyses, we have included the version of the SAFE-clustering code that was used for our evaluations in the repository. This includes the [gpmetis](gpmetis) and [shmetis](shmetis) executables, as well as the folder [Rscripts/clustering/SAFE_2.1_Linux](Rscripts/clustering/SAFE_2.1_Linux). These files were obtained from [https://yunliweb.its.unc.edu//safe/](https://yunliweb.its.unc.edu//safe/) on July 2, 2018. Minor modifications were made in the [Rscripts/clustering/SAFE_2.1_Linux/SAFE_modified.R](Rscripts/clustering/SAFE_2.1_Linux/SAFE_modified.R) and [Rscripts/clustering/SAFE_2.1_Linux/individual_clustering_modified.R](Rscripts/clustering/SAFE_2.1_Linux/individual_clustering_modified.R) scripts (clearly marked in the respective scripts), in order to allow setting the number of cores for execution, and to disable the internal cell/gene filtering for SC3 and Seurat, since we provide pre-filtered data in our evaluation. 
 
+In order to run RaceID2, you need to download the `RaceID2_StemID_class.R` script from [https://github.com/dgrun/StemID](https://github.com/dgrun/StemID) (we used the version from March 3, 2017) and place it in the [Rscripts/clustering](Rscripts/clustering) directory. 
