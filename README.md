@@ -3,19 +3,20 @@
 # scRNAseq clustering comparison
 This repository contains the code for our study comparing methods for unsupervised clustering of scRNA-seq data:
 
-- Duò A, Robinson MD and Soneson C: [A systematic performance evaluation of clustering methods for single-cell RNA-seq data](https://f1000research.com/articles/7-1141/v1). F1000Research 7:1141 (2018).
+- Duò A, Robinson MD and Soneson C: [A systematic performance evaluation of clustering methods for single-cell RNA-seq data](https://f1000research.com/articles/7-1141/v2). F1000Research 7:1141 (2018).
 
-
+Please note that the purpose of this repository is to provide a record of the exact code we used for the paper above. Thus, to run it you need the same versions of software and packages as we used (see below), and we can not guarantee that it will execute properly or generate the same results with new versions of any of the software. If you want to add a method to the comparison, we recommend using the [`DuoClustering2018`](https://bioconductor.org/packages/DuoClustering2018/) package to retrieve the data and our results (see below). 
 
 ## Downloading the data and results directly
-The unfiltered and filtered data sets, as well as all the clustering results from v1 of the paper, can be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
-
-The data and clustering results from both versions of the paper are also available from the [`DuoClustering2018`]() Bioconductor package. Install using the `BiocManager` CRAN package (note that you need the development version of Bioconductor):
+The data and clustering results from the paper are available from the [`DuoClustering2018`](https://bioconductor.org/packages/DuoClustering2018/) Bioconductor package. This is the recommended way to access and extend our benchmark (rather than rerunning all the code in this repository), and the package contains vignettes to show, e.g., how to add new methods. Install the package using the `BiocManager` CRAN package (note that you need the development version of Bioconductor):
 
 ```
 install.packages("BiocManager")
 BiocManager::install("DuoClustering2018")
 ```
+
+The unfiltered and filtered data sets, as well as all the clustering results from v1 of the paper, can also be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+
 
 ## Instructions for running the code
 If you want to reproduce the results of our study, you need to go through the steps below. Please note that running all the analyses will take a considerable amount of time (and that the preprocessed data and clustering output is available as described above).
