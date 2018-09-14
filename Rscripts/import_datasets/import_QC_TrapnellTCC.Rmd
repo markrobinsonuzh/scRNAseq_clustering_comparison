@@ -41,8 +41,7 @@ sce <- SingleCellExperiment(
   assays = list(counts = cts), 
   colData = phn
 )
-sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
-                 return_norm_as_exprs = TRUE) ## generates logcounts(sce)
+sce <- normalise(sce, exprs_values = "counts", return_log = TRUE) ## generates logcounts(sce)
 ```
 
 Exclude features that are not expressed
@@ -130,10 +129,8 @@ summary(sizeFactors(sce))
 ```
 
 ```{r normalization}
-sce <- normalise(sce, exprs_values = "counts", return_log = TRUE, 
-                 return_norm_as_exprs = TRUE)
-sce <- normalise(sce, exprs_values = "counts", return_log = FALSE, 
-                 return_norm_as_exprs = FALSE)
+sce <- normalise(sce, exprs_values = "counts", return_log = TRUE)
+sce <- normalise(sce, exprs_values = "counts", return_log = FALSE)
 ```
 
 ## Plot the proportion of explained variances
