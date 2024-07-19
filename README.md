@@ -17,7 +17,7 @@ install.packages("BiocManager")
 BiocManager::install("DuoClustering2018")
 ```
 
-The unfiltered and filtered data sets, as well as all the clustering results from v1 of the paper, can also be downloaded as a compressed archive from [here](http://imlspenticton.uzh.ch/robinson_lab/DuoClustering2018/DuoClustering2018.tar.gz) (4.93GB). 
+The unfiltered and filtered data sets, as well as all the clustering results from v1 of the paper, can also be downloaded as a compressed archive from [here](https://zenodo.org/records/12772318) (4.93GB). 
 
 
 ## Instructions for running the code
